@@ -27,6 +27,7 @@ class ConsultRequest(BaseModel):
     context: Optional[str] = None
 
 class BaZiRequest(BaseModel):
+    client_name: Optional[str] = "Client"
     birth_date: str
     birth_time: Optional[str] = "Unknown"
     gender: str
@@ -115,7 +116,8 @@ def consult_bazi(req: BaZiRequest):
         birth_date_str=req.birth_date,
         birth_time_str=req.birth_time,
         gender=req.gender,
-        question=req.question or "Provide a comprehensive BaZi reading and 10 Gods quality evaluation."
+        question=req.question or "Provide a comprehensive BaZi reading and 10 Gods quality evaluation.",
+        client_name=req.client_name or "Client"
     )
     res = call_gemini(prompt=prompt, skill_key="bazi")
     if pillars:
@@ -284,8 +286,12 @@ def index():
     <div id="panel-bazi" class="card tab-panel" style="display:none;">
       <h3 style="margin-bottom: 15px; color: #f59e0b;">BaZi Reading & Destiny Analysis (PSPR)</h3>
       <div class="form-group">
+        <label>Client Name</label>
+        <input type="text" id="bz-name" value="Atithreaksmey" placeholder="e.g. Atithreaksmey">
+      </div>
+      <div class="form-group">
         <label>Birth Date (YYYY-MM-DD)</label>
-        <input type="date" id="bz-date" value="1990-05-15">
+        <input type="date" id="bz-date" value="1986-12-07">
       </div>
       <div class="form-group">
         <label>Birth Time</label>
@@ -408,6 +414,7 @@ def index():
 
     function submitBaZi() {
       sendRequest('/api/bazi', {
+        client_name: document.getElementById('bz-name').value || 'Client',
         birth_date: document.getElementById('bz-date').value,
         birth_time: document.getElementById('bz-time').value,
         gender: document.getElementById('bz-gender').value,

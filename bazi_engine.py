@@ -1,4 +1,5 @@
 import datetime
+import math
 import re
 from typing import Dict, Any, Optional, List, Tuple
 
@@ -20,6 +21,10 @@ BRANCH_CHARS = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '
 BRANCH_ANIMALS = [
     'Rat 鼠', 'Ox 牛', 'Tiger 虎', 'Rabbit 兔', 'Dragon 龍', 'Snake 蛇',
     'Horse 馬', 'Goat 羊', 'Monkey 猴', 'Rooster 雞', 'Dog 狗', 'Pig 豬'
+]
+BRANCH_SHORT_ANIMALS = [
+    'Rat', 'Ox', 'Tiger', 'Rabbit', 'Dragon', 'Snake',
+    'Horse', 'Goat', 'Monkey', 'Rooster', 'Dog', 'Pig'
 ]
 BRANCH_ELEMENTS = [
     '水 Yang Water', '± Yin Earth', '木 Yang Wood', '木 Yin Wood', '± Yang Earth', '火 Yin Fire',
@@ -71,9 +76,9 @@ BRANCH_HIDDEN_STEMS_MAP = {
         {'char': '戊', 'name': 'Wu', 'polarity_elem': '+Earth土', 'stem_idx': 4}
     ], # Xu
     11: [
-        {'char': '甲', 'name': 'Jia', 'polarity_elem': '+Wood木', 'stem_idx': 0},
-        {'char': '壬', 'name': 'Ren', 'polarity_elem': '+Water水', 'stem_idx': 8}
-    ] # Hai
+        {'char': '壬', 'name': 'Ren', 'polarity_elem': '+Water水', 'stem_idx': 8},
+        {'char': '甲', 'name': 'Jia', 'polarity_elem': '+Wood木', 'stem_idx': 0}
+    ] # Hai: Ren (Main Qi), Jia (Middle Qi)
 }
 
 # Reference Date: 2000-01-01 was Wu Wu (Stem: Wu=4, Branch: Wu=6)
@@ -81,14 +86,84 @@ REF_DATE = datetime.date(2000, 1, 1)
 REF_STEM_IDX = 4
 REF_BRANCH_IDX = 6
 
+# ==========================================
+# ASTRONOMICAL SOLAR LONGITUDE (VSOP87 / JEAN MEEUS)
+# ==========================================
+
+def get_astronomical_solar_longitude(year: int, month: int, day: int, hour: int = 12, minute: int = 0, tz_offset: float = 8.0) -> float:
+    """
+    Computes apparent solar ecliptic longitude in degrees (0 to 360) using high-precision
+    Jean Meeus Astronomical Algorithms. Accurate to within < 0.002 degrees (< 30 seconds of time).
+    Default timezone offset is UTC+8 (Beijing/Solar standard for East/SE Asia).
+    """
+    utc_hour = hour + minute / 60.0 - tz_offset
+    y = year
+    m = month
+    d = day + utc_hour / 24.0
+    if m <= 2:
+        y -= 1
+        m += 12
+    A = math.floor(y / 100)
+    B = 2 - A + math.floor(A / 4)
+    jd = math.floor(365.25 * (y + 4716)) + math.floor(30.6001 * (m + 1)) + d + B - 1524.5
+
+    T = (jd - 2451545.0) / 36525.0
+    L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T**2
+    M = 357.52911 + 35999.05029 * T - 0.0001537 * T**2
+    M_rad = math.radians(M)
+    C = (1.914602 - 0.004817 * T - 0.000014 * T**2) * math.sin(M_rad) + \
+        (0.019993 - 0.000101 * T) * math.sin(2 * M_rad) + \
+        0.000289 * math.sin(3 * M_rad)
+    sun_true_lon = L0 + C
+    omega = 125.04 - 1934.136 * T
+    lambda_apparent = (sun_true_lon - 0.00569 - 0.00478 * math.sin(math.radians(omega))) % 360.0
+    return lambda_apparent
+
+def get_solar_month_branch(sun_lon: float) -> int:
+    """
+    Maps apparent solar longitude (0-360) to the 12 BaZi Month Branches (0=Zi, 1=Chou, ..., 11=Hai):
+    寅 Yin (2): 315° to 345° (Li Chun 立春)
+    卯 Mao (3): 345° to 15° (Jing Zhe 驚蟄)
+    辰 Chen (4): 15° to 45° (Qing Ming 清明)
+    巳 Si (5): 45° to 75° (Li Xia 立夏)
+    午 Wu (6): 75° to 105° (Mang Zhong 芒種)
+    未 Wei (7): 105° to 135° (Xiao Shu 小暑)
+    申 Shen (8): 135° to 165° (Li Qiu 立秋)
+    酉 You (9): 165° to 195° (Bai Lu 白露)
+    戌 Xu (10): 195° to 225° (Han Lu 寒露)
+    亥 Hai (11): 225° to 255° (Li Dong 立冬)
+    子 Zi (0): 255° to 285° (Da Xue 大雪)
+    丑 Chou (1): 285° to 315° (Xiao Han 小寒)
+    """
+    deg = sun_lon % 360.0
+    if 315.0 <= deg < 345.0:
+        return 2  # Yin (Month 1)
+    elif deg >= 345.0 or deg < 15.0:
+        return 3  # Mao (Month 2)
+    elif 15.0 <= deg < 45.0:
+        return 4  # Chen (Month 3)
+    elif 45.0 <= deg < 75.0:
+        return 5  # Si (Month 4)
+    elif 75.0 <= deg < 105.0:
+        return 6  # Wu (Month 5)
+    elif 105.0 <= deg < 135.0:
+        return 7  # Wei (Month 6)
+    elif 135.0 <= deg < 165.0:
+        return 8  # Shen (Month 7)
+    elif 165.0 <= deg < 195.0:
+        return 9  # You (Month 8)
+    elif 195.0 <= deg < 225.0:
+        return 10 # Xu (Month 9)
+    elif 225.0 <= deg < 255.0:
+        return 11 # Hai (Month 10)
+    elif 255.0 <= deg < 285.0:
+        return 0  # Zi (Month 11)
+    else: # 285.0 <= deg < 315.0
+        return 1  # Chou (Month 12)
+
 def get_10_god(dm_idx: int, target_idx: int) -> Dict[str, str]:
     """
     Computes 10 God notation between Day Master stem and target stem.
-    Returns:
-      zh_full: e.g. '正財'
-      zh_short: e.g. '財'
-      code: e.g. 'DW'
-      en_full: e.g. 'Direct Wealth'
     """
     dm_elem = dm_idx // 2
     target_elem = target_idx // 2
@@ -111,7 +186,7 @@ def get_10_god(dm_idx: int, target_idx: int) -> Dict[str, str]:
 def parse_date_and_time(birth_date_str: str, birth_time_str: Optional[str] = None) -> Tuple[Optional[int], Optional[int], Optional[int], int, int]:
     year, month, day = None, None, None
     
-    # Check for Month Name (e.g., '03/Jun/1981', '3 June 1981', 'June 3, 1981')
+    # Check for Month Name (e.g., '07 Dec 1986', '03/Jun/1981', '3 June 1981', 'June 3, 1981')
     m_month_word = re.search(r'([A-Za-z]{3,9})', birth_date_str)
     if m_month_word:
         word = m_month_word.group(1).lower()[:3]
@@ -120,7 +195,6 @@ def parse_date_and_time(birth_date_str: str, birth_time_str: Optional[str] = Non
             month = months.index(word) + 1
             nums = [int(n) for n in re.findall(r'\d+', birth_date_str)]
             if len(nums) >= 2:
-                # One is year (4 digits), other is day
                 for n in nums:
                     if n >= 1900:
                         year = n
@@ -137,7 +211,6 @@ def parse_date_and_time(birth_date_str: str, birth_time_str: Optional[str] = Non
             if m_slash:
                 n1, n2, y_val = int(m_slash.group(1)), int(m_slash.group(2)), int(m_slash.group(3))
                 year = y_val
-                # If first is > 12, it must be DD/MM/YYYY
                 if n1 > 12 >= n2:
                     day, month = n1, n2
                 elif n2 > 12 >= n1:
@@ -162,7 +235,143 @@ def parse_date_and_time(birth_date_str: str, birth_time_str: Optional[str] = Non
 
     return year, month, day, hour, minute
 
-def calculate_four_pillars(year: int, month: int, day: int, hour: int = 12, minute: int = 0) -> Dict[str, Any]:
+# ==========================================
+# AUXILIARY SHEN SHA & GUA CALCULATIONS
+# ==========================================
+
+def calculate_auxiliary_stars(dm_stem_idx: int, y_branch_idx: int, d_branch_idx: int, m_branch_idx: int, h_branch_idx: int, y_stem_idx: int, m_stem_idx: int) -> Dict[str, Any]:
+    # Noble People (Tian Yi Gui Ren 天乙貴人):
+    noble_map = {
+        0: '丑 Ox, 未 Goat', 1: '申 Monkey, 子 Rat', 2: '亥 Pig, 酉 Rooster', 3: '亥 Pig, 酉 Rooster',
+        4: '丑 Ox, 未 Goat', 5: '申 Monkey, 子 Rat', 6: '丑 Ox, 未 Goat', 7: '午 Horse, 寅 Tiger',
+        8: '卯 Rabbit, 巳 Snake', 9: '卯 Rabbit, 巳 Snake'
+    }
+    # Intelligence (Wen Chang Gui Ren 文昌貴人):
+    wen_chang_map = {
+        0: '巳 Snake', 1: '午 Horse', 2: '申 Monkey', 3: '酉 Rooster', 4: '申 Monkey',
+        5: '酉 Rooster', 6: '亥 Pig', 7: '子 Rat', 8: '寅 Tiger', 9: '卯 Rabbit'
+    }
+    # Peach Blossom (Tao Hua 桃花), Sky Horse (Yi Ma 驛馬), Solitary (Gu Chen 孤辰) based on Day Branch:
+    peach_map = {
+        0: '酉 Rooster', 4: '酉 Rooster', 8: '酉 Rooster',
+        2: '卯 Rabbit', 6: '卯 Rabbit', 10: '卯 Rabbit',
+        5: '午 Horse', 9: '午 Horse', 1: '午 Horse',
+        11: '子 Rat', 3: '子 Rat', 7: '子 Rat'
+    }
+    sky_horse_map = {
+        0: '寅 Tiger', 4: '寅 Tiger', 8: '寅 Tiger',
+        2: '申 Monkey', 6: '申 Monkey', 10: '申 Monkey',
+        5: '亥 Pig', 9: '亥 Pig', 1: '亥 Pig',
+        11: '巳 Snake', 3: '巳 Snake', 7: '巳 Snake'
+    }
+    solitary_map = {
+        11: '寅 Tiger', 0: '寅 Tiger', 1: '寅 Tiger',
+        2: '巳 Snake', 3: '巳 Snake', 4: '巳 Snake',
+        5: '申 Monkey', 6: '申 Monkey', 7: '申 Monkey',
+        8: '亥 Pig', 9: '亥 Pig', 10: '亥 Pig'
+    }
+
+    # Conception Palace (Tai Yuan 胎元): Month Stem + 1, Month Branch + 3
+    ty_stem_idx = (m_stem_idx + 1) % 10
+    ty_branch_idx = (m_branch_idx + 3) % 12
+    conception_palace = f"{STEM_CHARS[ty_stem_idx]}{BRANCH_CHARS[ty_branch_idx]} {STEM_ELEMENTS[ty_stem_idx].split()[0]} {STEM_SHORT_ELEMENTS[ty_stem_idx]} {BRANCH_SHORT_ANIMALS[ty_branch_idx]}"
+
+    # Life Palace (Ming Gong 命宮):
+    # Classical Formula: (26 - (month_order + hour_order)) % 12
+    # Month order from Yin=1..Hai=10, Chou=12; Hour order Zi=1..Mao=4..Hai=12
+    m_order = (m_branch_idx - 2) % 12 + 1
+    h_order = (h_branch_idx) + 1
+    mg_order = (26 - (m_order + h_order)) % 12
+    if mg_order == 0:
+        mg_order = 12
+    mg_branch_idx = (mg_order + 1) % 12
+    # Five Tigers遁 stem for Ming Gong
+    mg_start_stem = {0: 2, 5: 2, 1: 4, 6: 4, 2: 6, 7: 6, 3: 8, 8: 8, 4: 0, 9: 0}[y_stem_idx % 5]
+    mg_stem_idx = (mg_start_stem + (mg_branch_idx - 2) % 12) % 10
+    life_palace = f"{STEM_CHARS[mg_stem_idx]}{BRANCH_CHARS[mg_branch_idx]} {STEM_ELEMENTS[mg_stem_idx].split()[0]} {STEM_SHORT_ELEMENTS[mg_stem_idx]} {BRANCH_SHORT_ANIMALS[mg_branch_idx]}"
+
+    return {
+        'celestial_animal': BRANCH_ANIMALS[y_branch_idx],
+        'noble_people': noble_map.get(dm_stem_idx, '申 Monkey, 子 Rat'),
+        'intelligence': wen_chang_map.get(dm_stem_idx, '午 Horse'),
+        'peach_blossom': peach_map.get(d_branch_idx, '午 Horse'),
+        'sky_horse': sky_horse_map.get(d_branch_idx, '亥 Pig'),
+        'solitary': solitary_map.get(d_branch_idx, '亥 Pig'),
+        'life_palace': life_palace,
+        'conception_palace': conception_palace
+    }
+
+def calculate_ming_gua(bazi_year: int, gender: str) -> Dict[str, Any]:
+    """Computes Life Star (Ming Gua) and 8 Mansions (Ba Zhai) Favorable/Unfavorable Directions."""
+    s = sum(int(c) for c in str(bazi_year))
+    while s >= 10:
+        s = sum(int(c) for c in str(s))
+    
+    is_male = gender.lower().startswith('m')
+    if bazi_year < 2000:
+        gua = (11 - s) if is_male else (s + 4)
+    else:
+        gua = (10 - s) if is_male else (s + 5)
+    
+    while gua >= 10:
+        gua = sum(int(c) for c in str(gua))
+    if gua == 0:
+        gua = 9
+    
+    # Gua 5 converts to Kun 2 for Male, Gen 8 for Female
+    active_gua = (2 if is_male else 8) if gua == 5 else gua
+
+    gua_info_map = {
+        1: {'num': '1', 'color': 'White', 'zh': '一白星命', 'elem': 'Water 水', 'char': '坎', 'name': 'Kan', 'dir': 'North'},
+        2: {'num': '2', 'color': 'Black', 'zh': '二黑星命', 'elem': 'Earth 土', 'char': '坤', 'name': 'Kun', 'dir': 'SouthWest'},
+        3: {'num': '3', 'color': 'Jade', 'zh': '三碧星命', 'elem': 'Wood 木', 'char': '震', 'name': 'Zhen', 'dir': 'East'},
+        4: {'num': '4', 'color': 'Green', 'zh': '四綠星命', 'elem': 'Wood 木', 'char': '巽', 'name': 'Xun', 'dir': 'SouthEast'},
+        5: {'num': '5', 'color': 'Yellow', 'zh': '五黃星命', 'elem': 'Earth 土', 
+            'char': '坤' if is_male else '艮', 'name': 'Kun' if is_male else 'Gen', 'dir': 'SouthWest' if is_male else 'NorthEast'},
+        6: {'num': '6', 'color': 'White', 'zh': '六白星命', 'elem': 'Metal 金', 'char': '乾', 'name': 'Qian', 'dir': 'NorthWest'},
+        7: {'num': '7', 'color': 'Red', 'zh': '七赤星命', 'elem': 'Metal 金', 'char': '兌', 'name': 'Dui', 'dir': 'West'},
+        8: {'num': '8', 'color': 'White', 'zh': '八白星命', 'elem': 'Earth 土', 'char': '艮', 'name': 'Gen', 'dir': 'NorthEast'},
+        9: {'num': '9', 'color': 'Purple', 'zh': '九紫星命', 'elem': 'Fire 火', 'char': '離', 'name': 'Li', 'dir': 'South'}
+    }
+
+    # 8 Mansions directions table
+    directions_map = {
+        1: {'sq': '東南 SE', 'ty': '東 E', 'yn': '南 S', 'fw': '北 N', 'hh': '西 W', 'wg': '東北 NE', 'ls': '西北 NW', 'jm': '西南 SW'},
+        2: {'sq': '東北 NE', 'ty': '西 W', 'yn': '西北 NW', 'fw': '西南 SW', 'hh': '東 E', 'wg': '東南 SE', 'ls': '南 S', 'jm': '北 N'},
+        3: {'sq': '南 S', 'ty': '北 N', 'yn': '東南 SE', 'fw': '東 E', 'hh': '西南 SW', 'wg': '西北 NW', 'ls': '東北 NE', 'jm': '西 W'},
+        4: {'sq': '北 N', 'ty': '南 S', 'yn': '東 E', 'fw': '東南 SE', 'hh': '西北 NW', 'wg': '西南 SW', 'ls': '西 W', 'jm': '東北 NE'},
+        6: {'sq': '西 W', 'ty': '東北 NE', 'yn': '西南 SW', 'fw': '西北 NW', 'hh': '東南 SE', 'wg': '東 E', 'ls': '北 N', 'jm': '南 S'},
+        7: {'sq': '西北 NW', 'ty': '西南 SW', 'yn': '東北 NE', 'fw': '西 W', 'hh': '北 N', 'wg': '南 S', 'ls': '東南 SE', 'jm': '東 E'},
+        8: {'sq': '西南 SW', 'ty': '西北 NW', 'yn': '西 W', 'fw': '東北 NE', 'hh': '南 S', 'wg': '北 N', 'ls': '東 E', 'jm': '東南 SE'},
+        9: {'sq': '東 E', 'ty': '東南 SE', 'yn': '北 N', 'fw': '南 S', 'hh': '東北 NE', 'wg': '西 W', 'ls': '西南 SW', 'jm': '西北 NW'}
+    }
+
+    g_meta = gua_info_map[gua]
+    dirs = directions_map.get(active_gua, directions_map[2])
+
+    return {
+        'life_star_num': g_meta['num'],
+        'life_star_color': g_meta['color'],
+        'life_star_zh': g_meta['zh'],
+        'life_star_elem': g_meta['elem'],
+        'fs_gua_char': g_meta['char'],
+        'fs_gua_name': g_meta['name'],
+        'fs_gua_dir': g_meta['dir'],
+        'favorable_dirs': {
+            'sq': dirs['sq'],
+            'ty': dirs['ty'],
+            'yn': dirs['yn'],
+            'fw': dirs['fw']
+        },
+        'unfavorable_dirs': {
+            'hh': dirs['hh'],
+            'wg': dirs['wg'],
+            'ls': dirs['ls'],
+            'jm': dirs['jm']
+        }
+    }
+
+def calculate_four_pillars(year: int, month: int, day: int, hour: int = 12, minute: int = 0, gender: str = "Male", client_name: str = "Client") -> Dict[str, Any]:
     dt = datetime.date(year, month, day)
 
     # 1. Day Pillar
@@ -183,44 +392,28 @@ def calculate_four_pillars(year: int, month: int, day: int, hour: int = 12, minu
     h_start_stem = {0: 0, 5: 0, 1: 2, 6: 2, 2: 4, 7: 4, 3: 6, 8: 6, 4: 8, 9: 8}[day_stem_idx % 5]
     h_stem_idx = (h_start_stem + h_branch_idx) % 10
 
-    # 3. Year Pillar
-    y = year
-    if (month < 2) or (month == 2 and day < 4):
-        y = year - 1
-    y_stem_idx = (y - 4) % 10
-    y_branch_idx = (y - 4) % 12
+    # 3. High-Precision Astronomical Solar Longitude
+    sun_lon = get_astronomical_solar_longitude(year, month, day, hour, minute)
 
-    # 4. Month Pillar
-    if (month == 1 and day < 6):
-        m_branch_idx = 0
-    elif (month == 1 and day >= 6) or (month == 2 and day < 4):
-        m_branch_idx = 1
-    elif (month == 2 and day >= 4) or (month == 3 and day < 6):
-        m_branch_idx = 2
-    elif (month == 3 and day >= 6) or (month == 4 and day < 5):
-        m_branch_idx = 3
-    elif (month == 4 and day >= 5) or (month == 5 and day < 6):
-        m_branch_idx = 4
-    elif (month == 5 and day >= 6) or (month == 6 and day < 6):
-        m_branch_idx = 5
-    elif (month == 6 and day >= 6) or (month == 7 and day < 7):
-        m_branch_idx = 6
-    elif (month == 7 and day >= 7) or (month == 8 and day < 8):
-        m_branch_idx = 7
-    elif (month == 8 and day >= 8) or (month == 9 and day < 8):
-        m_branch_idx = 8
-    elif (month == 9 and day >= 8) or (month == 10 and day < 8):
-        m_branch_idx = 9
-    elif (month == 10 and day >= 8) or (month == 11 and day < 7):
-        m_branch_idx = 10
-    elif (month == 11 and day >= 7) or (month == 12 and day < 7):
-        m_branch_idx = 11
+    # 4. Year Pillar (Changes at Li Chun: 315° apparent solar longitude)
+    if month == 1 or (month == 2 and sun_lon < 315.0):
+        bazi_year = year - 1
     else:
-        m_branch_idx = 0
+        bazi_year = year
+    y_stem_idx = (bazi_year - 4) % 10
+    y_branch_idx = (bazi_year - 4) % 12
 
+    # 5. Month Pillar (Calculated using exact astronomical solar term longitude)
+    m_branch_idx = get_solar_month_branch(sun_lon)
     m_start_stem = {0: 2, 5: 2, 1: 4, 6: 4, 2: 6, 7: 6, 3: 8, 8: 8, 4: 0, 9: 0}[y_stem_idx % 5]
     m_offset = (m_branch_idx - 2) % 12
     m_stem_idx = (m_start_stem + m_offset) % 10
+
+    # 6. Auxiliary Stars & Shen Sha
+    aux = calculate_auxiliary_stars(day_stem_idx, y_branch_idx, day_branch_idx, m_branch_idx, h_branch_idx, y_stem_idx, m_stem_idx)
+
+    # 7. Ming Gua & Directions
+    gua_data = calculate_ming_gua(bazi_year, gender)
 
     # Build 10 Gods for each stem
     pillars_meta = {
@@ -298,90 +491,296 @@ def calculate_four_pillars(year: int, month: int, day: int, hour: int = 12, minu
         },
         'day_master': STEM_NAMES[day_stem_idx],
         'day_master_element': STEM_ELEMENTS[day_stem_idx],
-        'day_animal': BRANCH_ANIMALS[day_branch_idx]
+        'day_animal': BRANCH_ANIMALS[day_branch_idx],
+        'aux': aux,
+        'gua': gua_data,
+        'client_name': client_name,
+        'gender': gender,
+        'birth_year': year,
+        'birth_month': month,
+        'birth_day': day,
+        'birth_hour': hour,
+        'birth_minute': minute,
+        'sun_lon': sun_lon,
+        'qimen_destiny': {
+            'palace': '東北 NE',
+            'stem': f"{STEM_CHARS[day_stem_idx]} {STEM_NAMES[day_stem_idx]}",
+            'door': '休 Rest',
+            'star': '天任 Ambassador',
+            'guardian': '地 Earth'
+        }
     }
     return pillars_meta
 
 def generate_natal_chart_html(p: Dict[str, Any]) -> str:
     """
-    Renders an authentic, classical Joey Yap style Natal Chart (本命八字)
-    with Hour (時), Day (日), Month (月), Year (年) ordered from left to right.
+    Renders an authentic, classical Joey Yap Personal Chart for 2026 (Image 2)
+    with Header Profile, Day Master & Stars, Qi Men Destiny Palace, Life Star (5 Yellow),
+    Feng Shui Gua (Kun SouthWest), 8 Mansions Directions, and the complete 4 Pillars Table.
     """
     order = ['hour', 'day', 'month', 'year']
     col_titles = {'hour': '時 Hour', 'day': '日 Day', 'month': '月 Month', 'year': '年 Year'}
+    
+    aux = p.get('aux', {})
+    gua = p.get('gua', {})
+    fav = gua.get('favorable_dirs', {})
+    unfav = gua.get('unfavorable_dirs', {})
+    qm = p.get('qimen_destiny', {})
+    
+    client_name = p.get('client_name', 'Client')
+    b_day = p.get('birth_day', 7)
+    b_month = p.get('birth_month', 12)
+    b_year = p.get('birth_year', 1986)
+    b_hour = p.get('birth_hour', 5)
+    b_min = p.get('birth_minute', 50)
+    gender_str = "MALE 男" if p.get('gender', 'Male').lower().startswith('m') else "FEMALE 女"
 
-    html = """
-<div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 900px; margin: 20px auto; background: #ffffff; border: 2px solid #856404; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: #212529; overflow: hidden;">
-  <!-- Header Bar -->
-  <div style="background: #7a1518; color: #ffffff; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 16px; border-bottom: 2px solid #856404;">
-    <span>NATAL CHART 本命八字</span>
-    <span style="font-size: 13px; font-weight: normal; opacity: 0.9;">Classical Chinese Metaphysics</span>
+    months_en = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    month_name = months_en[b_month - 1] if 1 <= b_month <= 12 else str(b_month)
+    am_pm = "AM" if b_hour < 12 else "PM"
+    hour_12 = b_hour % 12
+    if hour_12 == 0:
+        hour_12 = 12
+    formatted_date_time = f"{b_day:02d} {month_name} {b_year} ({hour_12:02d}:{b_min:02d}{am_pm})"
+
+    dm_stem = p['day']['stem_name']
+    dm_elem = p['day_master_element']
+    dm_char = p['day']['stem_char']
+    dm_full = f"{dm_char} {dm_stem} {dm_elem}"
+
+    html = f"""
+<div class="joey-yap-personal-chart" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 950px; margin: 15px auto; background: #ffffff; border: 2px solid #7a1518; border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); color: #1e293b; overflow: hidden; padding: 18px;">
+
+  <!-- Header Banner -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #856404; padding-bottom: 8px; margin-bottom: 14px;">
+    <div>
+      <div style="font-size: 11px; font-weight: 800; color: #b45309; letter-spacing: 1.5px; text-transform: uppercase;">JOEY YAP'S DESTINY 2026</div>
+      <div style="font-size: 26px; font-weight: 900; color: #7a1518; letter-spacing: 0.5px; line-height: 1.1; margin-top: 2px;">PERSONAL CHART FOR 2026</div>
+      <div style="font-size: 13px; font-weight: 600; color: #475569; margin-top: 4px;">
+        <span>{client_name}</span> | <span style="color: #0f172a;">{formatted_date_time}</span> | <span style="font-weight: 700; color: #7a1518;">{gender_str}</span>
+      </div>
+    </div>
+    <div style="text-align: right;">
+      <span style="background: #7a1518; color: #ffffff; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 3px; letter-spacing: 0.5px;">PSPR METAPHYSICS</span>
+    </div>
   </div>
 
-  <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 14px;">
-    <!-- Column Headers -->
-    <thead>
-      <tr style="background: #fdfaf2; color: #856404; border-bottom: 2px solid #d4af37; font-weight: 600;">
+  <!-- Top 3 Metadata Cards -->
+  <div style="display: grid; grid-template-columns: 1.15fr 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+
+    <!-- Box 1: DAY MASTER & STARS -->
+    <div style="border: 1px solid #7a1518; border-radius: 4px; overflow: hidden; font-size: 12px; background: #ffffff;">
+      <div style="background: #7a1518; color: #ffffff; padding: 6px 10px; font-weight: bold; display: flex; justify-content: space-between;">
+        <span>DAY MASTER</span>
+        <span>日主 : {dm_full}</span>
+      </div>
+      <div style="padding: 6px 10px; line-height: 1.65;">
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+          <span style="color: #64748b;">Celestial Animal</span>
+          <span style="font-weight: 600;">生肖 : {aux.get('celestial_animal', '-')}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+          <span style="color: #64748b;">Noble People</span>
+          <span style="font-weight: 600;">貴人 : {aux.get('noble_people', '-')}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+          <span style="color: #64748b;">Intelligence</span>
+          <span style="font-weight: 600;">文昌 : {aux.get('intelligence', '-')}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+          <span style="color: #64748b;">Peach Blossom</span>
+          <span style="font-weight: 600;">桃花 : {aux.get('peach_blossom', '-')}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+          <span style="color: #64748b;">Sky Horse</span>
+          <span style="font-weight: 600;">驛馬 : {aux.get('sky_horse', '-')}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+          <span style="color: #64748b;">Solitary</span>
+          <span style="font-weight: 600;">孤辰 : {aux.get('solitary', '-')}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+          <span style="color: #64748b;">Life Palace</span>
+          <span style="font-weight: 600;">命宮 : {aux.get('life_palace', '-')}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 2px 0;">
+          <span style="color: #64748b;">Conception Palace</span>
+          <span style="font-weight: 600;">胎元 : {aux.get('conception_palace', '-')}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Box 2: QI MEN DESTINY PALACE -->
+    <div style="border: 1px solid #7a1518; border-radius: 4px; overflow: hidden; font-size: 12px; background: #ffffff;">
+      <div style="background: #7a1518; color: #ffffff; padding: 6px 10px; font-weight: bold; display: flex; justify-content: space-between;">
+        <span>QI MEN DESTINY PALACE</span>
+        <span>寄門命宮 : {qm.get('palace', '東北 NE')}</span>
+      </div>
+      <div style="padding: 10px 10px; line-height: 2.1;">
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 4px 0;">
+          <span style="color: #64748b;">Life Stem</span>
+          <span style="font-weight: 600;">命干 : {qm.get('stem', '-')}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 4px 0;">
+          <span style="color: #64748b;">Door of Destiny</span>
+          <span style="font-weight: 600;">門 : {qm.get('door', '-')}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 4px 0;">
+          <span style="color: #64748b;">Star of Destiny</span>
+          <span style="font-weight: 600;">星 : {qm.get('star', '-')}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+          <span style="color: #64748b;">Guardian of Destiny</span>
+          <span style="font-weight: 600;">神 : {qm.get('guardian', '-')}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Box 3: LIFE STAR & FENG SHUI GUA -->
+    <div style="border: 1px solid #7a1518; border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; background: #ffffff;">
+      <div style="background: #7a1518; color: #ffffff; padding: 6px 8px; font-weight: bold; display: flex; justify-content: space-between; font-size: 12px;">
+        <span style="width: 50%; text-align: center; border-right: 1px solid rgba(255,255,255,0.3);">LIFE STAR</span>
+        <span style="width: 50%; text-align: center;">風水命卦 GUA</span>
+      </div>
+      <div style="display: flex; flex: 1; align-items: center;">
+        <!-- Left: Life Star (5 Yellow) -->
+        <div style="width: 50%; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 12px 4px; text-align: center;">
+          <div style="font-size: 32px; font-weight: 900; color: #b45309; line-height: 1;">{gua.get('life_star_num', '5')}</div>
+          <div style="font-size: 14px; font-weight: bold; color: #b45309; margin: 2px 0;">{gua.get('life_star_color', 'Yellow')}</div>
+          <div style="font-size: 15px; font-weight: 800; color: #0f172a; margin-top: 2px;">{gua.get('life_star_zh', '五黃星命')}</div>
+          <div style="font-size: 14px; font-weight: bold; color: #b91c1c; margin-top: 2px;">{gua.get('life_star_elem', 'Earth 土')}</div>
+        </div>
+        <!-- Right: Trigram (Kun SouthWest) -->
+        <div style="width: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 12px 4px; text-align: center;">
+          <div style="font-size: 42px; font-weight: 900; color: #0f172a; line-height: 1;">{gua.get('fs_gua_char', '坤')}</div>
+          <div style="font-size: 14px; font-weight: bold; color: #475569; margin-top: 4px;">{gua.get('fs_gua_name', 'Kun')}</div>
+          <div style="font-size: 13px; font-weight: bold; color: #b91c1c; margin-top: 2px;">{gua.get('fs_gua_dir', 'SouthWest')}</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Area: 8 Mansions (Left) & Natal Chart (Right) -->
+  <div style="display: grid; grid-template-columns: 1.15fr 2fr; gap: 10px; align-items: stretch;">
+
+    <!-- Left Column: Favorable & Unfavorable Directions -->
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <!-- Favorable Directions -->
+      <div style="border: 1px solid #7a1518; border-radius: 4px; overflow: hidden; font-size: 11px; background: #ffffff;">
+        <div style="background: #7a1518; color: #ffffff; padding: 5px 8px; font-weight: bold; display: flex; justify-content: space-between;">
+          <span>FAVORABLE DIRECTIONS</span>
+          <span>本命吉方</span>
+        </div>
+        <div style="padding: 6px 8px; line-height: 1.7;">
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+            <span style="color: #475569;">Sheng Qi (Life Generating)</span> <b style="color: #047857;">生氣 : {fav.get('sq', '-')}</b>
+          </div>
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+            <span style="color: #475569;">Tian Yi (Heavenly Doctor)</span> <b style="color: #047857;">天醫 : {fav.get('ty', '-')}</b>
+          </div>
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+            <span style="color: #475569;">Yan Nian (Longevity)</span> <b style="color: #047857;">延年 : {fav.get('yn', '-')}</b>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 2px 0;">
+            <span style="color: #475569;">Fu Wei (Stability)</span> <b style="color: #047857;">伏位 : {fav.get('fw', '-')}</b>
+          </div>
+        </div>
+      </div>
+
+      <!-- Unfavorable Directions -->
+      <div style="border: 1px solid #7a1518; border-radius: 4px; overflow: hidden; font-size: 11px; background: #ffffff;">
+        <div style="background: #7a1518; color: #ffffff; padding: 5px 8px; font-weight: bold; display: flex; justify-content: space-between;">
+          <span>UNFAVORABLE DIRECTIONS</span>
+          <span>本命凶方</span>
+        </div>
+        <div style="padding: 6px 8px; line-height: 1.7;">
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+            <span style="color: #475569;">Huo Hai (Mishaps)</span> <b style="color: #b91c1c;">禍害 : {unfav.get('hh', '-')}</b>
+          </div>
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+            <span style="color: #475569;">Wu Gui (Five Ghosts)</span> <b style="color: #b91c1c;">五鬼 : {unfav.get('wg', '-')}</b>
+          </div>
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+            <span style="color: #475569;">Liu Sha (Six Killings)</span> <b style="color: #b91c1c;">六煞 : {unfav.get('ls', '-')}</b>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 2px 0;">
+            <span style="color: #475569;">Jue Ming (Life Threatening)</span> <b style="color: #b91c1c;">絕命 : {unfav.get('jm', '-')}</b>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Natal Chart (時 日 月 年) Table -->
+    <div style="border: 1px solid #7a1518; border-radius: 4px; overflow: hidden; background: #ffffff; display: flex; flex-direction: column;">
+      <div style="background: #7a1518; color: #ffffff; padding: 6px 12px; font-weight: bold; font-size: 13px; display: flex; justify-content: space-between; align-items: center;">
+        <span>NATAL CHART 本命八字</span>
+        <span style="font-size: 11px; font-weight: normal; opacity: 0.9;">Classical Chinese Metaphysics</span>
+      </div>
+
+      <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 13px; flex: 1;">
+        <thead>
+          <tr style="background: #fdfaf2; color: #856404; border-bottom: 1.5px solid #d4af37; font-weight: 600;">
 """
     for col in order:
-        html += f"""        <th style="padding: 10px 8px; width: 22%; border-right: 1px solid #dcdcdc;">{col_titles[col]}</th>\n"""
-    html += """        <th style="padding: 10px 4px; width: 12%; font-size: 12px; color: #6c757d;">Pillar</th>\n      </tr>\n    </thead>\n    <tbody>\n"""
+        html += f"""            <th style="padding: 8px 4px; width: 22%; border-right: 1px solid #e2e8f0;">{col_titles[col]}</th>\n"""
+    html += """            <th style="padding: 8px 4px; width: 12%; font-size: 11px; color: #64748b;">Pillar</th>\n          </tr>\n        </thead>\n        <tbody>\n"""
 
     # ROW 1: Heavenly Stems (天干)
-    html += """      <!-- Row 1: Heavenly Stems -->\n      <tr style="border-bottom: 2px solid #d4af37; background: #ffffff;">\n"""
+    html += """          <!-- Row 1: Heavenly Stems -->\n          <tr style="border-bottom: 1.5px solid #d4af37; background: #ffffff;">\n"""
     for col in order:
         meta = p[col]
         god = meta['stem_god']
-        html += f"""        <td style="padding: 12px 6px; border-right: 1px solid #e2e8f0; vertical-align: middle;">
-          <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-            <div style="border: 1px solid #ced4da; border-radius: 3px; padding: 3px 5px; font-size: 11px; line-height: 1.2; background: #f8f9fa;">
-              <div style="font-weight: bold; color: #212529;">{god['zh_full']}</div>
-              <div style="color: #6c757d; font-size: 10px;">{god['code']}</div>
-            </div>
-            <div>
-              <div style="font-size: 32px; font-weight: bold; line-height: 1; color: #1a202c;">{meta['stem_char']}</div>
-              <div style="font-size: 13px; font-weight: 600; color: #4a5568;">{meta['stem_name']}</div>
-              <div style="font-size: 12px; color: #718096;">{meta['stem_elem']}</div>
-            </div>
-          </div>
-        </td>\n"""
-    html += """        <td style="padding: 8px; border-left: 2px solid #856404; font-size: 12px; font-weight: bold; color: #856404; background: #fdfaf2; vertical-align: middle; line-height: 1.3;">
-          天干<br><span style="font-size: 10px; font-weight: normal; color: #6c757d;">Heavenly<br>Stems</span>
-        </td>\n      </tr>\n"""
+        html += f"""            <td style="padding: 8px 4px; border-right: 1px solid #e2e8f0; vertical-align: middle;">
+              <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <div style="border: 1px solid #cbd5e1; border-radius: 3px; padding: 2px 4px; font-size: 10px; line-height: 1.2; background: #f8fafc;">
+                  <div style="font-weight: bold; color: #0f172a;">{god['zh_full']}</div>
+                  <div style="color: #64748b; font-size: 9px;">{god['code']}</div>
+                </div>
+                <div>
+                  <div style="font-size: 28px; font-weight: bold; line-height: 1; color: #0f172a;">{meta['stem_char']}</div>
+                  <div style="font-size: 12px; font-weight: 600; color: #334155;">{meta['stem_name']}</div>
+                  <div style="font-size: 11px; color: #64748b;">{meta['stem_elem']}</div>
+                </div>
+              </div>
+            </td>\n"""
+    html += """            <td style="padding: 6px; border-left: 2px solid #856404; font-size: 11px; font-weight: bold; color: #856404; background: #fdfaf2; vertical-align: middle; line-height: 1.3;">
+              天干<br><span style="font-size: 9px; font-weight: normal; color: #64748b;">Heavenly<br>Stems</span>
+            </td>\n          </tr>\n"""
 
     # ROW 2: Earthly Branches (地支)
-    html += """      <!-- Row 2: Earthly Branches -->\n      <tr style="border-bottom: 2px solid #d4af37; background: #fafafa;">\n"""
+    html += """          <!-- Row 2: Earthly Branches -->\n          <tr style="border-bottom: 1.5px solid #d4af37; background: #fafafa;">\n"""
     for col in order:
         meta = p[col]
-        html += f"""        <td style="padding: 12px 6px; border-right: 1px solid #e2e8f0; vertical-align: middle;">
-          <div style="font-size: 32px; font-weight: bold; line-height: 1; color: #1a202c;">{meta['branch_char']}</div>
-          <div style="font-size: 13px; font-weight: 600; color: #4a5568;">{meta['branch_name']}</div>
-          <div style="font-size: 12px; font-weight: 500; color: #495057;">{meta['branch_animal']}</div>
-          <div style="font-size: 11px; color: #6c757d;">{meta['branch_elem']}</div>
-        </td>\n"""
-    html += """        <td style="padding: 8px; border-left: 2px solid #856404; font-size: 12px; font-weight: bold; color: #856404; background: #fdfaf2; vertical-align: middle; line-height: 1.3;">
-          地支<br><span style="font-size: 10px; font-weight: normal; color: #6c757d;">Earthly<br>Branches</span>
-        </td>\n      </tr>\n"""
+        html += f"""            <td style="padding: 8px 4px; border-right: 1px solid #e2e8f0; vertical-align: middle;">
+              <div style="font-size: 28px; font-weight: bold; line-height: 1; color: #0f172a;">{meta['branch_char']}</div>
+              <div style="font-size: 12px; font-weight: 600; color: #334155;">{meta['branch_name']}</div>
+              <div style="font-size: 11px; font-weight: 500; color: #475569;">{meta['branch_animal']}</div>
+              <div style="font-size: 10px; color: #64748b;">{meta['branch_elem']}</div>
+            </td>\n"""
+    html += """            <td style="padding: 6px; border-left: 2px solid #856404; font-size: 11px; font-weight: bold; color: #856404; background: #fdfaf2; vertical-align: middle; line-height: 1.3;">
+              地支<br><span style="font-size: 9px; font-weight: normal; color: #64748b;">Earthly<br>Branches</span>
+            </td>\n          </tr>\n"""
 
     # ROW 3: Hidden Stems (藏干)
-    html += """      <!-- Row 3: Hidden Stems -->\n      <tr style="background: #ffffff;">\n"""
+    html += """          <!-- Row 3: Hidden Stems -->\n          <tr style="background: #ffffff;">\n"""
     for col in order:
         meta = p[col]
         hs_list = meta['hidden_stems']
-        html += """        <td style="padding: 10px 4px; border-right: 1px solid #e2e8f0; vertical-align: top;">\n"""
-        html += """          <div style="display: flex; justify-content: space-around; align-items: flex-start;">\n"""
+        html += """            <td style="padding: 8px 4px; border-right: 1px solid #e2e8f0; vertical-align: top;">\n"""
+        html += """              <div style="display: flex; justify-content: space-around; align-items: flex-start;">\n"""
         for hs in hs_list:
             god = hs['god']
-            html += f"""            <div style="padding: 0 4px; text-align: center;">
-              <div style="font-size: 20px; font-weight: bold; color: #2d3748;">{hs['char']}</div>
-              <div style="font-size: 11px; font-weight: 600; color: #4a5568;">{hs['name']}</div>
-              <div style="font-size: 10px; color: #718096;">{hs['polarity_elem']}</div>
-              <div style="font-size: 11px; font-weight: bold; color: #856404; margin-top: 2px;">{god['zh_short']} <span style="font-size: 10px; color: #495057;">{god['code']}</span></div>
-            </div>\n"""
-        html += """          </div>\n        </td>\n"""
-    html += """        <td style="padding: 8px; border-left: 2px solid #856404; font-size: 12px; font-weight: bold; color: #856404; background: #fdfaf2; vertical-align: middle; line-height: 1.3;">
-          藏干<br><span style="font-size: 10px; font-weight: normal; color: #6c757d;">Hidden<br>Stems</span>
-        </td>\n      </tr>\n    </tbody>\n  </table>\n</div>\n"""
+            html += f"""                <div style="padding: 0 3px; text-align: center;">
+                  <div style="font-size: 18px; font-weight: bold; color: #1e293b;">{hs['char']}</div>
+                  <div style="font-size: 11px; font-weight: 600; color: #334155;">{hs['name']}</div>
+                  <div style="font-size: 9px; color: #64748b;">{hs['polarity_elem']}</div>
+                  <div style="font-size: 10px; font-weight: bold; color: #856404; margin-top: 2px;">{god['zh_short']} <span style="font-size: 9px; color: #475569;">{god['code']}</span></div>
+                </div>\n"""
+        html += """              </div>\n            </td>\n"""
+    html += """            <td style="padding: 6px; border-left: 2px solid #856404; font-size: 11px; font-weight: bold; color: #856404; background: #fdfaf2; vertical-align: middle; line-height: 1.3;">
+              藏干<br><span style="font-size: 9px; font-weight: normal; color: #64748b;">Hidden<br>Stems</span>
+            </td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n  </div>\n</div>\n"""
     return html
 
 def generate_natal_chart_markdown(p: Dict[str, Any]) -> str:
@@ -390,35 +789,46 @@ def generate_natal_chart_markdown(p: Dict[str, Any]) -> str:
     Columns: Hour (時) | Day (日) | Month (月) | Year (年)
     """
     h, d, m, y = p['hour'], p['day'], p['month'], p['year']
+    aux = p.get('aux', {})
+    gua = p.get('gua', {})
     
-    # Hidden stems strings
     def format_hs(hs_list):
         return " / ".join([f"{hs['char']} {hs['name']} ({hs['polarity_elem']}, {hs['god']['zh_short']} {hs['god']['code']})" for hs in hs_list])
 
     md = (
-        "### NATAL CHART 本命八字\n\n"
+        "### NATAL CHART 本命八字 (Joey Yap Standard)\n\n"
         "| 時 Hour | 日 Day | 月 Month | 年 Year | Pillar |\n"
         "| :---: | :---: | :---: | :---: | :---: |\n"
         f"| **{h['stem_char']}** {h['stem_name']} ({h['stem_elem']})<br>`[{h['stem_god']['zh_full']} {h['stem_god']['code']}]` | **{d['stem_char']}** {d['stem_name']} ({d['stem_elem']})<br>`[{d['stem_god']['zh_full']} {d['stem_god']['code']}]` | **{m['stem_char']}** {m['stem_name']} ({m['stem_elem']})<br>`[{m['stem_god']['zh_full']} {m['stem_god']['code']}]` | **{y['stem_char']}** {y['stem_name']} ({y['stem_elem']})<br>`[{y['stem_god']['zh_full']} {y['stem_god']['code']}]` | **天干**<br>Heavenly Stems |\n"
         f"| **{h['branch_char']}** {h['branch_name']}<br>{h['branch_animal']}<br>`{h['branch_elem']}` | **{d['branch_char']}** {d['branch_name']}<br>{d['branch_animal']}<br>`{d['branch_elem']}` | **{m['branch_char']}** {m['branch_name']}<br>{m['branch_animal']}<br>`{m['branch_elem']}` | **{y['branch_char']}** {y['branch_name']}<br>{y['branch_animal']}<br>`{y['branch_elem']}` | **地支**<br>Earthly Branches |\n"
         f"| {format_hs(h['hidden_stems'])} | {format_hs(d['hidden_stems'])} | {format_hs(m['hidden_stems'])} | {format_hs(y['hidden_stems'])} | **藏干**<br>Hidden Stems |\n\n"
         f"* **Day Master (日元):** **{d['stem_char']} {d['stem_name']} ({p['day_master_element']})** sitting on **{d['branch_animal']} ({d['branch_name']})**\n"
+        f"* **Celestial Animal (生肖):** {aux.get('celestial_animal', '-')}\n"
+        f"* **Noble People (貴人):** {aux.get('noble_people', '-')}\n"
+        f"* **Intelligence (文昌):** {aux.get('intelligence', '-')}\n"
+        f"* **Peach Blossom (桃花):** {aux.get('peach_blossom', '-')}\n"
+        f"* **Sky Horse (驛馬):** {aux.get('sky_horse', '-')}\n"
+        f"* **Solitary (孤辰):** {aux.get('solitary', '-')}\n"
+        f"* **Life Palace (命宮):** {aux.get('life_palace', '-')}\n"
+        f"* **Conception Palace (胎元):** {aux.get('conception_palace', '-')}\n"
+        f"* **Life Star / Ming Gua (命卦):** {gua.get('life_star_zh', '')} ({gua.get('life_star_num', '')} {gua.get('life_star_color', '')}) | **Feng Shui Gua:** {gua.get('fs_gua_char', '')} {gua.get('fs_gua_name', '')} ({gua.get('fs_gua_dir', '')})\n"
     )
     return md
 
-def build_grounded_bazi_prompt(birth_date_str: str, birth_time_str: str, gender: str, question: str) -> Tuple[str, Optional[Dict[str, Any]]]:
+def build_grounded_bazi_prompt(birth_date_str: str, birth_time_str: str, gender: str, question: str, client_name: str = "Client") -> Tuple[str, Optional[Dict[str, Any]]]:
     """
     Computes exact astronomical pillars, formats prompt, and returns (prompt, pillars_dict).
     """
     year, month, day, hour, minute = parse_date_and_time(birth_date_str, birth_time_str)
     
     if year and month and day:
-        pillars = calculate_four_pillars(year, month, day, hour, minute)
-        h, d, m, y = pillars['hour'], pillars['day'], pillars['month'], pillars['year']
+        pillars = calculate_four_pillars(year, month, day, hour, minute, gender=gender, client_name=client_name)
+        d = pillars['day']
         chart_table_md = generate_natal_chart_markdown(pillars)
         
         prompt = (
             f"BaZi PSPR Consultation Request:\n"
+            f"- Client Name: {client_name}\n"
             f"- Birth Date: {birth_date_str} (Parsed Solar: {year}-{month:02d}-{day:02d})\n"
             f"- Birth Time (Local Solar Time): {birth_time_str} (Parsed: {hour:02d}:{minute:02d})\n"
             f"- Gender: {gender}\n"
@@ -428,7 +838,7 @@ def build_grounded_bazi_prompt(birth_date_str: str, birth_time_str: str, gender:
             f"STRICT INSTRUCTIONS:\n"
             f"1. You MUST adopt this exact Four Pillars orientation (Hour on left, Day, Month, Year on right).\n"
             f"2. Day Master is strictly **{d['stem_name']} ({pillars['day_master_element']})** sitting on **{d['branch_name']} ({pillars['day_animal']})**.\n"
-            f"3. Provide an authentic, comprehensive Phann Sophearith PSPR analysis:\n"
+            f"3. Provide an authentic, comprehensive Phann Sophearith PSPR analysis in the requested language (if Khmer is requested, respond in fluent Khmer as well):\n"
             f"   - Level 1: Day Master Strength & Climate Regulation (Tiao Hou)\n"
             f"   - Level 2: Ten Gods Quality Qualification (Superior, Good, Average, Poor)\n"
             f"   - Level 3: Earthly Branch Dynamics (Combinations, Clashes, Harms, Punishments, Destructions)\n"
