@@ -443,7 +443,7 @@ def index():
         <input type="text" id="bz-name" placeholder="Enter client name">
       </div>
       <div class="form-group">
-        <label>Birth Date (YYYY-MM-DD)</label>
+        <label>Birth Date (MM/DD/YYYY)</label>
         <input type="date" id="bz-date">
       </div>
       <div class="form-group">

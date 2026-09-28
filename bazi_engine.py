@@ -308,6 +308,226 @@ def calculate_auxiliary_stars(dm_stem_idx: int, y_branch_idx: int, d_branch_idx:
         'conception_palace': conception_palace
     }
 
+def calculate_pillar_shen_sha(
+    d_stem: int, y_stem: int, m_stem: int, h_stem: int,
+    d_branch: int, y_branch: int, m_branch: int, h_branch: int
+) -> Dict[str, List[Dict[str, str]]]:
+    """
+    Calculates authentic classical Shen Sha (Auxiliary Stars 神煞) for each individual pillar
+    (Hour, Day, Month, Year) based on Day Master, Year Stem, Month Branch, and Three Harmonies (San He).
+    """
+    pillars_order = ['hour', 'day', 'month', 'year']
+    stems = {'hour': h_stem, 'day': d_stem, 'month': m_stem, 'year': y_stem}
+    branches = {'hour': h_branch, 'day': d_branch, 'month': m_branch, 'year': y_branch}
+    result: Dict[str, List[Dict[str, str]]] = {k: [] for k in pillars_order}
+
+    # 1. Nobleman (Tian Yi Gui Ren 天乙貴人):
+    # Jia/Wu/Geng -> Chou(1), Wei(7)
+    # Yi/Ji -> Zi(0), Shen(8)
+    # Bing/Ding -> Hai(11), You(9)
+    # Ren/Gui -> Mao(3), Si(5)
+    # Xin -> Wu(6), Yin(2)
+    tian_yi_map = {
+        0: [1, 7], 4: [1, 7], 6: [1, 7],
+        1: [0, 8], 5: [0, 8],
+        2: [11, 9], 3: [11, 9],
+        8: [3, 5], 9: [3, 5],
+        7: [6, 2]
+    }
+
+    # 2. Academic Star (Wen Chang Gui Ren 文昌貴人)
+    wen_chang_map = {0: 5, 1: 6, 2: 8, 3: 9, 4: 8, 5: 9, 6: 11, 7: 0, 8: 2, 9: 3}
+
+    # 3. Prosperity (Lu Shen 祿神)
+    lu_map = {0: 2, 1: 3, 2: 5, 3: 6, 4: 5, 5: 6, 6: 8, 7: 9, 8: 11, 9: 0}
+
+    # 4. Goat Blade (Yang Ren 羊刃)
+    yang_ren_map = {0: 3, 1: 4, 2: 6, 3: 7, 4: 6, 5: 7, 6: 9, 7: 10, 8: 0, 9: 1}
+
+    # 5. Golden Carriage (Jin Yu 金輿)
+    jin_yu_map = {0: 4, 1: 5, 2: 7, 3: 8, 4: 7, 5: 8, 6: 10, 7: 11, 8: 1, 9: 2}
+
+    # 6. Tai Ji Nobleman (Tai Ji Gui Ren 太極貴人)
+    taiji_map = {
+        0: [0, 6], 1: [0, 6],
+        2: [3, 9], 3: [3, 9],
+        4: [1, 7, 4, 10], 5: [1, 7, 4, 10],
+        6: [2, 11], 7: [2, 11],
+        8: [5, 8], 9: [5, 8]
+    }
+
+    # 7. National Seal (Guo Yin Gui Ren 國印貴人)
+    guo_yin_map = {0: 10, 1: 11, 2: 1, 3: 2, 4: 1, 5: 2, 6: 4, 7: 5, 8: 7, 9: 8}
+
+    # 8. San He Three Harmonies Star Groups (from Day Branch & Year Branch)
+    # 0: Shen-Zi-Chen, 1: Si-You-Chou, 2: Yin-Wu-Xu, 3: Hai-Mao-Wei
+    def get_san_he_stars(ref_branch: int) -> Dict[str, int]:
+        grp = ref_branch % 4
+        if grp == 0:
+            return {'peach': 9, 'horse': 2, 'general': 0, 'canopy': 4, 'robbery': 5, 'death': 11}
+        elif grp == 1:
+            return {'peach': 6, 'horse': 11, 'general': 9, 'canopy': 1, 'robbery': 2, 'death': 8}
+        elif grp == 2:
+            return {'peach': 3, 'horse': 8, 'general': 6, 'canopy': 10, 'robbery': 11, 'death': 5}
+        else:
+            return {'peach': 0, 'horse': 5, 'general': 3, 'canopy': 7, 'robbery': 8, 'death': 2}
+
+    day_sh = get_san_he_stars(d_branch)
+    year_sh = get_san_he_stars(y_branch)
+
+    # 9. Hong Luan & Tian Xi (from Year Branch)
+    hong_luan_b = (3 - y_branch) % 12
+    tian_xi_b = (hong_luan_b + 6) % 12
+
+    # 10. Solitary (Gu Chen 孤辰) & Lonesome (Gua Su 寡宿) (from Year Branch season)
+    def get_season(b: int) -> str:
+        if b in [11, 0, 1]: return 'winter'
+        if b in [2, 3, 4]: return 'spring'
+        if b in [5, 6, 7]: return 'summer'
+        return 'autumn'
+
+    sea = get_season(y_branch)
+    if sea == 'winter': gu_chen_b, gua_su_b = 2, 10
+    elif sea == 'spring': gu_chen_b, gua_su_b = 5, 1
+    elif sea == 'summer': gu_chen_b, gua_su_b = 8, 4
+    else: gu_chen_b, gua_su_b = 11, 7
+
+    # 11. Heavenly Doctor (Tian Yi 天醫) = Month Branch - 1
+    tian_yi_doc_b = (m_branch - 1) % 12
+
+    # 12. Monthly Virtue (Yue De Gui Ren 月德貴人)
+    # Yin-Wu-Xu: Bing(2), Shen-Zi-Chen: Ren(8), Hai-Mao-Wei: Jia(0), Si-You-Chou: Geng(6)
+    m_grp = m_branch % 4
+    yue_de_s = {2: 2, 0: 8, 3: 0, 1: 6}[m_grp]
+
+    # 13. Heavenly Virtue (Tian De Gui Ren 天德貴人)
+    tian_de_map = {
+        2: ('s', 3), 3: ('b', 8), 4: ('s', 8), 5: ('s', 7),
+        6: ('b', 11), 7: ('s', 0), 8: ('s', 9), 9: ('b', 2),
+        10: ('s', 2), 11: ('s', 1), 0: ('b', 5), 1: ('s', 6)
+    }
+    td_type, td_target = tian_de_map[m_branch]
+
+    for p_col in pillars_order:
+        b_idx = branches[p_col]
+        s_idx = stems[p_col]
+        p_stars: List[Dict[str, str]] = []
+
+        # Tian Yi Nobleman (Day Master)
+        if b_idx in tian_yi_map.get(d_stem, []):
+            p_stars.append({'zh': '天乙貴人', 'en': 'Tian Yi Nobleman', 'category': 'noble'})
+        # Tian Yi Nobleman (Year Stem)
+        elif b_idx in tian_yi_map.get(y_stem, []):
+            p_stars.append({'zh': '天乙貴人(年)', 'en': 'Year Nobleman', 'category': 'noble'})
+
+        # Tai Ji Nobleman
+        if b_idx in taiji_map.get(d_stem, []):
+            p_stars.append({'zh': '太極貴人', 'en': 'Tai Ji Nobleman', 'category': 'taiji'})
+
+        # Tian De & Yue De
+        if td_type == 's' and s_idx == td_target:
+            p_stars.append({'zh': '天德貴人', 'en': 'Heavenly Virtue', 'category': 'virtue'})
+        elif td_type == 'b' and b_idx == td_target:
+            p_stars.append({'zh': '天德貴人', 'en': 'Heavenly Virtue', 'category': 'virtue'})
+
+        if s_idx == yue_de_s:
+            p_stars.append({'zh': '月德貴人', 'en': 'Monthly Virtue', 'category': 'virtue'})
+
+        # Wen Chang Academic
+        if b_idx == wen_chang_map.get(d_stem):
+            p_stars.append({'zh': '文昌貴人', 'en': 'Academic Star', 'category': 'academic'})
+
+        # National Seal
+        if b_idx == guo_yin_map.get(d_stem):
+            p_stars.append({'zh': '國印貴人', 'en': 'National Seal', 'category': 'noble'})
+
+        # Lu Shen Prosperity
+        if b_idx == lu_map.get(d_stem):
+            p_stars.append({'zh': '祿神', 'en': 'Prosperity Star', 'category': 'lu'})
+
+        # Jin Yu Golden Carriage
+        if b_idx == jin_yu_map.get(d_stem):
+            p_stars.append({'zh': '金輿', 'en': 'Golden Carriage', 'category': 'jinyu'})
+
+        # General Star
+        if b_idx == day_sh['general'] or b_idx == year_sh['general']:
+            p_stars.append({'zh': '將星', 'en': 'General Star', 'category': 'general'})
+
+        # Hua Gai Elegant Seal / Canopy
+        if b_idx == day_sh['canopy'] or b_idx == year_sh['canopy']:
+            p_stars.append({'zh': '華蓋', 'en': 'Elegant Seal', 'category': 'canopy'})
+
+        # Sky Horse
+        if b_idx == day_sh['horse'] or b_idx == year_sh['horse']:
+            p_stars.append({'zh': '驛馬', 'en': 'Sky Horse', 'category': 'horse'})
+
+        # Peach Blossom
+        if b_idx == day_sh['peach'] or b_idx == year_sh['peach']:
+            p_stars.append({'zh': '桃花', 'en': 'Peach Blossom', 'category': 'peach'})
+
+        # Red Matchmaker & Heavenly Happiness
+        if b_idx == hong_luan_b:
+            p_stars.append({'zh': '紅鸞', 'en': 'Red Matchmaker', 'category': 'romance'})
+        if b_idx == tian_xi_b:
+            p_stars.append({'zh': '天喜', 'en': 'Heavenly Happiness', 'category': 'romance'})
+
+        # Heavenly Doctor
+        if b_idx == tian_yi_doc_b:
+            p_stars.append({'zh': '天醫', 'en': 'Heavenly Doctor', 'category': 'doctor'})
+
+        # Goat Blade
+        if b_idx == yang_ren_map.get(d_stem):
+            p_stars.append({'zh': '羊刃', 'en': 'Goat Blade', 'category': 'blade'})
+
+        # Robbery Sha & Death God
+        if b_idx == day_sh['robbery'] or b_idx == year_sh['robbery']:
+            p_stars.append({'zh': '劫煞', 'en': 'Robbery Sha', 'category': 'sha'})
+        if b_idx == day_sh['death'] or b_idx == year_sh['death']:
+            p_stars.append({'zh': '亡神', 'en': 'Death God', 'category': 'sha'})
+
+        # Solitary & Lonesome
+        if b_idx == gu_chen_b:
+            p_stars.append({'zh': '孤辰', 'en': 'Solitary Star', 'category': 'sha'})
+        if b_idx == gua_su_b:
+            p_stars.append({'zh': '寡宿', 'en': 'Lonesome Star', 'category': 'sha'})
+
+        # Special Pillars
+        pillar_str = f"{STEM_CHARS[s_idx]}{BRANCH_CHARS[b_idx]}"
+        if pillar_str in ['戊戌', '庚戌', '庚辰', '壬辰']:
+            p_stars.append({'zh': '魁罡', 'en': 'Kui Gang', 'category': 'leader'})
+        if pillar_str in ['甲辰', '乙亥', '丙辰', '丁酉', '戊午', '庚戌', '庚寅', '辛亥', '壬寅', '癸未']:
+            p_stars.append({'zh': '十靈日', 'en': 'Ten Spirits', 'category': 'taiji'})
+        if pillar_str in ['乙丑', '己巳', '癸酉']:
+            p_stars.append({'zh': '金神', 'en': 'Golden God', 'category': 'general'})
+
+        # Deduplicate preserving order
+        seen = set()
+        dedup = []
+        for s in p_stars:
+            if s['zh'] not in seen:
+                seen.add(s['zh'])
+                dedup.append(s)
+        result[p_col] = dedup
+
+    return result
+
+def get_shen_sha_badge_style(category: str) -> str:
+    """Returns CSS styles for color-coded Shen Sha badges."""
+    base = "display: inline-flex; flex-direction: column; align-items: center; justify-content: center; padding: 4px 6px; border-radius: 5px; font-size: 11px; text-align: center; min-width: 66px; max-width: 105px; box-sizing: border-box; "
+    if category in ('noble', 'virtue', 'lu', 'general', 'jinyu'):
+        return base + "background: rgba(245, 158, 11, 0.14); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.38);"
+    elif category in ('academic', 'doctor'):
+        return base + "background: rgba(16, 185, 129, 0.14); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.38);"
+    elif category in ('horse', 'taiji', 'leader'):
+        return base + "background: rgba(56, 189, 248, 0.14); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.38);"
+    elif category in ('romance', 'peach'):
+        return base + "background: rgba(244, 114, 182, 0.14); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.38);"
+    elif category in ('canopy',):
+        return base + "background: rgba(192, 132, 252, 0.14); color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.38);"
+    elif category in ('blade', 'sha'):
+        return base + "background: rgba(244, 63, 94, 0.14); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.38);"
+    return base + "background: rgba(148, 163, 184, 0.14); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.35);"
+
 def calculate_ming_gua(bazi_year: int, gender: str) -> Dict[str, Any]:
     """Computes Life Star (Ming Gua) and 8 Mansions (Ba Zhai) Favorable/Unfavorable Directions."""
     last_two = bazi_year % 100
@@ -429,6 +649,10 @@ def calculate_four_pillars(year: int, month: int, day: int, hour: int = 12, minu
 
     # 6. Auxiliary Stars & Shen Sha
     aux = calculate_auxiliary_stars(day_stem_idx, y_branch_idx, day_branch_idx, m_branch_idx, h_branch_idx, y_stem_idx, m_stem_idx, sun_lon=sun_lon)
+    pillar_shen_sha = calculate_pillar_shen_sha(
+        day_stem_idx, y_stem_idx, m_stem_idx, h_stem_idx,
+        day_branch_idx, y_branch_idx, m_branch_idx, h_branch_idx
+    )
 
     # 7. Ming Gua & Directions
     gua_data = calculate_ming_gua(bazi_year, gender)
@@ -451,7 +675,8 @@ def calculate_four_pillars(year: int, month: int, day: int, hour: int = 12, minu
                     **hs,
                     'god': get_10_god(day_stem_idx, hs['stem_idx'])
                 } for hs in BRANCH_HIDDEN_STEMS_MAP[h_branch_idx]
-            ]
+            ],
+            'shen_sha': pillar_shen_sha['hour'],
         },
         'day': {
             'stem_idx': day_stem_idx,
@@ -469,7 +694,8 @@ def calculate_four_pillars(year: int, month: int, day: int, hour: int = 12, minu
                     **hs,
                     'god': get_10_god(day_stem_idx, hs['stem_idx'])
                 } for hs in BRANCH_HIDDEN_STEMS_MAP[day_branch_idx]
-            ]
+            ],
+            'shen_sha': pillar_shen_sha['day'],
         },
         'month': {
             'stem_idx': m_stem_idx,
@@ -487,7 +713,8 @@ def calculate_four_pillars(year: int, month: int, day: int, hour: int = 12, minu
                     **hs,
                     'god': get_10_god(day_stem_idx, hs['stem_idx'])
                 } for hs in BRANCH_HIDDEN_STEMS_MAP[m_branch_idx]
-            ]
+            ],
+            'shen_sha': pillar_shen_sha['month'],
         },
         'year': {
             'stem_idx': y_stem_idx,
@@ -505,12 +732,14 @@ def calculate_four_pillars(year: int, month: int, day: int, hour: int = 12, minu
                     **hs,
                     'god': get_10_god(day_stem_idx, hs['stem_idx'])
                 } for hs in BRANCH_HIDDEN_STEMS_MAP[y_branch_idx]
-            ]
+            ],
+            'shen_sha': pillar_shen_sha['year'],
         },
         'day_master': STEM_NAMES[day_stem_idx],
         'day_master_element': STEM_ELEMENTS[day_stem_idx],
         'day_animal': BRANCH_ANIMALS[day_branch_idx],
         'aux': aux,
+        'pillar_shen_sha': pillar_shen_sha,
         'gua': gua_data,
         'client_name': client_name,
         'gender': gender,
@@ -779,11 +1008,47 @@ def generate_natal_chart_html(p: Dict[str, Any]) -> str:
   </div>
 </div>"""
         raw_html += """</div></td>"""
-    raw_html += f"""<td style="padding: 10px; border-left: 2px solid #f59e0b; font-size: 12px; font-weight: 700; color: #fbbf24; background: #1e293b; vertical-align: middle; line-height: 1.4;">藏干<br><span style="font-size: 10px; font-weight: normal; color: #94a3b8;">Hidden<br>Stems</span></td></tr></tbody></table>
+    raw_html += f"""<td style="padding: 10px; border-left: 2px solid #f59e0b; font-size: 12px; font-weight: 700; color: #fbbf24; background: #1e293b; vertical-align: middle; line-height: 1.4;">藏干<br><span style="font-size: 10px; font-weight: normal; color: #94a3b8;">Hidden<br>Stems</span></td></tr>"""
+
+    # SHEN SHA AUXILIARY STARS (神煞)
+    raw_html += """<tr style="background: rgba(30, 41, 59, 0.45);">"""
+    for col in order:
+        meta = p[col]
+        ss_list = meta.get('shen_sha', [])
+        raw_html += """<td style="padding: 10px 6px; border-right: 1px solid #334155; vertical-align: top;">
+  <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; min-height: 48px; align-content: flex-start;">"""
+        if not ss_list:
+            raw_html += """<span style="color: #64748b; font-size: 11px; font-style: italic; padding: 12px 0;">—</span>"""
+        else:
+            for item in ss_list:
+                zh_name = item['zh']
+                en_name = item['en']
+                category = item['category']
+                badge_style = get_shen_sha_badge_style(category)
+                raw_html += f"""<div style="{badge_style}" title="{zh_name} ({en_name})">
+  <span style="font-weight: 700; line-height: 1.2;">{zh_name}</span>
+  <span style="font-size: 8.5px; opacity: 0.85; line-height: 1.1; margin-top: 1px;">{en_name}</span>
+</div>"""
+        raw_html += """</div></td>"""
+    raw_html += f"""<td style="padding: 10px; border-left: 2px solid #f59e0b; font-size: 12px; font-weight: 700; color: #fbbf24; background: #1e293b; vertical-align: middle; line-height: 1.4;">神煞<br><span style="font-size: 10px; font-weight: normal; color: #94a3b8;">Shen Sha /<br>Auxiliary<br>Stars</span></td></tr></tbody></table>
 </div>
 
-<!-- BOTTOM ROW: 8 MANSIONS (FAVORABLE & UNFAVORABLE DIRECTIONS) -->
-<div class="directions-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+<!-- AUXILIARY STARS LEGEND -->
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; margin: -10px 0 16px 0; padding: 8px 14px; background: rgba(19, 29, 54, 0.8); border: 1px solid #1e3a8a; border-radius: 6px; font-size: 11px; color: #94a3b8; gap: 8px;">
+  <span style="font-weight: 700; color: #fbbf24;">神煞 Shen Sha Star Types:</span>
+  <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+    <span style="color: #fbbf24;">● Noble / Virtue / Prosperity</span>
+    <span style="color: #34d399;">● Intelligence / Doctor</span>
+    <span style="color: #38bdf8;">● Travel / Wisdom</span>
+    <span style="color: #f472b6;">● Romance / Peach Blossom</span>
+    <span style="color: #c084fc;">● Arts / Canopy</span>
+    <span style="color: #fb7185;">● Martial / Dynamic Sha</span>
+  </div>
+</div>"""
+
+    # BOTTOM ROW: 8 MANSIONS (FAVORABLE & UNFAVORABLE DIRECTIONS)
+    raw_html += f"""<div class="directions-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+
 
   <!-- Favorable Directions -->
   <div style="background: #131d36; border: 1px solid #065f46; border-radius: 8px; overflow: hidden; font-size: 12px;">
@@ -856,13 +1121,19 @@ def generate_natal_chart_markdown(p: Dict[str, Any]) -> str:
     def format_hs(hs_list):
         return " / ".join([f"{hs['char']} {hs['name']} ({hs['polarity_elem']}, {hs['god']['zh_short']} {hs['god']['code']})" for hs in hs_list])
 
+    def format_ss(ss_list):
+        if not ss_list:
+            return "-"
+        return ", ".join([f"{s['zh']} {s['en']}" for s in ss_list])
+
     md = (
         "### NATAL CHART 本命八字\n\n"
         "| 時 Hour | 日 Day | 月 Month | 年 Year | Pillar |\n"
         "| :---: | :---: | :---: | :---: | :---: |\n"
         f"| **{h['stem_char']}** {h['stem_name']} ({h['stem_elem']})<br>`[{h['stem_god']['zh_full']} {h['stem_god']['code']}]` | **{d['stem_char']}** {d['stem_name']} ({d['stem_elem']})<br>`[{d['stem_god']['zh_full']} {d['stem_god']['code']}]` | **{m['stem_char']}** {m['stem_name']} ({m['stem_elem']})<br>`[{m['stem_god']['zh_full']} {m['stem_god']['code']}]` | **{y['stem_char']}** {y['stem_name']} ({y['stem_elem']})<br>`[{y['stem_god']['zh_full']} {y['stem_god']['code']}]` | **天干**<br>Heavenly Stems |\n"
         f"| **{h['branch_char']}** {h['branch_name']}<br>{h['branch_animal']}<br>`{h['branch_elem']}` | **{d['branch_char']}** {d['branch_name']}<br>{d['branch_animal']}<br>`{d['branch_elem']}` | **{m['branch_char']}** {m['branch_name']}<br>{m['branch_animal']}<br>`{m['branch_elem']}` | **{y['branch_char']}** {y['branch_name']}<br>{y['branch_animal']}<br>`{y['branch_elem']}` | **地支**<br>Earthly Branches |\n"
-        f"| {format_hs(h['hidden_stems'])} | {format_hs(d['hidden_stems'])} | {format_hs(m['hidden_stems'])} | {format_hs(y['hidden_stems'])} | **藏干**<br>Hidden Stems |\n\n"
+        f"| {format_hs(h['hidden_stems'])} | {format_hs(d['hidden_stems'])} | {format_hs(m['hidden_stems'])} | {format_hs(y['hidden_stems'])} | **藏干**<br>Hidden Stems |\n"
+        f"| {format_ss(h.get('shen_sha', []))} | {format_ss(d.get('shen_sha', []))} | {format_ss(m.get('shen_sha', []))} | {format_ss(y.get('shen_sha', []))} | **神煞**<br>Shen Sha |\n\n"
         f"* **Day Master (日元):** **{d['stem_char']} {d['stem_name']} ({p['day_master_element']})** sitting on **{d['branch_animal']} ({d['branch_name']})**\n"
         f"* **Celestial Animal (生肖):** {aux.get('celestial_animal', '-')}\n"
         f"* **Noble People (貴人):** {aux.get('noble_people', '-')}\n"
