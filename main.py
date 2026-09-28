@@ -226,11 +226,11 @@ def index():
     </header>
 
     <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('qimen_date')">📅 Qi Men Date Selection</button>
-      <button class="tab-btn" onclick="switchTab('qimen_fs')">🧭 Qi Men Feng Shui</button>
-      <button class="tab-btn" onclick="switchTab('bazi')">🔮 BaZi PSPR</button>
-      <button class="tab-btn" onclick="switchTab('fengshui')">🏡 Feng Shui Audit</button>
-      <button class="tab-btn" onclick="switchTab('calendar')">📜 10K Calendar</button>
+      <button class="tab-btn active" onclick="switchTab('qimen_date', this)">📅 Qi Men Date Selection</button>
+      <button class="tab-btn" onclick="switchTab('qimen_fs', this)">🧭 Qi Men Feng Shui</button>
+      <button class="tab-btn" onclick="switchTab('bazi', this)">🔮 BaZi PSPR</button>
+      <button class="tab-btn" onclick="switchTab('fengshui', this)">🏡 Feng Shui Audit</button>
+      <button class="tab-btn" onclick="switchTab('calendar', this)">📜 10K Calendar</button>
     </div>
 
     <!-- Qi Men Date Selection Form -->
@@ -355,11 +355,19 @@ def index():
   </div>
 
   <script>
-    function switchTab(tabId) {
+    function switchTab(tabId, btn) {
       document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('panel-' + tabId).style.display = 'block';
-      event.target.classList.add('active');
+      const targetPanel = document.getElementById('panel-' + tabId);
+      if (targetPanel) {
+        targetPanel.style.display = 'block';
+      }
+      if (btn) {
+        btn.classList.add('active');
+      } else {
+        const found = document.querySelector(`.tab-btn[onclick*="'${tabId}'"]`);
+        if (found) found.classList.add('active');
+      }
     }
 
     async function sendRequest(url, payload) {
@@ -386,14 +394,6 @@ def index():
           htmlOutput += data.chart_html;
         }
         let text = data.result || data.response || '';
-        if (!data.chart_html && typeof text === 'string' && text.includes('class="joey-yap-personal-chart"')) {
-          const splitIdx = text.indexOf('</div>\n</div>');
-          if (splitIdx !== -1) {
-            const endDiv = splitIdx + '</div>\n</div>'.length;
-            htmlOutput += text.substring(0, endDiv);
-            text = text.substring(endDiv).trim();
-          }
-        }
         if (text) {
           htmlOutput += '<div style="margin-top:20px; line-height: 1.7;">' + marked.parse(text) + '</div>';
         }
