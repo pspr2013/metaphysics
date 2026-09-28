@@ -500,14 +500,21 @@ def calculate_four_pillars(year: int, month: int, day: int, hour: int = 12, minu
         'birth_hour': hour,
         'birth_minute': minute,
         'sun_lon': sun_lon,
-        'qimen_destiny': {
+    }
+
+    # Dynamic Authentic Qi Men Destiny Palace calculation (Zhi Run Fa)
+    try:
+        from qimen_engine import calculate_natal_qimen_destiny
+        pillars_meta['qimen_destiny'] = calculate_natal_qimen_destiny(pillars_meta)
+    except Exception:
+        pillars_meta['qimen_destiny'] = {
             'palace': '東北 NE',
             'stem': f"{STEM_CHARS[day_stem_idx]} {STEM_NAMES[day_stem_idx]}",
             'door': '休 Rest',
             'star': '天任 Ambassador',
             'guardian': '地 Earth'
         }
-    }
+
     return pillars_meta
 
 def generate_natal_chart_html(p: Dict[str, Any]) -> str:
@@ -604,7 +611,7 @@ def generate_natal_chart_html(p: Dict[str, Any]) -> str:
 <div style="border: 1px solid #7a1518; border-radius: 4px; overflow: hidden; font-size: 12px; background: #ffffff;">
 <div style="background: #7a1518; color: #ffffff; padding: 6px 10px; font-weight: bold; display: flex; justify-content: space-between;">
 <span>QI MEN DESTINY PALACE</span>
-<span>寄門命宮 : {qm.get('palace', '東北 NE')}</span>
+<span>奇門命宮 : {qm.get('palace', '東北 NE')}</span>
 </div>
 <div style="padding: 10px 10px; line-height: 2.1;">
 <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 4px 0;">
@@ -778,6 +785,7 @@ def generate_natal_chart_markdown(p: Dict[str, Any]) -> str:
         f"* **Life Palace (命宮):** {aux.get('life_palace', '-')}\n"
         f"* **Conception Palace (胎元):** {aux.get('conception_palace', '-')}\n"
         f"* **Life Star / Ming Gua (命卦):** {gua.get('life_star_zh', '')} ({gua.get('life_star_num', '')} {gua.get('life_star_color', '')}) | **Feng Shui Gua:** {gua.get('fs_gua_char', '')} {gua.get('fs_gua_name', '')} ({gua.get('fs_gua_dir', '')})\n"
+        f"* **Qi Men Destiny Palace (奇門命宮):** {p.get('qimen_destiny', {}).get('palace', '-')} | **Life Stem (命干):** {p.get('qimen_destiny', {}).get('stem', '-')} | **Door (門):** {p.get('qimen_destiny', {}).get('door', '-')} | **Star (星):** {p.get('qimen_destiny', {}).get('star', '-')} | **Guardian (神):** {p.get('qimen_destiny', {}).get('guardian', '-')}\n"
     )
     return md
 

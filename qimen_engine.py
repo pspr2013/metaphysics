@@ -2,7 +2,7 @@ import datetime
 from typing import Dict, Any, List, Optional, Tuple
 import re
 
-from bazi_engine import calculate_four_pillars, parse_date_and_time, STEM_NAMES, STEM_CHARS, BRANCH_NAMES, BRANCH_CHARS
+from bazi_engine import calculate_four_pillars, parse_date_and_time, STEM_NAMES, STEM_CHARS, BRANCH_NAMES, BRANCH_CHARS, get_astronomical_solar_longitude
 
 # ==========================================
 # PALACE METADATA & CONSTANTS
@@ -86,19 +86,98 @@ DEITY_CYCLE = ['Chief', 'Snake', 'Moon', 'Harmony', 'Hook', 'Phoenix', 'Earth', 
 # QI MEN CALCULATION ENGINE (ZHI RUN FA)
 # ==========================================
 
+SOLAR_TERM_JU = {
+    'Dong Zhi': ('Yang', (1, 7, 4)),
+    'Xiao Han': ('Yang', (2, 8, 5)),
+    'Da Han': ('Yang', (3, 9, 6)),
+    'Li Chun': ('Yang', (8, 5, 2)),
+    'Yu Shui': ('Yang', (9, 6, 3)),
+    'Jing Zhe': ('Yang', (1, 7, 4)),
+    'Chun Fen': ('Yang', (3, 9, 6)),
+    'Qing Ming': ('Yang', (4, 1, 7)),
+    'Gu Yu': ('Yang', (5, 2, 8)),
+    'Li Xia': ('Yang', (4, 1, 7)),
+    'Xiao Man': ('Yang', (5, 2, 8)),
+    'Mang Zhong': ('Yang', (6, 3, 9)),
+    'Xia Zhi': ('Yin', (9, 3, 6)),
+    'Xiao Shu': ('Yin', (8, 2, 5)),
+    'Da Shu': ('Yin', (7, 1, 4)),
+    'Li Qiu': ('Yin', (2, 5, 8)),
+    'Chu Shu': ('Yin', (1, 4, 7)),
+    'Bai Lu': ('Yin', (9, 3, 6)),
+    'Qiu Fen': ('Yin', (7, 1, 4)),
+    'Han Lu': ('Yin', (6, 9, 3)),
+    'Shuang Jiang': ('Yin', (5, 8, 2)),
+    'Li Dong': ('Yin', (6, 9, 3)),
+    'Xiao Xue': ('Yin', (5, 8, 2)),
+    'Da Xue': ('Yin', (4, 7, 1)),
+}
+
+TERM_LONGITUDES = [
+    ('Chun Fen', 0.0), ('Qing Ming', 15.0), ('Gu Yu', 30.0), ('Li Xia', 45.0),
+    ('Xiao Man', 60.0), ('Mang Zhong', 75.0), ('Xia Zhi', 90.0), ('Xiao Shu', 105.0),
+    ('Da Shu', 120.0), ('Li Qiu', 135.0), ('Chu Shu', 150.0), ('Bai Lu', 165.0),
+    ('Qiu Fen', 180.0), ('Han Lu', 195.0), ('Shuang Jiang', 210.0), ('Li Dong', 225.0),
+    ('Xiao Xue', 240.0), ('Da Xue', 255.0), ('Dong Zhi', 270.0), ('Xiao Han', 285.0),
+    ('Da Han', 300.0), ('Li Chun', 315.0), ('Yu Shui', 330.0), ('Jing Zhe', 345.0)
+]
+
+DIR_ZH_MAP = {
+    'N': '北 N',
+    'NE': '東北 NE',
+    'E': '東 E',
+    'SE': '東南 SE',
+    'S': '南 S',
+    'SW': '西南 SW',
+    'W': '西 W',
+    'NW': '西北 NW',
+    'Center': '中 Center'
+}
+
+def get_qimen_dun_and_ju(year: int, month: int, day: int, day_stem_idx: int, day_branch_idx: int) -> Tuple[str, int, str]:
+    """
+    Computes authentic Dun (Yang/Yin) and Ju Number (1-9) using Zhi Run Fa (置閏法 - 超神接氣).
+    Determines Fu Tou (符頭), nearest Solar Term, and Yuan (Shang/Zhong/Xia).
+    """
+    # 60 Jia Zi cycle index (0 to 59)
+    day_cycle_idx = (day_stem_idx * 6 - day_branch_idx * 5) % 60
+    
+    # Fu Tou day offset from today (occurs every 5 days: cycle 0, 5, 10, ...)
+    ft_rem = day_cycle_idx % 5
+    ft_date = datetime.date(year, month, day) - datetime.timedelta(days=ft_rem)
+    
+    # Determine Yuan:
+    # Shang Yuan Fu Tou: 0 (Jia Zi), 15 (Ji Mao), 30 (Jia Wu), 45 (Ji You)
+    # Zhong Yuan Fu Tou: 5 (Ji Si), 20 (Jia Shen), 35 (Ji Hai), 50 (Jia Yin)
+    # Xia Yuan Fu Tou: 10 (Jia Xu), 25 (Ji Chou), 40 (Jia Chen), 55 (Ji Wei)
+    ft_cycle_idx = day_cycle_idx - ft_rem
+    if ft_cycle_idx in [0, 15, 30, 45]:
+        yuan_idx = 0  # Shang Yuan
+    elif ft_cycle_idx in [5, 20, 35, 50]:
+        yuan_idx = 1  # Zhong Yuan
+    else:
+        yuan_idx = 2  # Xia Yuan
+
+    # Find the nearest Solar Term to Fu Tou date (Zhi Run Fa)
+    ft_sun_lon = get_astronomical_solar_longitude(ft_date.year, ft_date.month, ft_date.day, 12, 0)
+    nearest_term_deg = (round(ft_sun_lon / 15.0) * 15) % 360
+    
+    term_name = 'Dong Zhi'
+    for name, deg in TERM_LONGITUDES:
+        if abs(deg - nearest_term_deg) < 1e-4:
+            term_name = name
+            break
+            
+    dun_type, triplet = SOLAR_TERM_JU[term_name]
+    ju_num = triplet[yuan_idx]
+    return dun_type, ju_num, term_name
+
 def get_xun_shou(stem_idx: int, branch_idx: int) -> Tuple[str, str, int]:
     """
     Computes Xun Shou (Leader Jia Zi head and hidden stem) from Stem & Branch index.
     Returns: (xun_shou_name, leader_stem, void_branch_idx)
     """
-    diff = (stem_idx - branch_idx) % 12
-    # diff:
-    # 0 -> Jia Zi (Wu 戊) [Void: Xu 10, Hai 11]
-    # 10 -> Jia Xu (Ji 己) [Void: Shen 8, You 9]
-    # 8 -> Jia Shen (Geng 庚) [Void: Wu 6, Wei 7]
-    # 6 -> Jia Wu (Xin 辛) [Void: Chen 4, Si 5]
-    # 4 -> Jia Chen (Ren 壬) [Void: Yin 2, Mao 3]
-    # 2 -> Jia Yin (Gui 癸) [Void: Zi 0, Chou 1]
+    diff = (branch_idx - stem_idx) % 12
     mapping = {
         0: ('Jia Zi', 'Wu', 10),
         10: ('Jia Xu', 'Ji', 8),
@@ -111,10 +190,6 @@ def get_xun_shou(stem_idx: int, branch_idx: int) -> Tuple[str, str, int]:
 
 def get_void_palaces(void_branch_idx: int) -> List[int]:
     """Maps void branches to Lo Shu palaces."""
-    # Branches to Palaces:
-    # Zi(0) -> Kan 1, Chou(1) -> Gen 8, Yin(2) -> Gen 8, Mao(3) -> Zhen 3,
-    # Chen(4) -> Xun 4, Si(5) -> Xun 4, Wu(6) -> Li 9, Wei(7) -> Kun 2,
-    # Shen(8) -> Kun 2, You(9) -> Dui 7, Xu(10) -> Qian 6, Hai(11) -> Qian 6
     b_map = {0: 1, 1: 8, 2: 8, 3: 3, 4: 4, 5: 4, 6: 9, 7: 2, 8: 2, 9: 7, 10: 6, 11: 6}
     p1 = b_map.get(void_branch_idx, 1)
     p2 = b_map.get((void_branch_idx + 1) % 12, 1)
@@ -188,14 +263,17 @@ def calculate_qimen_chart_from_pillars(pillars: Dict[str, Any], dun_type: str = 
     tian_pan[5] = di_pan.get(5, 'Ji')
 
     # 5. Rotate 8 Doors
-    # Calculate step difference between Hour branch and Xun Shou branch
-    step_diff = (h_branch_idx - ((h_stem_idx - h_branch_idx) % 12)) % 12
-    door_start_perim_idx = PERIMETER_PALACES.index(active_leader_palace) if active_leader_palace in PERIMETER_PALACES else 0
+    # The Duty Door (值使門) steps along the 9 Lo Shu palaces from its home palace
+    xun_shou_branch_idx = (h_branch_idx - h_stem_idx) % 12
+    step_diff = (h_branch_idx - xun_shou_branch_idx) % 12
     if dun_type.lower() == 'yang':
-        door_dest_perim_idx = (door_start_perim_idx + step_diff) % 8
+        door_dest_palace = (active_leader_palace + step_diff - 1) % 9 + 1
     else:
-        door_dest_perim_idx = (door_start_perim_idx - step_diff) % 8
+        door_dest_palace = (active_leader_palace - step_diff - 1) % 9 + 1
+    if door_dest_palace == 5:
+        door_dest_palace = 2 if dun_type.lower() == 'yang' else 8
 
+    door_dest_perim_idx = PERIMETER_PALACES.index(door_dest_palace)
     door_positions = {}
     door_idx_start = DOOR_CYCLE.index(duty_door) if duty_door in DOOR_CYCLE else 0
     for i in range(8):
@@ -294,6 +372,52 @@ def calculate_qimen_chart_from_pillars(pillars: Dict[str, Any], dun_type: str = 
         'duty_door': duty_door,
         'void_palaces': void_palaces,
         'palaces': palaces_data
+    }
+
+def calculate_natal_qimen_destiny(pillars: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Dynamically computes authentic Joey Yap Natal Qi Men Destiny Palace info
+    (Palace, Life Stem, Door of Destiny, Star of Destiny, Guardian of Destiny)
+    using Zhi Run Fa (置閏法).
+    """
+    year = pillars.get('birth_year', 1981)
+    month = pillars.get('birth_month', 6)
+    day = pillars.get('birth_day', 3)
+    d_stem_name = pillars['day']['stem_name']
+    d_branch_name = pillars['day']['branch_name']
+    d_stem_idx = STEM_NAMES.index(d_stem_name) if d_stem_name in STEM_NAMES else 0
+    d_branch_idx = BRANCH_NAMES.index(d_branch_name) if d_branch_name in BRANCH_NAMES else 0
+
+    dun_type, ju_num, term_name = get_qimen_dun_and_ju(year, month, day, d_stem_idx, d_branch_idx)
+    chart = calculate_qimen_chart_from_pillars(pillars, dun_type=dun_type, ju_num=ju_num)
+
+    destiny_p = chart['destiny_palace']
+    p_info = chart['palaces'][destiny_p]
+
+    pal_dir = PALACES_INFO[destiny_p]['dir']
+    pal_zh = DIR_ZH_MAP.get(pal_dir, pal_dir)
+
+    stem_char = pillars['day']['stem_char']
+    stem_name = pillars['day']['stem_name']
+
+    door_char = p_info['door']['char']
+    door_en = p_info['door']['en']
+
+    star_char = p_info['star']['char']
+    star_en = p_info['star']['en']
+    star_display = f"天{star_char} {star_en}" if not star_char.startswith('天') else f"{star_char} {star_en}"
+
+    deity_char = p_info['deity']['char']
+    deity_en = p_info['deity']['en']
+
+    return {
+        'palace': pal_zh,
+        'stem': f"{stem_char} {stem_name}",
+        'door': f"{door_char} {door_en}",
+        'star': star_display,
+        'guardian': f"{deity_char} {deity_en}",
+        'structure': f"{dun_type} Dun {ju_num} ({term_name})",
+        'palace_num': destiny_p
     }
 
 # ==========================================
@@ -553,13 +677,12 @@ def build_grounded_qimen_destiny_prompt(birth_date_str: str, birth_time_str: str
         # Fallback reference pillars (1990-05-15 09:30)
         pillars = calculate_four_pillars(1990, 5, 15, 9, 30)
 
-    # Calculate Qi Men chart (Default Yang Dun 2 or derived Dun/Ju)
-    # If month is between Dong Zhi (Dec 22) and Xia Zhi (Jun 21), it is Yang Dun
-    is_yang = not (6 <= month <= 11)
-    dun_type = "Yang" if is_yang else "Yin"
-    ju_num = (pillars['day']['branch_idx'] % 9) + 1
-    if ju_num == 0:
-        ju_num = 1
+    # Calculate Qi Men chart using authentic Zhi Run Fa (置閏法)
+    d_stem_name = pillars['day']['stem_name']
+    d_branch_name = pillars['day']['branch_name']
+    d_stem_idx = STEM_NAMES.index(d_stem_name) if d_stem_name in STEM_NAMES else 0
+    d_branch_idx = BRANCH_NAMES.index(d_branch_name) if d_branch_name in BRANCH_NAMES else 0
+    dun_type, ju_num, term_name = get_qimen_dun_and_ju(year or 1990, month or 5, day or 15, d_stem_idx, d_branch_idx)
 
     chart_data = calculate_qimen_chart_from_pillars(pillars, dun_type=dun_type, ju_num=ju_num)
     matrix_md = generate_component_matrix_markdown(chart_data)
