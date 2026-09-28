@@ -240,12 +240,12 @@ def parse_date_and_time(birth_date_str: str, birth_time_str: Optional[str] = Non
 # AUXILIARY SHEN SHA & GUA CALCULATIONS
 # ==========================================
 
-def calculate_auxiliary_stars(dm_stem_idx: int, y_branch_idx: int, d_branch_idx: int, m_branch_idx: int, h_branch_idx: int, y_stem_idx: int, m_stem_idx: int) -> Dict[str, Any]:
+def calculate_auxiliary_stars(dm_stem_idx: int, y_branch_idx: int, d_branch_idx: int, m_branch_idx: int, h_branch_idx: int, y_stem_idx: int, m_stem_idx: int, sun_lon: Optional[float] = None) -> Dict[str, Any]:
     # Noble People (Tian Yi Gui Ren 天乙貴人):
     noble_map = {
         0: '未 Goat, 丑 Ox', 1: '申 Monkey, 子 Rat', 2: '酉 Rooster, 亥 Pig', 3: '酉 Rooster, 亥 Pig',
         4: '未 Goat, 丑 Ox', 5: '申 Monkey, 子 Rat', 6: '丑 Ox, 未 Goat', 7: '午 Horse, 寅 Tiger',
-        8: '卯 Rabbit, 巳 Snake', 9: '卯 Rabbit, 巳 Snake'
+        8: '巳 Snake, 卯 Rabbit', 9: '巳 Snake, 卯 Rabbit'
     }
     # Intelligence (Wen Chang Gui Ren 文昌貴人):
     wen_chang_map = {
@@ -278,9 +278,14 @@ def calculate_auxiliary_stars(dm_stem_idx: int, y_branch_idx: int, d_branch_idx:
     conception_palace = f"{STEM_CHARS[ty_stem_idx]}{BRANCH_CHARS[ty_branch_idx]} {STEM_ELEMENTS[ty_stem_idx].split()[0]} {STEM_SHORT_ELEMENTS[ty_stem_idx]} {BRANCH_SHORT_ANIMALS[ty_branch_idx]}"
 
     # Life Palace (Ming Gong 命宮):
-    # Classical Palm Digital Cardinal method (数字基数法):
+    # Classical Palm Digital Cardinal method (数字基数法) with Zhong Qi advance rule (若過中氣，須作次月推):
     # Count month from Yin=1..Hai=10..Chou=12; Hour from Yin=1..Hai=10..Chou=12
     m_num = (m_branch_idx - 2) % 12 + 1
+    if sun_lon is not None:
+        deg_in_month = (sun_lon - 315.0) % 360.0
+        if (deg_in_month % 30.0) >= 15.0:
+            m_num = (m_num % 12) + 1
+
     h_num = (h_branch_idx - 2) % 12 + 1
     total = m_num + h_num
     mg_num = (14 - total) if total < 14 else (26 - total)
@@ -423,7 +428,7 @@ def calculate_four_pillars(year: int, month: int, day: int, hour: int = 12, minu
     m_stem_idx = (m_start_stem + m_offset) % 10
 
     # 6. Auxiliary Stars & Shen Sha
-    aux = calculate_auxiliary_stars(day_stem_idx, y_branch_idx, day_branch_idx, m_branch_idx, h_branch_idx, y_stem_idx, m_stem_idx)
+    aux = calculate_auxiliary_stars(day_stem_idx, y_branch_idx, day_branch_idx, m_branch_idx, h_branch_idx, y_stem_idx, m_stem_idx, sun_lon=sun_lon)
 
     # 7. Ming Gua & Directions
     gua_data = calculate_ming_gua(bazi_year, gender)
