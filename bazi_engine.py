@@ -919,37 +919,50 @@ def generate_annual_destiny_html(pillars: Dict[str, Any], current_year: int = 20
         palace_name = "南 S (離宮 9)"
 
     html = f"""
-<div style="font-family: 'Kantumruy Pro', 'Inter', -apple-system, sans-serif; background: #ffffff; color: #1e293b; border: 2px solid #800000; border-radius: 8px; overflow: hidden; margin: 24px 0 16px 0; box-shadow: 0 6px 24px rgba(0,0,0,0.2);">
+<!-- 2026 ANNUAL DESTINY & STARS (MATCHING NATAL CHART THEME) -->
+<div style="background: #131d36; border: 1px solid #1e3a8a; border-radius: 10px; overflow: hidden; margin-bottom: 18px; box-shadow: 0 6px 20px rgba(0,0,0,0.3); font-family: 'Kantumruy Pro', 'Inter', -apple-system, sans-serif;">
   
+  <!-- MAIN HEADER BAR -->
+  <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-bottom: 2px solid #f59e0b; color: #ffffff; padding: 10px 16px; font-weight: 700; font-size: 14px; display: flex; justify-content: space-between; align-items: center;">
+    <span style="color: #fbbf24; letter-spacing: 0.03em;">{current_year} ANNUAL DESTINY & STARS 流年吉凶星與奇門</span>
+    <span style="font-size: 12px; font-weight: 500; color: #94a3b8;">Bing Wu Year 丙午年 · Yang Fire Horse</span>
+  </div>
+
   <!-- TOP SECTION: MOBILITY + ANNUAL STARS -->
-  <div class="annual-top-grid" style="display: grid; grid-template-columns: 31% 69%; border-bottom: 2px solid #800000;">
+  <div class="annual-top-grid" style="display: grid; grid-template-columns: 28% 72%; border-bottom: 1px solid #334155;">
     
     <!-- LEFT: MOBILITY DIRECTIONS -->
-    <div style="border-right: 2px solid #800000; display: flex; flex-direction: column;">
-      <div style="background: linear-gradient(135deg, #800000 0%, #991b1b 100%); color: #ffffff; padding: 8px 12px; font-weight: 800; font-size: 12px; letter-spacing: 0.3px; line-height: 1.4;">
-        <div>{current_year} QIMEN MOBILITY DIRECTIONS</div>
-        <div style="font-size: 11px; font-weight: 500; opacity: 0.9;">本命流年奇門出行方</div>
+    <div style="border-right: 1px solid #334155; display: flex; flex-direction: column; background: rgba(15, 23, 42, 0.7);">
+      <div style="background: #1e293b; border-bottom: 1px solid #334155; color: #fbbf24; padding: 8px 12px; font-weight: 700; font-size: 12px; display: flex; justify-content: space-between; align-items: center;">
+        <span>MOBILITY DIRECTIONS</span>
+        <span style="font-size: 11px; font-weight: 500; color: #94a3b8;">本命奇門出行方</span>
       </div>
-      <div style="padding: 6px 10px; flex: 1; display: flex; flex-direction: column; justify-content: space-around; background: #fafbfc;">
+      <div style="padding: 8px 10px; flex: 1; display: flex; flex-direction: column; justify-content: space-around; gap: 5px;">
 """
     for code, zh, star_str, style_type in MOBILITY_DIRECTIONS_2026:
         if style_type == 'blue':
-            badge_bg = "background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.28);"
-            star_style = "color: #1d4ed8; font-weight: 700;"
-            tag_badge = '<span style="font-size: 9px; background: #2563eb; color: #fff; padding: 1px 4px; border-radius: 3px; margin-left: 4px;">吉</span>'
+            badge_bg = "background: rgba(56, 189, 248, 0.12); border: 1px solid #0284c7;"
+            code_style = "color: #38bdf8;"
+            zh_style = "color: #7dd3fc;"
+            star_style = "color: #38bdf8; font-weight: 700;"
+            tag_badge = '<span style="font-size: 9.5px; background: rgba(14, 165, 233, 0.3); color: #38bdf8; border: 1px solid #0284c7; padding: 1px 5px; border-radius: 3px; margin-left: 6px;">吉</span>'
         elif style_type == 'red':
-            badge_bg = "background: rgba(185, 28, 28, 0.08); border: 1px solid rgba(185, 28, 28, 0.28);"
-            star_style = "color: #b91c1c; font-weight: 700;"
-            tag_badge = '<span style="font-size: 9px; background: #b91c1c; color: #fff; padding: 1px 4px; border-radius: 3px; margin-left: 4px;">吉</span>'
+            badge_bg = "background: rgba(239, 68, 68, 0.12); border: 1px solid #dc2626;"
+            code_style = "color: #f87171;"
+            zh_style = "color: #fca5a5;"
+            star_style = "color: #f87171; font-weight: 700;"
+            tag_badge = '<span style="font-size: 9.5px; background: rgba(239, 68, 68, 0.3); color: #f87171; border: 1px solid #dc2626; padding: 1px 5px; border-radius: 3px; margin-left: 6px;">吉</span>'
         else:
-            badge_bg = "background: #ffffff; border: 1px solid #e2e8f0;"
-            star_style = "color: #334155; font-weight: 500;"
+            badge_bg = "background: rgba(30, 41, 59, 0.5); border: 1px solid #334155;"
+            code_style = "color: #f8fafc;"
+            zh_style = "color: #94a3b8;"
+            star_style = "color: #cbd5e1; font-weight: 500;"
             tag_badge = ''
 
-        html += f"""        <div style="display: flex; align-items: center; justify-content: space-between; padding: 3px 8px; margin: 2px 0; border-radius: 5px; font-size: 11.5px; {badge_bg}">
+        html += f"""        <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 8px; border-radius: 5px; font-size: 11.5px; {badge_bg}">
           <div style="display: flex; align-items: center; gap: 6px;">
-            <span style="font-weight: 800; color: #0f172a; min-width: 22px;">{code}</span>
-            <span style="font-weight: 700; color: #475569;">{zh}</span>
+            <span style="font-weight: 800; min-width: 22px; {code_style}">{code}</span>
+            <span style="font-weight: 700; {zh_style}">{zh}</span>
           </div>
           <div style="{star_style} display: flex; align-items: center;">
             <span>{star_str}</span>{tag_badge}
@@ -961,26 +974,27 @@ def generate_annual_destiny_html(pillars: Dict[str, Any], current_year: int = 20
     
     <!-- RIGHT: ANNUAL BAZI STARS -->
     <div style="display: flex; flex-direction: column;">
-      <div style="background: linear-gradient(135deg, #800000 0%, #991b1b 100%); color: #ffffff; padding: 8px 12px; font-weight: 800; font-size: 12px; letter-spacing: 0.3px; line-height: 1.4;">
-        <div>ANNUAL BAZI STARS</div>
-        <div style="font-size: 11px; font-weight: 500; opacity: 0.9;">本命八字流年吉凶星</div>
+      <div style="background: #1e293b; border-bottom: 1px solid #334155; color: #fbbf24; padding: 8px 12px; font-weight: 700; font-size: 12px; display: flex; justify-content: space-between; align-items: center;">
+        <span>ANNUAL BAZI STARS</span>
+        <span style="font-size: 11px; font-weight: 500; color: #94a3b8;">本命八字流年吉凶星</span>
       </div>
       <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 11px; flex: 1;">
         <thead>
-          <tr style="border-bottom: 2px solid #cbd5e1; background: #f1f5f9;">
+          <tr style="border-bottom: 1px solid #334155; background: #1e293b;">
 """
     for col in order:
         b_name = pillars[col]['branch_name']
         b_char = pillars[col]['branch_char']
         b_anim = pillars[col]['branch_animal'].split()[-1]
-        html += f"""            <th style="padding: 8px 6px; border-right: 1px solid #e2e8f0; width: 21%; text-align: center;">
-              <div style="font-size: 10.5px; color: #64748b; font-weight: 600;">{col_titles[col]}</div>
-              <div style="font-size: 14px; font-weight: 800; color: #0f172a; margin-top: 2px;">{b_char} <span style="font-size: 11px; font-weight: 600; color: #475569;">({b_anim})</span></div>
+        b_color = get_branch_element_color(b_char)
+        html += f"""            <th style="padding: 8px 6px; border-right: 1px solid #334155; width: 21%; text-align: center;">
+              <div style="font-size: 11px; color: #fbbf24; font-weight: 700;">{col_titles[col]}</div>
+              <div style="font-size: 16px; font-weight: 900; color: {b_color}; margin-top: 2px;">{b_char} <span style="font-size: 11.5px; font-weight: 600; color: #cbd5e1;">({b_anim})</span></div>
             </th>\n"""
 
-    html += f"""            <th style="padding: 8px 6px; font-weight: 800; color: #800000; text-align: center; width: 16%; border-left: 2px solid #800000; background: #fef2f2;">
-              <div style="font-size: 14px; font-weight: 900; color: #991b1b;">{current_year}</div>
-              <div style="font-size: 10.5px; font-weight: 700; color: #800000;">流年 Annual</div>
+    html += f"""            <th style="padding: 8px 6px; font-weight: 800; color: #fbbf24; text-align: center; width: 16%; border-left: 2px solid #f59e0b; background: rgba(239, 68, 68, 0.15);">
+              <div style="font-size: 16px; font-weight: 900; color: #ef4444;">{current_year}</div>
+              <div style="font-size: 11px; font-weight: 700; color: #fbbf24;">流年 Annual</div>
             </th>
           </tr>
         </thead>
@@ -993,54 +1007,54 @@ def generate_annual_destiny_html(pillars: Dict[str, Any], current_year: int = 20
         ausp = stars_info['auspicious']
         inausp = stars_info['inauspicious']
         
-        html += """            <td style="padding: 8px 6px; vertical-align: top; border-right: 1px solid #e2e8f0; background: #ffffff;">\n"""
+        html += """            <td style="padding: 8px 6px; vertical-align: top; border-right: 1px solid #334155; background: rgba(15, 23, 42, 0.7);">\n"""
         
         # Auspicious Header & Badges
-        html += """              <div style="font-size: 10px; font-weight: 800; color: #991b1b; text-transform: uppercase; margin-bottom: 5px; display: flex; align-items: center; gap: 3px; letter-spacing: 0.3px;">
+        html += """              <div style="font-size: 10px; font-weight: 800; color: #fbbf24; text-transform: uppercase; margin-bottom: 5px; display: flex; align-items: center; gap: 3px; letter-spacing: 0.3px;">
                 <span>★</span> 吉星 Auspicious
               </div>\n"""
         if not ausp:
-            html += """              <div style="font-size: 10.5px; color: #94a3b8; font-style: italic; margin-bottom: 8px;">— None</div>\n"""
+            html += """              <div style="font-size: 10.5px; color: #64748b; font-style: italic; margin-bottom: 8px;">— None</div>\n"""
         else:
             for zh_s, en_s in ausp:
-                html += f"""              <div style="display: flex; align-items: center; justify-content: space-between; background: #fff5f5; border: 1px solid #fecaca; border-left: 3px solid #dc2626; border-radius: 4px; padding: 2.5px 6px; margin-bottom: 3.5px; font-size: 11px;">
-                <span style="font-weight: 800; color: #991b1b;">{zh_s}</span>
-                <span style="font-size: 9.5px; color: #7f1d1d; font-weight: 600;">{en_s}</span>
+                html += f"""              <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(30, 41, 59, 0.6); border: 1px solid #475569; border-left: 3px solid #f59e0b; border-radius: 4px; padding: 2.5px 6px; margin-bottom: 3.5px; font-size: 11px;">
+                <span style="font-weight: 800; color: #fbbf24;">{zh_s}</span>
+                <span style="font-size: 9.5px; color: #e2e8f0; font-weight: 600;">{en_s}</span>
               </div>\n"""
         
         # Inauspicious Header & Badges
-        html += """              <div style="font-size: 10px; font-weight: 800; color: #475569; text-transform: uppercase; margin: 10px 0 5px 0; display: flex; align-items: center; gap: 3px; letter-spacing: 0.3px;">
+        html += """              <div style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin: 10px 0 5px 0; display: flex; align-items: center; gap: 3px; letter-spacing: 0.3px;">
                 <span>▲</span> 凶煞 Afflictions
               </div>\n"""
         if not inausp:
-            html += """              <div style="font-size: 10.5px; color: #94a3b8; font-style: italic;">— None</div>\n"""
+            html += """              <div style="font-size: 10.5px; color: #64748b; font-style: italic;">— None</div>\n"""
         else:
             for zh_s, en_s in inausp:
-                html += f"""              <div style="display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #64748b; border-radius: 4px; padding: 2.5px 6px; margin-bottom: 3px; font-size: 10.5px;">
-                <span style="font-weight: 700; color: #334155;">{zh_s}</span>
-                <span style="font-size: 9px; color: #64748b; font-weight: 500;">{en_s}</span>
+                html += f"""              <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(15, 23, 42, 0.6); border: 1px solid #334155; border-left: 3px solid #64748b; border-radius: 4px; padding: 2.5px 6px; margin-bottom: 3px; font-size: 10.5px;">
+                <span style="font-weight: 700; color: #cbd5e1;">{zh_s}</span>
+                <span style="font-size: 9px; color: #94a3b8; font-weight: 500;">{en_s}</span>
               </div>\n"""
 
         html += """            </td>\n"""
 
     # 5th Column: 2026 Annual Stem & Branch
-    html += f"""            <td style="padding: 10px 6px; vertical-align: middle; text-align: center; border-left: 2px solid #800000; background: #fffdfa;">
+    html += f"""            <td style="padding: 10px 6px; vertical-align: middle; text-align: center; border-left: 2px solid #f59e0b; background: rgba(30, 41, 59, 0.4);">
               
               <!-- Stem Box -->
-              <div style="background: #ffffff; border: 1px solid #fecaca; border-radius: 6px; padding: 6px 4px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-                <div style="display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 9.5px; font-weight: 800; background: #fee2e2; color: #b91c1c; border: 1px solid #f87171; margin-bottom: 4px;">
+              <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; border-radius: 6px; padding: 8px 6px; margin-bottom: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+                <div style="display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 9.5px; font-weight: 800; background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #dc2626; margin-bottom: 4px;">
                   {bing_god['zh_short']} {bing_god['code']}
                 </div>
-                <div style="font-size: 28px; font-weight: 900; color: #dc2626; line-height: 1;">丙</div>
-                <div style="font-size: 11px; font-weight: 700; color: #1e293b; margin-top: 2px;">Bing</div>
-                <div style="font-size: 9.5px; color: #64748b;">+Fire 陽火</div>
+                <div style="font-size: 30px; font-weight: 900; color: #ef4444; line-height: 1;">丙</div>
+                <div style="font-size: 11px; font-weight: 700; color: #f8fafc; margin-top: 2px;">Bing</div>
+                <div style="font-size: 9.5px; color: #94a3b8;">+Fire 陽火</div>
               </div>
 
               <!-- Branch Box -->
-              <div style="background: #ffffff; border: 1px solid #fecaca; border-radius: 6px; padding: 6px 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-                <div style="font-size: 28px; font-weight: 900; color: #dc2626; line-height: 1;">午</div>
-                <div style="font-size: 11px; font-weight: 700; color: #1e293b; margin-top: 2px;">Wu <span style="font-size: 10px; color: #475569;">(Horse 馬)</span></div>
-                <div style="font-size: 9.5px; color: #64748b;">Yang Fire</div>
+              <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; border-radius: 6px; padding: 8px 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+                <div style="font-size: 30px; font-weight: 900; color: #ef4444; line-height: 1;">午</div>
+                <div style="font-size: 11px; font-weight: 700; color: #f8fafc; margin-top: 2px;">Wu <span style="font-size: 10px; color: #cbd5e1;">(Horse 馬)</span></div>
+                <div style="font-size: 9.5px; color: #94a3b8;">Yang Fire 午火</div>
               </div>
 
             </td>
@@ -1051,69 +1065,71 @@ def generate_annual_destiny_html(pillars: Dict[str, Any], current_year: int = 20
   </div>
   
   <!-- BOTTOM SECTION: QI MEN LIFE PALACE + 2026 HIDDEN STEMS -->
-  <div class="annual-bottom-grid" style="display: grid; grid-template-columns: 84% 16%; background: #ffffff;">
+  <div class="annual-bottom-grid" style="display: grid; grid-template-columns: 84% 16%; background: #131d36; border-top: 2px solid #f59e0b;">
     
     <!-- LEFT: QI MEN LIFE PALACE TABLE -->
-    <div style="border-right: 2px solid #800000;">
-      <div style="background: linear-gradient(135deg, #800000 0%, #991b1b 100%); color: #ffffff; padding: 6px 12px; font-weight: 800; font-size: 12px; letter-spacing: 0.3px; display: flex; justify-content: space-between; align-items: center;">
+    <div style="border-right: 1px solid #334155;">
+      <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff; padding: 8px 12px; font-weight: 700; font-size: 12px; letter-spacing: 0.3px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155;">
         <div>
-          <span>{current_year} QI MEN LIFE PALACE</span>
-          <span style="font-size: 11px; font-weight: 500; opacity: 0.9; margin-left: 6px;">流年奇門命宮</span>
+          <span style="color: #fbbf24; font-weight: 800;">{current_year} QI MEN LIFE PALACE</span>
+          <span style="font-size: 11px; font-weight: 500; color: #94a3b8; margin-left: 6px;">流年奇門命宮</span>
         </div>
-        <div style="font-size: 11px; font-weight: 700; color: #fef08a;">{palace_name}</div>
+        <div style="font-size: 11px; font-weight: 700; color: #fbbf24; background: rgba(245, 158, 11, 0.15); border: 1px solid #d97706; padding: 2px 8px; border-radius: 4px;">{palace_name}</div>
       </div>
       
       <!-- 5 Life Palace Cards Grid -->
-      <div style="padding: 10px 12px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; background: #fafbfc;">
+      <div style="padding: 10px 12px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; background: rgba(15, 23, 42, 0.7);">
         
-        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 6px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
-          <div style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase;">天干 Stem</div>
-          <div style="font-size: 17px; font-weight: 900; color: #0f172a; margin-top: 4px;">{qm_stem}</div>
+        <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid #334155; border-radius: 6px; padding: 8px 6px; text-align: center;">
+          <div style="font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">天干 Stem</div>
+          <div style="font-size: 17px; font-weight: 900; color: #e2e8f0; margin-top: 4px;">{qm_stem}</div>
           <div style="font-size: 9.5px; color: #64748b; margin-top: 2px;">Heaven Plate</div>
         </div>
 
-        <div style="background: #ffffff; border: 1px solid #a7f3d0; border-radius: 6px; padding: 8px 6px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
-          <div style="font-size: 10px; font-weight: 700; color: #059669; text-transform: uppercase;">門 Door</div>
-          <div style="font-size: 17px; font-weight: 900; color: #047857; margin-top: 4px;">{qm_door}</div>
-          <div style="font-size: 9.5px; color: #10b981; font-weight: 700; margin-top: 2px;">★ 吉門 Auspicious</div>
+        <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 6px; padding: 8px 6px; text-align: center;">
+          <div style="font-size: 10px; font-weight: 700; color: #34d399; text-transform: uppercase;">門 Door</div>
+          <div style="font-size: 17px; font-weight: 900; color: #10b981; margin-top: 4px;">{qm_door}</div>
+          <div style="font-size: 9.5px; color: #34d399; font-weight: 700; margin-top: 2px;">★ 吉門 Auspicious</div>
         </div>
 
-        <div style="background: #ffffff; border: 1px solid #fde68a; border-radius: 6px; padding: 8px 6px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
-          <div style="font-size: 10px; font-weight: 700; color: #d97706; text-transform: uppercase;">星 Star</div>
-          <div style="font-size: 17px; font-weight: 900; color: #b45309; margin-top: 4px;">{qm_star}</div>
-          <div style="font-size: 9.5px; color: #d97706; font-weight: 700; margin-top: 2px;">★ 吉星 Auspicious</div>
+        <div style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 6px; padding: 8px 6px; text-align: center;">
+          <div style="font-size: 10px; font-weight: 700; color: #fbbf24; text-transform: uppercase;">星 Star</div>
+          <div style="font-size: 17px; font-weight: 900; color: #f59e0b; margin-top: 4px;">{qm_star}</div>
+          <div style="font-size: 9.5px; color: #fbbf24; font-weight: 700; margin-top: 2px;">★ 吉星 Auspicious</div>
         </div>
 
-        <div style="background: #ffffff; border: 1px solid #c7d2fe; border-radius: 6px; padding: 8px 6px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
-          <div style="font-size: 10px; font-weight: 700; color: #4f46e5; text-transform: uppercase;">神 Deity</div>
-          <div style="font-size: 17px; font-weight: 900; color: #3730a3; margin-top: 4px;">{qm_deity}</div>
-          <div style="font-size: 9.5px; color: #6366f1; font-weight: 700; margin-top: 2px;">九地 Peaceful Earth</div>
+        <div style="background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99, 102, 241, 0.35); border-radius: 6px; padding: 8px 6px; text-align: center;">
+          <div style="font-size: 10px; font-weight: 700; color: #818cf8; text-transform: uppercase;">神 Deity</div>
+          <div style="font-size: 17px; font-weight: 900; color: #a5b4fc; margin-top: 4px;">{qm_deity}</div>
+          <div style="font-size: 9.5px; color: #818cf8; font-weight: 600; margin-top: 2px;">九地 Peaceful Earth</div>
         </div>
 
-        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 6px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
-          <div style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase;">Year Stars 年星</div>
-          <div style="font-size: 17px; font-weight: 900; color: #94a3b8; margin-top: 4px;">—</div>
-          <div style="font-size: 9.5px; color: #94a3b8; margin-top: 2px;">Annual Stars</div>
+        <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid #334155; border-radius: 6px; padding: 8px 6px; text-align: center;">
+          <div style="font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Year Stars 年星</div>
+          <div style="font-size: 17px; font-weight: 900; color: #64748b; margin-top: 4px;">—</div>
+          <div style="font-size: 9.5px; color: #64748b; margin-top: 2px;">Annual Stars</div>
         </div>
 
       </div>
     </div>
     
     <!-- RIGHT: 2026 HIDDEN STEMS -->
-    <div style="padding: 10px 8px; text-align: center; background: #fffdfa; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-      <div style="font-size: 10px; font-weight: 700; color: #800000; margin-bottom: 6px; text-transform: uppercase;">2026 藏干</div>
-      <div style="display: flex; justify-content: center; gap: 8px; width: 100%;">
-        <div style="background: #ffffff; border: 1px solid #fecaca; border-radius: 5px; padding: 4px 6px; flex: 1;">
-          <div style="font-size: 18px; font-weight: 900; color: #dc2626; line-height: 1;">丁</div>
-          <div style="font-size: 9.5px; font-weight: 700; color: #334155; margin-top: 2px;">Ding</div>
-          <div style="font-size: 9px; color: #64748b;">-Fire</div>
-          <div style="font-size: 9.5px; font-weight: 800; color: #b91c1c; margin-top: 3px; background: #fee2e2; border-radius: 3px; padding: 1px;">{ding_god['zh_short']} {ding_god['code']}</div>
+    <div style="padding: 10px 8px; text-align: center; background: rgba(30, 41, 59, 0.4); display: flex; flex-direction: column; justify-content: center; align-items: center;">
+      <div style="font-size: 11px; font-weight: 700; color: #fbbf24; margin-bottom: 6px; text-transform: uppercase; line-height: 1.2;">
+        2026 藏干<br><span style="font-size: 9.5px; font-weight: normal; color: #94a3b8;">Hidden Stems</span>
+      </div>
+      <div style="display: flex; justify-content: center; gap: 6px; width: 100%;">
+        <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid #334155; border-radius: 5px; padding: 6px 4px; flex: 1; text-align: center;">
+          <div style="font-size: 20px; font-weight: 900; color: #ef4444; line-height: 1;">丁</div>
+          <div style="font-size: 10px; font-weight: 700; color: #f8fafc; margin-top: 2px;">Ding</div>
+          <div style="font-size: 9px; color: #94a3b8;">-Fire</div>
+          <div style="font-size: 9.5px; font-weight: 800; color: #f59e0b; margin-top: 3px; background: rgba(245, 158, 11, 0.1); border-radius: 3px; padding: 1px;">{ding_god['zh_short']} {ding_god['code']}</div>
         </div>
-        <div style="background: #ffffff; border: 1px solid #fed7aa; border-radius: 5px; padding: 4px 6px; flex: 1;">
-          <div style="font-size: 18px; font-weight: 900; color: #d97706; line-height: 1;">己</div>
-          <div style="font-size: 9.5px; font-weight: 700; color: #334155; margin-top: 2px;">Ji</div>
-          <div style="font-size: 9px; color: #64748b;">-Earth</div>
-          <div style="font-size: 9.5px; font-weight: 800; color: #b91c1c; margin-top: 3px; background: #fee2e2; border-radius: 3px; padding: 1px;">{ji_god['zh_short']} {ji_god['code']}</div>
+        <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid #334155; border-radius: 5px; padding: 6px 4px; flex: 1; text-align: center;">
+          <div style="font-size: 20px; font-weight: 900; color: #f59e0b; line-height: 1;">己</div>
+          <div style="font-size: 10px; font-weight: 700; color: #f8fafc; margin-top: 2px;">Ji</div>
+          <div style="font-size: 9px; color: #94a3b8;">-Earth</div>
+          <div style="font-size: 9.5px; font-weight: 800; color: #f59e0b; margin-top: 3px; background: rgba(245, 158, 11, 0.1); border-radius: 3px; padding: 1px;">{ji_god['zh_short']} {ji_god['code']}</div>
         </div>
       </div>
     </div>
