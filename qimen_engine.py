@@ -398,6 +398,10 @@ def calculate_natal_qimen_destiny(pillars: Dict[str, Any]) -> Dict[str, Any]:
 
     stem_char = pillars['day']['stem_char']
     stem_name = pillars['day']['stem_name']
+    if stem_name == 'Jia':
+        _, d_leader_stem, _ = get_xun_shou(d_stem_idx, d_branch_idx)
+        stem_char = STEM_LOOKUP.get(d_leader_stem, {}).get('char', d_leader_stem)
+        stem_name = d_leader_stem
 
     door_char = p_info['door']['char']
     door_en = p_info['door']['en']

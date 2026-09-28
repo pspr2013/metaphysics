@@ -19,8 +19,8 @@ STEM_SHORT_ELEMENTS = [
 BRANCH_NAMES = ['Zi', 'Chou', 'Yin', 'Mao', 'Chen', 'Si', 'Wu', 'Wei', 'Shen', 'You', 'Xu', 'Hai']
 BRANCH_CHARS = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥']
 BRANCH_ANIMALS = [
-    'Rat 鼠', 'Ox 牛', 'Tiger 虎', 'Rabbit 兔', 'Dragon 龍', 'Snake 蛇',
-    'Horse 馬', 'Goat 羊', 'Monkey 猴', 'Rooster 雞', 'Dog 狗', 'Pig 豬'
+    '鼠 Rat', '牛 Ox', '虎 Tiger', '兔 Rabbit', '龍 Dragon', '蛇 Snake',
+    '馬 Horse', '羊 Goat', '猴 Monkey', '雞 Rooster', '狗 Dog', '豬 Pig'
 ]
 BRANCH_SHORT_ANIMALS = [
     'Rat', 'Ox', 'Tiger', 'Rabbit', 'Dragon', 'Snake',
@@ -71,9 +71,9 @@ BRANCH_HIDDEN_STEMS_MAP = {
     ], # Shen
     9: [{'char': '辛', 'name': 'Xin', 'polarity_elem': '-Metal金', 'stem_idx': 7}], # You
     10: [
-        {'char': '辛', 'name': 'Xin', 'polarity_elem': '-Metal金', 'stem_idx': 7},
         {'char': '丁', 'name': 'Ding', 'polarity_elem': '-Fire火', 'stem_idx': 3},
-        {'char': '戊', 'name': 'Wu', 'polarity_elem': '+Earth土', 'stem_idx': 4}
+        {'char': '戊', 'name': 'Wu', 'polarity_elem': '+Earth土', 'stem_idx': 4},
+        {'char': '辛', 'name': 'Xin', 'polarity_elem': '-Metal金', 'stem_idx': 7}
     ], # Xu
     11: [
         {'char': '壬', 'name': 'Ren', 'polarity_elem': '+Water水', 'stem_idx': 8},
@@ -242,8 +242,8 @@ def parse_date_and_time(birth_date_str: str, birth_time_str: Optional[str] = Non
 def calculate_auxiliary_stars(dm_stem_idx: int, y_branch_idx: int, d_branch_idx: int, m_branch_idx: int, h_branch_idx: int, y_stem_idx: int, m_stem_idx: int) -> Dict[str, Any]:
     # Noble People (Tian Yi Gui Ren 天乙貴人):
     noble_map = {
-        0: '丑 Ox, 未 Goat', 1: '申 Monkey, 子 Rat', 2: '亥 Pig, 酉 Rooster', 3: '亥 Pig, 酉 Rooster',
-        4: '丑 Ox, 未 Goat', 5: '申 Monkey, 子 Rat', 6: '丑 Ox, 未 Goat', 7: '午 Horse, 寅 Tiger',
+        0: '未 Goat, 丑 Ox', 1: '申 Monkey, 子 Rat', 2: '酉 Rooster, 亥 Pig', 3: '酉 Rooster, 亥 Pig',
+        4: '未 Goat, 丑 Ox', 5: '申 Monkey, 子 Rat', 6: '丑 Ox, 未 Goat', 7: '午 Horse, 寅 Tiger',
         8: '卯 Rabbit, 巳 Snake', 9: '卯 Rabbit, 巳 Snake'
     }
     # Intelligence (Wen Chang Gui Ren 文昌貴人):
@@ -301,20 +301,30 @@ def calculate_auxiliary_stars(dm_stem_idx: int, y_branch_idx: int, d_branch_idx:
 
 def calculate_ming_gua(bazi_year: int, gender: str) -> Dict[str, Any]:
     """Computes Life Star (Ming Gua) and 8 Mansions (Ba Zhai) Favorable/Unfavorable Directions."""
-    s = sum(int(c) for c in str(bazi_year))
-    while s >= 10:
-        s = sum(int(c) for c in str(s))
+    last_two = bazi_year % 100
+    d = sum(int(c) for c in str(last_two))
+    while d >= 10:
+        d = sum(int(c) for c in str(d))
     
     is_male = gender.lower().startswith('m')
     if bazi_year < 2000:
-        gua = (11 - s) if is_male else (s + 4)
+        if is_male:
+            gua = 10 - d
+            if gua == 0:
+                gua = 9
+        else:
+            gua = 5 + d
+            while gua >= 10:
+                gua = sum(int(c) for c in str(gua))
     else:
-        gua = (10 - s) if is_male else (s + 5)
-    
-    while gua >= 10:
-        gua = sum(int(c) for c in str(gua))
-    if gua == 0:
-        gua = 9
+        if is_male:
+            gua = 9 - d
+            if gua == 0:
+                gua = 9
+        else:
+            gua = 6 + d
+            while gua >= 10:
+                gua = sum(int(c) for c in str(gua))
     
     # Gua 5 converts to Kun 2 for Male, Gen 8 for Female
     active_gua = (2 if is_male else 8) if gua == 5 else gua
