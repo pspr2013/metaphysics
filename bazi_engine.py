@@ -554,17 +554,10 @@ def generate_natal_chart_html(p: Dict[str, Any]) -> str:
     dm_char = p['day']['stem_char']
     dm_full = f"{dm_char} {dm_stem} {dm_elem}"
 
-    raw_html = f"""<div class="joey-yap-personal-chart" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 960px; margin: 15px auto; background: #ffffff; border: 2px solid #7a1518; border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); color: #1e293b; overflow: hidden; padding: 18px;">
-<div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #856404; padding-bottom: 8px; margin-bottom: 14px;">
-<div>
-<div style="font-size: 11px; font-weight: 800; color: #b45309; letter-spacing: 1.5px; text-transform: uppercase;">JOEY YAP'S DESTINY 2026</div>
-<div style="font-size: 26px; font-weight: 900; color: #7a1518; letter-spacing: 0.5px; line-height: 1.1; margin-top: 2px;">PERSONAL CHART FOR 2026</div>
-<div style="font-size: 13px; font-weight: 600; color: #475569; margin-top: 4px;">
+    raw_html = f"""<div class="personal-natal-chart" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 960px; margin: 15px auto; background: #ffffff; border: 2px solid #7a1518; border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); color: #1e293b; overflow: hidden; padding: 18px;">
+<div style="border-bottom: 2px solid #856404; padding-bottom: 10px; margin-bottom: 14px;">
+<div style="font-size: 15px; font-weight: 700; color: #475569;">
 <span>{client_name}</span> | <span style="color: #0f172a;">{formatted_date_time}</span> | <span style="font-weight: 700; color: #7a1518;">{gender_str}</span>
-</div>
-</div>
-<div style="text-align: right;">
-<span style="background: #7a1518; color: #ffffff; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 3px; letter-spacing: 0.5px;">PSPR METAPHYSICS</span>
 </div>
 </div>
 <div style="display: grid; grid-template-columns: 1.22fr 1.08fr 0.85fr 0.85fr; gap: 10px; margin-bottom: 12px;">
@@ -695,7 +688,7 @@ def generate_natal_chart_html(p: Dict[str, Any]) -> str:
 </div>
 <div style="border: 1px solid #7a1518; border-radius: 4px; overflow: hidden; background: #ffffff; display: flex; flex-direction: column;">
 <div style="background: #7a1518; color: #ffffff; padding: 6px 12px; font-weight: bold; font-size: 13px; display: flex; justify-content: space-between; align-items: center;">
-<span>NATAL CHART 本命八字 www.joeyyap.com</span>
+<span>NATAL CHART 本命八字</span>
 <span style="font-size: 11px; font-weight: normal; opacity: 0.9;">Classical Metaphysics</span>
 </div>
 <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 13px; flex: 1;">
@@ -769,7 +762,7 @@ def generate_natal_chart_markdown(p: Dict[str, Any]) -> str:
         return " / ".join([f"{hs['char']} {hs['name']} ({hs['polarity_elem']}, {hs['god']['zh_short']} {hs['god']['code']})" for hs in hs_list])
 
     md = (
-        "### NATAL CHART 本命八字 (Joey Yap Standard)\n\n"
+        "### NATAL CHART 本命八字\n\n"
         "| 時 Hour | 日 Day | 月 Month | 年 Year | Pillar |\n"
         "| :---: | :---: | :---: | :---: | :---: |\n"
         f"| **{h['stem_char']}** {h['stem_name']} ({h['stem_elem']})<br>`[{h['stem_god']['zh_full']} {h['stem_god']['code']}]` | **{d['stem_char']}** {d['stem_name']} ({d['stem_elem']})<br>`[{d['stem_god']['zh_full']} {d['stem_god']['code']}]` | **{m['stem_char']}** {m['stem_name']} ({m['stem_elem']})<br>`[{m['stem_god']['zh_full']} {m['stem_god']['code']}]` | **{y['stem_char']}** {y['stem_name']} ({y['stem_elem']})<br>`[{y['stem_god']['zh_full']} {y['stem_god']['code']}]` | **天干**<br>Heavenly Stems |\n"
@@ -801,18 +794,18 @@ def build_grounded_bazi_prompt(birth_date_str: str, birth_time_str: str, gender:
         chart_table_md = generate_natal_chart_markdown(pillars)
         
         prompt = (
-            f"BaZi PSPR Consultation Request:\n"
+            f"BaZi Consultation Request:\n"
             f"- Client Name: {client_name}\n"
             f"- Birth Date: {birth_date_str} (Parsed Solar: {year}-{month:02d}-{day:02d})\n"
             f"- Birth Time (Local Solar Time): {birth_time_str} (Parsed: {hour:02d}:{minute:02d})\n"
             f"- Gender: {gender}\n"
             f"- Question / Focus: {question}\n\n"
-            f"MANDATORY VERIFIED NATAL CHART (Follow Joey Yap Standard format strictly: Hour, Day, Month, Year):\n\n"
+            f"MANDATORY VERIFIED NATAL CHART (Classical format: Hour, Day, Month, Year):\n\n"
             f"{chart_table_md}\n"
             f"STRICT INSTRUCTIONS:\n"
             f"1. You MUST adopt this exact Four Pillars orientation (Hour on left, Day, Month, Year on right).\n"
             f"2. Day Master is strictly **{d['stem_name']} ({pillars['day_master_element']})** sitting on **{d['branch_name']} ({pillars['day_animal']})**.\n"
-            f"3. Provide an authentic, comprehensive Phann Sophearith PSPR analysis in the requested language (if Khmer is requested, respond in fluent Khmer as well):\n"
+            f"3. Provide an authentic, comprehensive classical BaZi analysis in the requested language (if Khmer is requested, respond in fluent Khmer as well):\n"
             f"   - Level 1: Day Master Strength & Climate Regulation (Tiao Hou)\n"
             f"   - Level 2: Ten Gods Quality Qualification (Superior, Good, Average, Poor)\n"
             f"   - Level 3: Earthly Branch Dynamics (Combinations, Clashes, Harms, Punishments, Destructions)\n"
@@ -821,11 +814,11 @@ def build_grounded_bazi_prompt(birth_date_str: str, birth_time_str: str, gender:
         return prompt, pillars
     else:
         fallback_prompt = (
-            f"BaZi PSPR Consultation Request:\n"
+            f"BaZi Consultation Request:\n"
             f"- Birth Date: {birth_date_str}\n"
             f"- Birth Time: {birth_time_str}\n"
             f"- Gender: {gender}\n"
             f"- Focus: {question}\n"
-            f"Please calculate the Four Pillars and provide PSPR analysis."
+            f"Please calculate the Four Pillars and provide classical BaZi analysis."
         )
         return fallback_prompt, None

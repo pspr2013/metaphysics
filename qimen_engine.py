@@ -137,30 +137,20 @@ DIR_ZH_MAP = {
 def get_qimen_dun_and_ju(year: int, month: int, day: int, day_stem_idx: int, day_branch_idx: int) -> Tuple[str, int, str]:
     """
     Computes authentic Dun (Yang/Yin) and Ju Number (1-9) using Zhi Run Fa (置閏法 - 超神接氣).
-    Determines Fu Tou (符頭), nearest Solar Term, and Yuan (Shang/Zhong/Xia).
+    Determines Shang Yuan Fu Tou (上元符頭), nearest Solar Term, and Yuan (Shang/Zhong/Xia).
     """
     # 60 Jia Zi cycle index (0 to 59)
     day_cycle_idx = (day_stem_idx * 6 - day_branch_idx * 5) % 60
     
-    # Fu Tou day offset from today (occurs every 5 days: cycle 0, 5, 10, ...)
-    ft_rem = day_cycle_idx % 5
-    ft_date = datetime.date(year, month, day) - datetime.timedelta(days=ft_rem)
-    
-    # Determine Yuan:
-    # Shang Yuan Fu Tou: 0 (Jia Zi), 15 (Ji Mao), 30 (Jia Wu), 45 (Ji You)
-    # Zhong Yuan Fu Tou: 5 (Ji Si), 20 (Jia Shen), 35 (Ji Hai), 50 (Jia Yin)
-    # Xia Yuan Fu Tou: 10 (Jia Xu), 25 (Ji Chou), 40 (Jia Chen), 55 (Ji Wei)
-    ft_cycle_idx = day_cycle_idx - ft_rem
-    if ft_cycle_idx in [0, 15, 30, 45]:
-        yuan_idx = 0  # Shang Yuan
-    elif ft_cycle_idx in [5, 20, 35, 50]:
-        yuan_idx = 1  # Zhong Yuan
-    else:
-        yuan_idx = 2  # Xia Yuan
+    # Each 15-day block (0-14, 15-29, 30-44, 45-59) has a Shang Yuan Fu Tou:
+    # 0: Jia Zi, 15: Ji Mao, 30: Jia Wu, 45: Ji You
+    shang_rem = day_cycle_idx % 15
+    shang_date = datetime.date(year, month, day) - datetime.timedelta(days=shang_rem)
+    yuan_idx = shang_rem // 5  # 0: Shang Yuan, 1: Zhong Yuan, 2: Xia Yuan
 
-    # Find the nearest Solar Term to Fu Tou date (Zhi Run Fa)
-    ft_sun_lon = get_astronomical_solar_longitude(ft_date.year, ft_date.month, ft_date.day, 12, 0)
-    nearest_term_deg = (round(ft_sun_lon / 15.0) * 15) % 360
+    # Determine Solar Term from the Shang Yuan Fu Tou date
+    shang_sun_lon = get_astronomical_solar_longitude(shang_date.year, shang_date.month, shang_date.day, 12, 0)
+    nearest_term_deg = (round(shang_sun_lon / 15.0) * 15) % 360
     
     term_name = 'Dong Zhi'
     for name, deg in TERM_LONGITUDES:
@@ -238,9 +228,11 @@ def calculate_qimen_chart_from_pillars(pillars: Dict[str, Any], dun_type: str = 
     duty_door = PALACES_INFO[active_leader_palace]['orig_door']
 
     # 3. Locate Target Stem (Hour stem on Di Pan) -> Destination Palace of Zhi Fu
+    # In Qi Men Dun Jia, Jia is hidden (遁甲). When hour stem is Jia, target stem is the leader stem!
+    target_stem = leader_stem if h_stem_name == 'Jia' else h_stem_name
     dest_palace = 1
     for p_num, s in di_pan.items():
-        if s == h_stem_name:
+        if s == target_stem:
             dest_palace = p_num
             break
     dest_palace = 2 if dest_palace == 5 else dest_palace
@@ -294,11 +286,18 @@ def calculate_qimen_chart_from_pillars(pillars: Dict[str, Any], dun_type: str = 
         deity_positions[cur_pal] = DEITY_CYCLE[i]
     deity_positions[5] = '-'
 
-    # 7. Identify Destiny Palace & Life Aspects (Joey Yap System)
-    # Destiny palace is where Day Stem sits on Tian Pan (or Di Pan)
+    # 7. Identify Destiny Palace & Life Aspects
+    # Destiny palace is where Day Stem sits on Tian Pan
     destiny_palace = dest_palace
+    # If Day Stem is Jia, Day Master is hidden under Day Xun Shou leader stem!
+    d_branch_name = pillars['day']['branch_name']
+    d_stem_idx = STEM_NAMES.index(d_stem_name) if d_stem_name in STEM_NAMES else 0
+    d_branch_idx = BRANCH_NAMES.index(d_branch_name) if d_branch_name in BRANCH_NAMES else 0
+    _, d_leader_stem, _ = get_xun_shou(d_stem_idx, d_branch_idx)
+    target_day_stem = d_leader_stem if d_stem_name == 'Jia' else d_stem_name
+
     for p_num, s in tian_pan.items():
-        if s == d_stem_name:
+        if s == target_day_stem:
             destiny_palace = p_num
             break
 
@@ -692,7 +691,7 @@ def build_grounded_qimen_destiny_prompt(birth_date_str: str, birth_time_str: str
     p_info = chart_data['palaces'][destiny_p]
 
     prompt = (
-        f"Natal Qi Men Destiny Consultation Request (Joey Yap Method):\n"
+        f"Natal Qi Men Destiny Consultation Request:\n"
         f"- Birth Date: {birth_date_str} (Solar: {year}-{month:02d}-{day:02d})\n"
         f"- Birth Time: {birth_time_str} (Solar Hour: {hour:02d}:{minute:02d})\n"
         f"- Gender: {gender}\n"
@@ -707,7 +706,7 @@ def build_grounded_qimen_destiny_prompt(birth_date_str: str, birth_time_str: str
         f"Your response MUST include this exact section and table as Section 2:\n\n"
         f"{matrix_md}\n\n"
         f"STRICT CONSULTATION INSTRUCTIONS:\n"
-        f"1. Follow Joey Yap's Natal Qi Men Destiny Reading framework.\n"
+        f"1. Follow the authentic Natal Qi Men Destiny Reading framework.\n"
         f"2. Decode the client's Destiny Palace, Guardian Deity capabilities, and spiritual archetype.\n"
         f"3. Evaluate the 8 Life Aspects across the palaces (Destiny, Wealth, Career, Relationships, Health, Knowledge, Subconscious, Karmic).\n"
         f"4. Provide concrete, non-superstitious strategic action steps for personal mastery."

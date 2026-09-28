@@ -17,7 +17,7 @@ logger = logging.getLogger("metaphysics_app")
 
 app = FastAPI(
     title="Classical Chinese Metaphysics & QiMen Suite (Zhi Run Fa)",
-    description="Unified API & Web Suite integrating Phann Sophearith BaZi, Feng Shui, Qi Men Dun Jia (Zhi Run Fa), and Calendar ephemeris.",
+    description="Unified API & Web Suite integrating Classical BaZi, Feng Shui, Qi Men Dun Jia (Zhi Run Fa), and Calendar ephemeris.",
     version="1.0.0"
 )
 
@@ -132,7 +132,7 @@ def consult_fengshui(req: FengShuiRequest):
         f"- Main Door Location: {req.door_mountain} (24 Mountains)\n"
         f"- Property Type: {req.property_type}\n"
         f"- Specific Inquiries: {req.inquiry}\n"
-        f"Evaluate the spatial Qi according to Phann Sophearith's Feng Shui for Homebuyers and Yang Mansion principles."
+        f"Evaluate the spatial Qi according to Classical Feng Shui and Yang Mansion principles."
     )
     res = call_gemini(prompt=prompt, skill_key="fengshui")
     return {"skill": "fengshui", "result": res}
@@ -221,14 +221,14 @@ def index():
   <div class="container">
     <header>
       <h1>Classical Chinese Metaphysics Suite</h1>
-      <p class="sub">Phann Sophearith Classical BaZi, Feng Shui, Qi Men Dun Jia & Ephemeris Engine</p>
+      <p class="sub">Classical Chinese Metaphysics — BaZi, Feng Shui, Qi Men Dun Jia & Ephemeris Engine</p>
       <span class="badge">Qi Men Engine: Zhi Run Fa (置閏法)</span>
     </header>
 
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('qimen_date', this)">📅 Qi Men Date Selection</button>
       <button class="tab-btn" onclick="switchTab('qimen_fs', this)">🧭 Qi Men Feng Shui</button>
-      <button class="tab-btn" onclick="switchTab('bazi', this)">🔮 BaZi PSPR</button>
+      <button class="tab-btn" onclick="switchTab('bazi', this)">🔮 BaZi Reading</button>
       <button class="tab-btn" onclick="switchTab('fengshui', this)">🏡 Feng Shui Audit</button>
       <button class="tab-btn" onclick="switchTab('calendar', this)">📜 10K Calendar</button>
     </div>
