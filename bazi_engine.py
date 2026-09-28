@@ -56,8 +56,8 @@ BRANCH_HIDDEN_STEMS_MAP = {
         {'char': '戊', 'name': 'Wu', 'polarity_elem': '+Earth土', 'stem_idx': 4}
     ], # Si
     6: [
-        {'char': '己', 'name': 'Ji', 'polarity_elem': '-Earth土', 'stem_idx': 5},
-        {'char': '丁', 'name': 'Ding', 'polarity_elem': '-Fire火', 'stem_idx': 3}
+        {'char': '丁', 'name': 'Ding', 'polarity_elem': '-Fire火', 'stem_idx': 3},
+        {'char': '己', 'name': 'Ji', 'polarity_elem': '-Earth土', 'stem_idx': 5}
     ], # Wu
     7: [
         {'char': '丁', 'name': 'Ding', 'polarity_elem': '-Fire火', 'stem_idx': 3},
@@ -161,17 +161,18 @@ def get_solar_month_branch(sun_lon: float) -> int:
     else: # 285.0 <= deg < 315.0
         return 1  # Chou (Month 12)
 
-def get_10_god(dm_idx: int, target_idx: int) -> Dict[str, str]:
+def get_10_god(dm_idx: int, target_idx: int, is_day_master: bool = False) -> Dict[str, str]:
     """
     Computes 10 God notation between Day Master stem and target stem.
+    Only the Day Heavenly Stem receives Day Master (DM). Hidden stems and other pillars receive Friend (F) / Rob Wealth (RW).
     """
+    if is_day_master:
+        return {'zh_full': '日元', 'zh_short': '日', 'code': 'DM', 'en_full': 'Day Master'}
     dm_elem = dm_idx // 2
     target_elem = target_idx // 2
     same_polar = (dm_idx % 2) == (target_idx % 2)
     
     if dm_elem == target_elem:
-        if dm_idx == target_idx:
-            return {'zh_full': '日元', 'zh_short': '日', 'code': 'DM', 'en_full': 'Day Master'}
         return {'zh_full': '比肩', 'zh_short': '比', 'code': 'F', 'en_full': 'Friend'} if same_polar else {'zh_full': '劫財', 'zh_short': '劫', 'code': 'RW', 'en_full': 'Rob Wealth'}
     elif (dm_elem + 1) % 5 == target_elem:
         return {'zh_full': '食神', 'zh_short': '食', 'code': 'EG', 'en_full': 'Eating God'} if same_polar else {'zh_full': '傷官', 'zh_short': '傷', 'code': 'HO', 'en_full': 'Hurting Officer'}
@@ -277,12 +278,15 @@ def calculate_auxiliary_stars(dm_stem_idx: int, y_branch_idx: int, d_branch_idx:
     conception_palace = f"{STEM_CHARS[ty_stem_idx]}{BRANCH_CHARS[ty_branch_idx]} {STEM_ELEMENTS[ty_stem_idx].split()[0]} {STEM_SHORT_ELEMENTS[ty_stem_idx]} {BRANCH_SHORT_ANIMALS[ty_branch_idx]}"
 
     # Life Palace (Ming Gong 命宮):
-    # Classical Palm formula: Count month from Yin=1..Hai=10..Chou=12; Hour from Zi=1..Mao=4..Hai=12
-    # Offset from Yin is: (14 - (m_order + h_order)) % 12
-    m_order = (m_branch_idx - 2) % 12 + 1
-    h_order = h_branch_idx + 1
-    offset = (14 - (m_order + h_order)) % 12
-    mg_branch_idx = (2 + offset) % 12
+    # Classical Palm Digital Cardinal method (数字基数法):
+    # Count month from Yin=1..Hai=10..Chou=12; Hour from Yin=1..Hai=10..Chou=12
+    m_num = (m_branch_idx - 2) % 12 + 1
+    h_num = (h_branch_idx - 2) % 12 + 1
+    total = m_num + h_num
+    mg_num = (14 - total) if total < 14 else (26 - total)
+    if mg_num <= 0:
+        mg_num += 12
+    mg_branch_idx = (mg_num - 1 + 2) % 12
     # Five Tigers遁 stem for Ming Gong from Year Stem
     mg_start_stem = {0: 2, 5: 2, 1: 4, 6: 4, 2: 6, 7: 6, 3: 8, 8: 8, 4: 0, 9: 0}[y_stem_idx % 5]
     mg_stem_idx = (mg_start_stem + (mg_branch_idx - 2) % 12) % 10
@@ -365,6 +369,7 @@ def calculate_ming_gua(bazi_year: int, gender: str) -> Dict[str, Any]:
         'fs_gua_char': g_meta['char'],
         'fs_gua_name': g_meta['name'],
         'fs_gua_dir': g_meta['dir'],
+        'group': 'West Group 西四命' if active_gua in [2, 5, 6, 7, 8] else 'East Group 東四命',
         'favorable_dirs': {
             'sq': dirs['sq'],
             'ty': dirs['ty'],
@@ -449,7 +454,7 @@ def calculate_four_pillars(year: int, month: int, day: int, hour: int = 12, minu
             'stem_char': STEM_CHARS[day_stem_idx],
             'stem_name': STEM_NAMES[day_stem_idx],
             'stem_elem': STEM_SHORT_ELEMENTS[day_stem_idx],
-            'stem_god': get_10_god(day_stem_idx, day_stem_idx),
+            'stem_god': get_10_god(day_stem_idx, day_stem_idx, is_day_master=True),
             'branch_char': BRANCH_CHARS[day_branch_idx],
             'branch_name': BRANCH_NAMES[day_branch_idx],
             'branch_animal': BRANCH_ANIMALS[day_branch_idx],
@@ -769,7 +774,7 @@ def generate_natal_chart_html(p: Dict[str, Any]) -> str:
   </div>
 </div>"""
         raw_html += """</div></td>"""
-    raw_html += """<td style="padding: 10px; border-left: 2px solid #f59e0b; font-size: 12px; font-weight: 700; color: #fbbf24; background: #1e293b; vertical-align: middle; line-height: 1.4;">藏干<br><span style="font-size: 10px; font-weight: normal; color: #94a3b8;">Hidden<br>Stems</span></td></tr></tbody></table>
+    raw_html += f"""<td style="padding: 10px; border-left: 2px solid #f59e0b; font-size: 12px; font-weight: 700; color: #fbbf24; background: #1e293b; vertical-align: middle; line-height: 1.4;">藏干<br><span style="font-size: 10px; font-weight: normal; color: #94a3b8;">Hidden<br>Stems</span></td></tr></tbody></table>
 </div>
 
 <!-- BOTTOM ROW: 8 MANSIONS (FAVORABLE & UNFAVORABLE DIRECTIONS) -->

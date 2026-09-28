@@ -51,6 +51,8 @@ DEITY_META = {
     'Harmony': {'char': '合', 'pinyin': 'He', 'en': 'Harmony', 'full': 'Liu He'},
     'Hook': {'char': '陳', 'pinyin': 'Chen', 'en': 'Hook', 'full': 'Gou Chen'},
     'Phoenix': {'char': '雀', 'pinyin': 'Que', 'en': 'Phoenix', 'full': 'Zhu Que'},
+    'Tiger': {'char': '虎', 'pinyin': 'Hu', 'en': 'Tiger', 'full': 'Bai Hu'},
+    'Tortoise': {'char': '武', 'pinyin': 'Wu', 'en': 'Tortoise', 'full': 'Xuan Wu'},
     'Earth': {'char': '地', 'pinyin': 'Di', 'en': 'Earth', 'full': 'Jiu Di'},
     'Heaven': {'char': '天', 'pinyin': 'Tian', 'en': 'Heaven', 'full': 'Jiu Tian'},
     '-': {'char': '-', 'pinyin': '-', 'en': '-', 'full': '-'}
@@ -80,7 +82,9 @@ DOOR_CYCLE = ['Rest', 'Life', 'Harm', 'Delusion', 'Scenery', 'Death', 'Fear', 'O
 # Standard 8 Stars in clockwise natural order:
 STAR_CYCLE = ['Tian Peng', 'Tian Ren', 'Tian Chong', 'Tian Fu', 'Tian Ying', 'Tian Rui', 'Tian Zhu', 'Tian Xin']
 # Standard 8 Deities:
-DEITY_CYCLE = ['Chief', 'Snake', 'Moon', 'Harmony', 'Hook', 'Phoenix', 'Earth', 'Heaven']
+DEITY_CYCLE_YANG = ['Chief', 'Snake', 'Moon', 'Harmony', 'Hook', 'Phoenix', 'Earth', 'Heaven']
+DEITY_CYCLE_YIN = ['Chief', 'Snake', 'Moon', 'Harmony', 'Tiger', 'Tortoise', 'Earth', 'Heaven']
+DEITY_CYCLE = DEITY_CYCLE_YANG
 
 # ==========================================
 # QI MEN CALCULATION ENGINE (ZHI RUN FA)
@@ -263,7 +267,7 @@ def calculate_qimen_chart_from_pillars(pillars: Dict[str, Any], dun_type: str = 
     else:
         door_dest_palace = (active_leader_palace - step_diff - 1) % 9 + 1
     if door_dest_palace == 5:
-        door_dest_palace = 2 if dun_type.lower() == 'yang' else 8
+        door_dest_palace = 2
 
     door_dest_perim_idx = PERIMETER_PALACES.index(door_dest_palace)
     door_positions = {}
@@ -278,12 +282,13 @@ def calculate_qimen_chart_from_pillars(pillars: Dict[str, Any], dun_type: str = 
     # Zhi Fu sits with the duty star / dest_palace
     deity_positions = {}
     deity_start_perim_idx = PERIMETER_PALACES.index(dest_palace) if dest_palace in PERIMETER_PALACES else 0
+    deity_cycle = DEITY_CYCLE_YIN if dun_type.lower() == 'yin' else DEITY_CYCLE_YANG
     for i in range(8):
         if dun_type.lower() == 'yang':
             cur_pal = PERIMETER_PALACES[(deity_start_perim_idx + i) % 8]
         else:
             cur_pal = PERIMETER_PALACES[(deity_start_perim_idx - i) % 8]
-        deity_positions[cur_pal] = DEITY_CYCLE[i]
+        deity_positions[cur_pal] = deity_cycle[i]
     deity_positions[5] = '-'
 
     # 7. Identify Destiny Palace & Life Aspects
