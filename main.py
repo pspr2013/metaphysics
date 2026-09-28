@@ -173,13 +173,16 @@ def consult_calendar(req: ConsultRequest):
 # Frontend Web Interface
 @app.get("/", response_class=HTMLResponse)
 def index():
-    return """
+    return r"""
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chinese Metaphysics & QiMen Suite (Zhi Run Fa)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Kantumruy+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     :root {
@@ -192,9 +195,21 @@ def index():
       --text-muted: #94a3b8;
       --border: #334155;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }
-    body { background: var(--bg); color: var(--text); padding: 20px; line-height: 1.6; }
-    .container { max-width: 1000px; margin: 0 auto; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Kantumruy Pro', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      padding: 24px;
+      line-height: 1.75;
+      font-size: 15px;
+      letter-spacing: 0.01em;
+    }
+    .container { max-width: 1140px; margin: 0 auto; }
     header { text-align: center; margin-bottom: 30px; }
     h1 { color: #f59e0b; font-size: 2rem; margin-bottom: 8px; }
     p.sub { color: var(--text-muted); font-size: 1rem; }
@@ -209,11 +224,153 @@ def index():
     input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
     button.submit-btn { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: background 0.2s; width: 100%; }
     button.submit-btn:hover { background: var(--primary-hover); }
-    .output-card { display: none; background: #0b1329; border: 1px solid #1e3a8a; border-radius: 12px; padding: 24px; }
-    .output-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #1e3a8a; padding-bottom: 10px; }
-    .output-content { font-size: 0.95rem; color: #e2e8f0; }
-    .output-content h2, .output-content h3 { color: #f59e0b; margin-top: 15px; margin-bottom: 8px; }
-    .output-content ul, .output-content ol { margin-left: 20px; margin-bottom: 10px; }
+    
+    /* Output Card & Content Styling */
+    .output-card { display: none; background: #0b1329; border: 1px solid #1e3a8a; border-radius: 14px; padding: 26px; box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5); }
+    .output-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #1e3a8a; padding-bottom: 12px; }
+    .output-content { font-size: 0.95rem; color: #e2e8f0; line-height: 1.75; }
+    .output-content h1, .output-content h2, .output-content h3, .output-content h4 { color: #f59e0b; font-weight: 700; margin-top: 24px; margin-bottom: 12px; line-height: 1.45; }
+    .output-content h2 { font-size: 1.4rem; border-bottom: 1px solid rgba(245, 158, 11, 0.3); padding-bottom: 8px; }
+    .output-content h3 { font-size: 1.25rem; }
+    .output-content p { margin-bottom: 14px; line-height: 1.8; color: #cbd5e1; }
+    .output-content strong { color: #f8fafc; font-weight: 600; }
+    .output-content ul, .output-content ol { margin-left: 24px; margin-bottom: 16px; line-height: 1.75; }
+    .output-content li { margin-bottom: 6px; }
+
+    /* Responsive Table Styles */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin: 22px 0;
+      border-radius: 12px;
+      border: 1px solid #1e3a8a;
+      background: #0f172a;
+      box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.45);
+      -webkit-overflow-scrolling: touch;
+    }
+    .output-content table {
+      width: 100%;
+      min-width: 880px;
+      border-collapse: collapse;
+      font-size: 0.93rem;
+      line-height: 1.75;
+      color: #e2e8f0;
+      background: #0b1329;
+      text-align: left;
+    }
+    .output-content thead {
+      background: linear-gradient(180deg, #1e293b 0%, #101c36 100%);
+      border-bottom: 2px solid #d97706;
+    }
+    .output-content th {
+      color: #fbbf24;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 14px 16px;
+      letter-spacing: 0.02em;
+      border-right: 1px solid rgba(51, 65, 85, 0.45);
+      vertical-align: middle;
+    }
+    .output-content th:last-child {
+      border-right: none;
+    }
+    .output-content td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #1e293b;
+      border-right: 1px solid rgba(51, 65, 85, 0.3);
+      vertical-align: top;
+      line-height: 1.75;
+    }
+    .output-content td:last-child {
+      border-right: none;
+    }
+    .output-content tbody tr:nth-child(even) {
+      background: rgba(30, 41, 59, 0.35);
+    }
+    .output-content tbody tr:nth-child(odd) {
+      background: rgba(11, 19, 41, 0.6);
+    }
+    .output-content tbody tr:hover {
+      background: rgba(245, 158, 11, 0.08);
+    }
+
+    /* Column Widths & Highlights */
+    .output-content td:nth-child(1), .output-content th:nth-child(1) {
+      width: 18%;
+      min-width: 160px;
+      font-weight: 600;
+      color: #38bdf8;
+    }
+    .output-content td:nth-child(2), .output-content th:nth-child(2) {
+      width: 13%;
+      min-width: 110px;
+      color: #f1f5f9;
+    }
+    .output-content td:nth-child(3), .output-content th:nth-child(3) {
+      width: 24%;
+      min-width: 210px;
+    }
+    .output-content td:nth-child(4), .output-content th:nth-child(4) {
+      width: 15%;
+      min-width: 140px;
+    }
+    .output-content td:nth-child(5), .output-content th:nth-child(5) {
+      width: 30%;
+      min-width: 270px;
+      color: #cbd5e1;
+    }
+
+    /* Quality Tier Badges */
+    .tier-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.83rem;
+      font-weight: 600;
+      line-height: 1.4;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    }
+    .tier-superior {
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+      border: 1px solid #059669;
+    }
+    .tier-good {
+      background: rgba(14, 165, 233, 0.16);
+      color: #38bdf8;
+      border: 1px solid #0284c7;
+    }
+    .tier-average {
+      background: rgba(245, 158, 11, 0.16);
+      color: #fbbf24;
+      border: 1px solid #d97706;
+    }
+    .tier-poor {
+      background: rgba(239, 68, 68, 0.16);
+      color: #f87171;
+      border: 1px solid #dc2626;
+    }
+
+    /* Cell List Items */
+    .cell-item {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      margin-bottom: 6px;
+    }
+    .cell-item:last-child {
+      margin-bottom: 0;
+    }
+    .cell-dot {
+      color: #f59e0b;
+      font-size: 1.05rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
     .loading { display: none; text-align: center; color: #f59e0b; font-weight: 600; margin: 20px 0; }
   </style>
 </head>
@@ -401,6 +558,7 @@ def index():
           htmlOutput = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
         }
         outContent.innerHTML = htmlOutput;
+        formatRenderedContent(outContent);
         outCard.style.display = 'block';
       } catch (err) {
         outContent.innerHTML = '<p style="color:#ef4444;">Error: ' + err.message + '</p>';
@@ -408,6 +566,60 @@ def index():
       } finally {
         loading.style.display = 'none';
       }
+    }
+
+    function formatRenderedContent(container) {
+      if (!container) return;
+      // 1. Wrap any table in responsive .table-container
+      container.querySelectorAll('table').forEach(table => {
+        if (!table.parentElement.classList.contains('table-container')) {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'table-container';
+          table.parentNode.insertBefore(wrapper, table);
+          wrapper.appendChild(table);
+        }
+      });
+
+      // 2. Format table cells (bullets, badges, spacing)
+      container.querySelectorAll('table td').forEach(td => {
+        let html = td.innerHTML;
+
+        // Clean up asterisks or dash bullets
+        if (html.includes('*') || html.includes('-') || html.includes('•')) {
+          const lines = html.split(/<br\s*\/?>|\n/);
+          if (lines.length > 1 || lines.some(l => l.trim().match(/^[*•\-]/))) {
+            const formatted = lines.map(line => {
+              const trimmed = line.trim();
+              if (trimmed.match(/^[*•\-]\s*/)) {
+                const clean = trimmed.replace(/^[*•\-]\s*/, '');
+                return `<div class="cell-item"><span class="cell-dot">•</span><span>${clean}</span></div>`;
+              }
+              return trimmed ? `<div>${trimmed}</div>` : '';
+            }).filter(Boolean).join('');
+            if (formatted) {
+              td.innerHTML = formatted;
+            }
+          }
+        }
+
+        // Add badges for Quality Tiers
+        const rawText = td.textContent.trim();
+        if (rawText.length > 0 && rawText.length < 50) {
+          if (/Superior|គុណភាពខ្ពស់/i.test(rawText)) {
+            td.innerHTML = `<span class="tier-badge tier-superior">${td.innerHTML}</span>`;
+            td.style.textAlign = 'center';
+          } else if (/Good|គុណភាពល្អ/i.test(rawText)) {
+            td.innerHTML = `<span class="tier-badge tier-good">${td.innerHTML}</span>`;
+            td.style.textAlign = 'center';
+          } else if (/Average|គុណភាពមធ្យម/i.test(rawText)) {
+            td.innerHTML = `<span class="tier-badge tier-average">${td.innerHTML}</span>`;
+            td.style.textAlign = 'center';
+          } else if (/Poor|គុណភាពទន់ខ្សោយ|គុណភាពខ្សោយ/i.test(rawText)) {
+            td.innerHTML = `<span class="tier-badge tier-poor">${td.innerHTML}</span>`;
+            td.style.textAlign = 'center';
+          }
+        }
+      });
     }
 
     function submitQiMenDate() {

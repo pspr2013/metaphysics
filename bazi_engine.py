@@ -564,7 +564,7 @@ def generate_natal_chart_html(p: Dict[str, Any]) -> str:
     dm_char = p['day']['stem_char']
     dm_full = f"{dm_char} {dm_stem} {dm_elem}"
 
-    raw_html = f"""<div class="personal-natal-chart" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 960px; margin: 15px auto; background: #ffffff; border: 2px solid #7a1518; border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); color: #1e293b; overflow: hidden; padding: 18px;">
+    raw_html = f"""<div class="personal-natal-chart" style="font-family: 'Kantumruy Pro', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 960px; margin: 15px auto; background: #ffffff; border: 2px solid #7a1518; border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); color: #1e293b; overflow: hidden; padding: 18px;">
 <div style="border-bottom: 2px solid #856404; padding-bottom: 10px; margin-bottom: 14px;">
 <div style="font-size: 15px; font-weight: 700; color: #475569;">
 <span>{client_name}</span> | <span style="color: #0f172a;">{formatted_date_time}</span> | <span style="font-weight: 700; color: #7a1518;">{gender_str}</span>
