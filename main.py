@@ -237,7 +237,7 @@ def index():
     .output-content ul, .output-content ol { margin-left: 24px; margin-bottom: 16px; line-height: 1.75; }
     .output-content li { margin-bottom: 6px; }
 
-    /* Responsive Table Styles */
+    /* Responsive Table Styles (For AI Markdown Analysis Tables) */
     .table-container {
       width: 100%;
       overflow-x: auto;
@@ -248,7 +248,7 @@ def index():
       box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.45);
       -webkit-overflow-scrolling: touch;
     }
-    .output-content table {
+    .table-container table {
       width: 100%;
       min-width: 880px;
       border-collapse: collapse;
@@ -258,11 +258,11 @@ def index():
       background: #0b1329;
       text-align: left;
     }
-    .output-content thead {
+    .table-container thead {
       background: linear-gradient(180deg, #1e293b 0%, #101c36 100%);
       border-bottom: 2px solid #d97706;
     }
-    .output-content th {
+    .table-container th {
       color: #fbbf24;
       font-weight: 700;
       font-size: 0.95rem;
@@ -271,50 +271,50 @@ def index():
       border-right: 1px solid rgba(51, 65, 85, 0.45);
       vertical-align: middle;
     }
-    .output-content th:last-child {
+    .table-container th:last-child {
       border-right: none;
     }
-    .output-content td {
+    .table-container td {
       padding: 14px 16px;
       border-bottom: 1px solid #1e293b;
       border-right: 1px solid rgba(51, 65, 85, 0.3);
       vertical-align: top;
       line-height: 1.75;
     }
-    .output-content td:last-child {
+    .table-container td:last-child {
       border-right: none;
     }
-    .output-content tbody tr:nth-child(even) {
+    .table-container tbody tr:nth-child(even) {
       background: rgba(30, 41, 59, 0.35);
     }
-    .output-content tbody tr:nth-child(odd) {
+    .table-container tbody tr:nth-child(odd) {
       background: rgba(11, 19, 41, 0.6);
     }
-    .output-content tbody tr:hover {
+    .table-container tbody tr:hover {
       background: rgba(245, 158, 11, 0.08);
     }
 
     /* Column Widths & Highlights */
-    .output-content td:nth-child(1), .output-content th:nth-child(1) {
+    .table-container td:nth-child(1), .table-container th:nth-child(1) {
       width: 18%;
       min-width: 160px;
       font-weight: 600;
       color: #38bdf8;
     }
-    .output-content td:nth-child(2), .output-content th:nth-child(2) {
+    .table-container td:nth-child(2), .table-container th:nth-child(2) {
       width: 13%;
       min-width: 110px;
       color: #f1f5f9;
     }
-    .output-content td:nth-child(3), .output-content th:nth-child(3) {
+    .table-container td:nth-child(3), .table-container th:nth-child(3) {
       width: 24%;
       min-width: 210px;
     }
-    .output-content td:nth-child(4), .output-content th:nth-child(4) {
+    .table-container td:nth-child(4), .table-container th:nth-child(4) {
       width: 15%;
       min-width: 140px;
     }
-    .output-content td:nth-child(5), .output-content th:nth-child(5) {
+    .table-container td:nth-child(5), .table-container th:nth-child(5) {
       width: 30%;
       min-width: 270px;
       color: #cbd5e1;
@@ -570,8 +570,9 @@ def index():
 
     function formatRenderedContent(container) {
       if (!container) return;
-      // 1. Wrap any table in responsive .table-container
+      // 1. Wrap markdown tables in responsive .table-container (skip .personal-natal-chart)
       container.querySelectorAll('table').forEach(table => {
+        if (table.closest('.personal-natal-chart')) return;
         if (!table.parentElement.classList.contains('table-container')) {
           const wrapper = document.createElement('div');
           wrapper.className = 'table-container';
@@ -580,8 +581,8 @@ def index():
         }
       });
 
-      // 2. Format table cells (bullets, badges, spacing)
-      container.querySelectorAll('table td').forEach(td => {
+      // 2. Format table cells for markdown analysis tables
+      container.querySelectorAll('.table-container td').forEach(td => {
         let html = td.innerHTML;
 
         // Clean up asterisks or dash bullets
