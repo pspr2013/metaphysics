@@ -280,18 +280,18 @@ def index():
 
     <!-- BaZi Form -->
     <div id="panel-bazi" class="card tab-panel" style="display:none;">
-      <h3 style="margin-bottom: 15px; color: #f59e0b;">BaZi Reading & Destiny Analysis (PSPR)</h3>
+      <h3 style="margin-bottom: 15px; color: #f59e0b;">BaZi Reading & Destiny Analysis</h3>
       <div class="form-group">
         <label>Client Name</label>
-        <input type="text" id="bz-name" value="Atithreaksmey" placeholder="e.g. Atithreaksmey">
+        <input type="text" id="bz-name" placeholder="Enter client name">
       </div>
       <div class="form-group">
         <label>Birth Date (YYYY-MM-DD)</label>
-        <input type="date" id="bz-date" value="1986-12-07">
+        <input type="date" id="bz-date">
       </div>
       <div class="form-group">
         <label>Birth Time</label>
-        <input type="time" id="bz-time" value="09:30">
+        <input type="time" id="bz-time">
       </div>
       <div class="form-group">
         <label>Gender</label>
@@ -427,10 +427,15 @@ def index():
     }
 
     function submitBaZi() {
+      const birthDate = document.getElementById('bz-date').value;
+      if (!birthDate) {
+        alert('Please enter a birth date.');
+        return;
+      }
       sendRequest('/api/bazi', {
         client_name: document.getElementById('bz-name').value || 'Client',
-        birth_date: document.getElementById('bz-date').value,
-        birth_time: document.getElementById('bz-time').value,
+        birth_date: birthDate,
+        birth_time: document.getElementById('bz-time').value || '12:00',
         gender: document.getElementById('bz-gender').value,
         question: document.getElementById('bz-question').value
       });
