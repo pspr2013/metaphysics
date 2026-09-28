@@ -1018,8 +1018,8 @@ def generate_annual_destiny_html(pillars: Dict[str, Any], current_year: int = 20
         else:
             for zh_s, en_s in ausp:
                 html += f"""              <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(30, 41, 59, 0.6); border: 1px solid #475569; border-left: 3px solid #f59e0b; border-radius: 4px; padding: 2.5px 6px; margin-bottom: 3.5px; font-size: 11px;">
-                <span style="font-weight: 800; color: #fbbf24;">{zh_s}</span>
-                <span style="font-size: 9.5px; color: #e2e8f0; font-weight: 600;">{en_s}</span>
+                <span style="font-weight: 800; color: #fbbf24; white-space: nowrap;">{zh_s}</span>
+                <span style="font-size: 9.5px; color: #e2e8f0; font-weight: 600; text-align: right; margin-left: 4px;">{en_s}</span>
               </div>\n"""
         
         # Inauspicious Header & Badges
@@ -1031,8 +1031,8 @@ def generate_annual_destiny_html(pillars: Dict[str, Any], current_year: int = 20
         else:
             for zh_s, en_s in inausp:
                 html += f"""              <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(15, 23, 42, 0.6); border: 1px solid #334155; border-left: 3px solid #64748b; border-radius: 4px; padding: 2.5px 6px; margin-bottom: 3px; font-size: 10.5px;">
-                <span style="font-weight: 700; color: #cbd5e1;">{zh_s}</span>
-                <span style="font-size: 9px; color: #94a3b8; font-weight: 500;">{en_s}</span>
+                <span style="font-weight: 700; color: #cbd5e1; white-space: nowrap;">{zh_s}</span>
+                <span style="font-size: 9px; color: #94a3b8; font-weight: 500; text-align: right; margin-left: 4px;">{en_s}</span>
               </div>\n"""
 
         html += """            </td>\n"""
