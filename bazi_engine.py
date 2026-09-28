@@ -41,8 +41,8 @@ BRANCH_HIDDEN_STEMS_MAP = {
     ], # Chou
     2: [
         {'char': '戊', 'name': 'Wu', 'polarity_elem': '+Earth土', 'stem_idx': 4},
-        {'char': '丙', 'name': 'Bing', 'polarity_elem': '+Fire火', 'stem_idx': 2},
-        {'char': '甲', 'name': 'Jia', 'polarity_elem': '+Wood木', 'stem_idx': 0}
+        {'char': '甲', 'name': 'Jia', 'polarity_elem': '+Wood木', 'stem_idx': 0},
+        {'char': '丙', 'name': 'Bing', 'polarity_elem': '+Fire火', 'stem_idx': 2}
     ], # Yin
     3: [{'char': '乙', 'name': 'Yi', 'polarity_elem': '-Wood木', 'stem_idx': 1}], # Mao
     4: [
@@ -277,15 +277,13 @@ def calculate_auxiliary_stars(dm_stem_idx: int, y_branch_idx: int, d_branch_idx:
     conception_palace = f"{STEM_CHARS[ty_stem_idx]}{BRANCH_CHARS[ty_branch_idx]} {STEM_ELEMENTS[ty_stem_idx].split()[0]} {STEM_SHORT_ELEMENTS[ty_stem_idx]} {BRANCH_SHORT_ANIMALS[ty_branch_idx]}"
 
     # Life Palace (Ming Gong 命宮):
-    # Classical Formula: (26 - (month_order + hour_order)) % 12
-    # Month order from Yin=1..Hai=10, Chou=12; Hour order Zi=1..Mao=4..Hai=12
+    # Classical Palm formula: Count month from Yin=1..Hai=10..Chou=12; Hour from Zi=1..Mao=4..Hai=12
+    # Offset from Yin is: (14 - (m_order + h_order)) % 12
     m_order = (m_branch_idx - 2) % 12 + 1
-    h_order = (h_branch_idx) + 1
-    mg_order = (26 - (m_order + h_order)) % 12
-    if mg_order == 0:
-        mg_order = 12
-    mg_branch_idx = (mg_order + 1) % 12
-    # Five Tigers遁 stem for Ming Gong
+    h_order = h_branch_idx + 1
+    offset = (14 - (m_order + h_order)) % 12
+    mg_branch_idx = (2 + offset) % 12
+    # Five Tigers遁 stem for Ming Gong from Year Stem
     mg_start_stem = {0: 2, 5: 2, 1: 4, 6: 4, 2: 6, 7: 6, 3: 8, 8: 8, 4: 0, 9: 0}[y_stem_idx % 5]
     mg_stem_idx = (mg_start_stem + (mg_branch_idx - 2) % 12) % 10
     life_palace = f"{STEM_CHARS[mg_stem_idx]}{BRANCH_CHARS[mg_branch_idx]} {STEM_ELEMENTS[mg_stem_idx].split()[0]} {STEM_SHORT_ELEMENTS[mg_stem_idx]} {BRANCH_SHORT_ANIMALS[mg_branch_idx]}"
@@ -515,8 +513,9 @@ def calculate_four_pillars(year: int, month: int, day: int, hour: int = 12, minu
 def generate_natal_chart_html(p: Dict[str, Any]) -> str:
     """
     Renders an authentic, classical Joey Yap Personal Chart for 2026 (Image 2)
-    with Header Profile, Day Master & Stars, Qi Men Destiny Palace, Life Star (5 Yellow),
+    with Header Profile, Day Master and Stars, Qi Men Destiny Palace, Life Star (5 Yellow),
     Feng Shui Gua (Kun SouthWest), 8 Mansions Directions, and the complete 4 Pillars Table.
+    Outputs completely unindented, comment-free HTML to guarantee zero markdown parser collisions.
     """
     order = ['hour', 'day', 'month', 'year']
     col_titles = {'hour': '時 Hour', 'day': '日 Day', 'month': '月 Month', 'year': '年 Year'}
@@ -548,240 +547,207 @@ def generate_natal_chart_html(p: Dict[str, Any]) -> str:
     dm_char = p['day']['stem_char']
     dm_full = f"{dm_char} {dm_stem} {dm_elem}"
 
-    html = f"""
-<div class="joey-yap-personal-chart" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 950px; margin: 15px auto; background: #ffffff; border: 2px solid #7a1518; border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); color: #1e293b; overflow: hidden; padding: 18px;">
-
-  <!-- Header Banner -->
-  <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #856404; padding-bottom: 8px; margin-bottom: 14px;">
-    <div>
-      <div style="font-size: 11px; font-weight: 800; color: #b45309; letter-spacing: 1.5px; text-transform: uppercase;">JOEY YAP'S DESTINY 2026</div>
-      <div style="font-size: 26px; font-weight: 900; color: #7a1518; letter-spacing: 0.5px; line-height: 1.1; margin-top: 2px;">PERSONAL CHART FOR 2026</div>
-      <div style="font-size: 13px; font-weight: 600; color: #475569; margin-top: 4px;">
-        <span>{client_name}</span> | <span style="color: #0f172a;">{formatted_date_time}</span> | <span style="font-weight: 700; color: #7a1518;">{gender_str}</span>
-      </div>
-    </div>
-    <div style="text-align: right;">
-      <span style="background: #7a1518; color: #ffffff; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 3px; letter-spacing: 0.5px;">PSPR METAPHYSICS</span>
-    </div>
-  </div>
-
-  <!-- Top 3 Metadata Cards -->
-  <div style="display: grid; grid-template-columns: 1.15fr 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-
-    <!-- Box 1: DAY MASTER & STARS -->
-    <div style="border: 1px solid #7a1518; border-radius: 4px; overflow: hidden; font-size: 12px; background: #ffffff;">
-      <div style="background: #7a1518; color: #ffffff; padding: 6px 10px; font-weight: bold; display: flex; justify-content: space-between;">
-        <span>DAY MASTER</span>
-        <span>日主 : {dm_full}</span>
-      </div>
-      <div style="padding: 6px 10px; line-height: 1.65;">
-        <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
-          <span style="color: #64748b;">Celestial Animal</span>
-          <span style="font-weight: 600;">生肖 : {aux.get('celestial_animal', '-')}</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
-          <span style="color: #64748b;">Noble People</span>
-          <span style="font-weight: 600;">貴人 : {aux.get('noble_people', '-')}</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
-          <span style="color: #64748b;">Intelligence</span>
-          <span style="font-weight: 600;">文昌 : {aux.get('intelligence', '-')}</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
-          <span style="color: #64748b;">Peach Blossom</span>
-          <span style="font-weight: 600;">桃花 : {aux.get('peach_blossom', '-')}</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
-          <span style="color: #64748b;">Sky Horse</span>
-          <span style="font-weight: 600;">驛馬 : {aux.get('sky_horse', '-')}</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
-          <span style="color: #64748b;">Solitary</span>
-          <span style="font-weight: 600;">孤辰 : {aux.get('solitary', '-')}</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
-          <span style="color: #64748b;">Life Palace</span>
-          <span style="font-weight: 600;">命宮 : {aux.get('life_palace', '-')}</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; padding: 2px 0;">
-          <span style="color: #64748b;">Conception Palace</span>
-          <span style="font-weight: 600;">胎元 : {aux.get('conception_palace', '-')}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Box 2: QI MEN DESTINY PALACE -->
-    <div style="border: 1px solid #7a1518; border-radius: 4px; overflow: hidden; font-size: 12px; background: #ffffff;">
-      <div style="background: #7a1518; color: #ffffff; padding: 6px 10px; font-weight: bold; display: flex; justify-content: space-between;">
-        <span>QI MEN DESTINY PALACE</span>
-        <span>寄門命宮 : {qm.get('palace', '東北 NE')}</span>
-      </div>
-      <div style="padding: 10px 10px; line-height: 2.1;">
-        <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 4px 0;">
-          <span style="color: #64748b;">Life Stem</span>
-          <span style="font-weight: 600;">命干 : {qm.get('stem', '-')}</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 4px 0;">
-          <span style="color: #64748b;">Door of Destiny</span>
-          <span style="font-weight: 600;">門 : {qm.get('door', '-')}</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 4px 0;">
-          <span style="color: #64748b;">Star of Destiny</span>
-          <span style="font-weight: 600;">星 : {qm.get('star', '-')}</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; padding: 4px 0;">
-          <span style="color: #64748b;">Guardian of Destiny</span>
-          <span style="font-weight: 600;">神 : {qm.get('guardian', '-')}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Box 3: LIFE STAR & FENG SHUI GUA -->
-    <div style="border: 1px solid #7a1518; border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; background: #ffffff;">
-      <div style="background: #7a1518; color: #ffffff; padding: 6px 8px; font-weight: bold; display: flex; justify-content: space-between; font-size: 12px;">
-        <span style="width: 50%; text-align: center; border-right: 1px solid rgba(255,255,255,0.3);">LIFE STAR</span>
-        <span style="width: 50%; text-align: center;">風水命卦 GUA</span>
-      </div>
-      <div style="display: flex; flex: 1; align-items: center;">
-        <!-- Left: Life Star (5 Yellow) -->
-        <div style="width: 50%; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 12px 4px; text-align: center;">
-          <div style="font-size: 32px; font-weight: 900; color: #b45309; line-height: 1;">{gua.get('life_star_num', '5')}</div>
-          <div style="font-size: 14px; font-weight: bold; color: #b45309; margin: 2px 0;">{gua.get('life_star_color', 'Yellow')}</div>
-          <div style="font-size: 15px; font-weight: 800; color: #0f172a; margin-top: 2px;">{gua.get('life_star_zh', '五黃星命')}</div>
-          <div style="font-size: 14px; font-weight: bold; color: #b91c1c; margin-top: 2px;">{gua.get('life_star_elem', 'Earth 土')}</div>
-        </div>
-        <!-- Right: Trigram (Kun SouthWest) -->
-        <div style="width: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 12px 4px; text-align: center;">
-          <div style="font-size: 42px; font-weight: 900; color: #0f172a; line-height: 1;">{gua.get('fs_gua_char', '坤')}</div>
-          <div style="font-size: 14px; font-weight: bold; color: #475569; margin-top: 4px;">{gua.get('fs_gua_name', 'Kun')}</div>
-          <div style="font-size: 13px; font-weight: bold; color: #b91c1c; margin-top: 2px;">{gua.get('fs_gua_dir', 'SouthWest')}</div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Bottom Area: 8 Mansions (Left) & Natal Chart (Right) -->
-  <div style="display: grid; grid-template-columns: 1.15fr 2fr; gap: 10px; align-items: stretch;">
-
-    <!-- Left Column: Favorable & Unfavorable Directions -->
-    <div style="display: flex; flex-direction: column; gap: 8px;">
-      <!-- Favorable Directions -->
-      <div style="border: 1px solid #7a1518; border-radius: 4px; overflow: hidden; font-size: 11px; background: #ffffff;">
-        <div style="background: #7a1518; color: #ffffff; padding: 5px 8px; font-weight: bold; display: flex; justify-content: space-between;">
-          <span>FAVORABLE DIRECTIONS</span>
-          <span>本命吉方</span>
-        </div>
-        <div style="padding: 6px 8px; line-height: 1.7;">
-          <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
-            <span style="color: #475569;">Sheng Qi (Life Generating)</span> <b style="color: #047857;">生氣 : {fav.get('sq', '-')}</b>
-          </div>
-          <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
-            <span style="color: #475569;">Tian Yi (Heavenly Doctor)</span> <b style="color: #047857;">天醫 : {fav.get('ty', '-')}</b>
-          </div>
-          <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
-            <span style="color: #475569;">Yan Nian (Longevity)</span> <b style="color: #047857;">延年 : {fav.get('yn', '-')}</b>
-          </div>
-          <div style="display: flex; justify-content: space-between; padding: 2px 0;">
-            <span style="color: #475569;">Fu Wei (Stability)</span> <b style="color: #047857;">伏位 : {fav.get('fw', '-')}</b>
-          </div>
-        </div>
-      </div>
-
-      <!-- Unfavorable Directions -->
-      <div style="border: 1px solid #7a1518; border-radius: 4px; overflow: hidden; font-size: 11px; background: #ffffff;">
-        <div style="background: #7a1518; color: #ffffff; padding: 5px 8px; font-weight: bold; display: flex; justify-content: space-between;">
-          <span>UNFAVORABLE DIRECTIONS</span>
-          <span>本命凶方</span>
-        </div>
-        <div style="padding: 6px 8px; line-height: 1.7;">
-          <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
-            <span style="color: #475569;">Huo Hai (Mishaps)</span> <b style="color: #b91c1c;">禍害 : {unfav.get('hh', '-')}</b>
-          </div>
-          <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
-            <span style="color: #475569;">Wu Gui (Five Ghosts)</span> <b style="color: #b91c1c;">五鬼 : {unfav.get('wg', '-')}</b>
-          </div>
-          <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
-            <span style="color: #475569;">Liu Sha (Six Killings)</span> <b style="color: #b91c1c;">六煞 : {unfav.get('ls', '-')}</b>
-          </div>
-          <div style="display: flex; justify-content: space-between; padding: 2px 0;">
-            <span style="color: #475569;">Jue Ming (Life Threatening)</span> <b style="color: #b91c1c;">絕命 : {unfav.get('jm', '-')}</b>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Right Column: Natal Chart (時 日 月 年) Table -->
-    <div style="border: 1px solid #7a1518; border-radius: 4px; overflow: hidden; background: #ffffff; display: flex; flex-direction: column;">
-      <div style="background: #7a1518; color: #ffffff; padding: 6px 12px; font-weight: bold; font-size: 13px; display: flex; justify-content: space-between; align-items: center;">
-        <span>NATAL CHART 本命八字</span>
-        <span style="font-size: 11px; font-weight: normal; opacity: 0.9;">Classical Chinese Metaphysics</span>
-      </div>
-
-      <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 13px; flex: 1;">
-        <thead>
-          <tr style="background: #fdfaf2; color: #856404; border-bottom: 1.5px solid #d4af37; font-weight: 600;">
-"""
+    raw_html = f"""<div class="joey-yap-personal-chart" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 960px; margin: 15px auto; background: #ffffff; border: 2px solid #7a1518; border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); color: #1e293b; overflow: hidden; padding: 18px;">
+<div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #856404; padding-bottom: 8px; margin-bottom: 14px;">
+<div>
+<div style="font-size: 11px; font-weight: 800; color: #b45309; letter-spacing: 1.5px; text-transform: uppercase;">JOEY YAP'S DESTINY 2026</div>
+<div style="font-size: 26px; font-weight: 900; color: #7a1518; letter-spacing: 0.5px; line-height: 1.1; margin-top: 2px;">PERSONAL CHART FOR 2026</div>
+<div style="font-size: 13px; font-weight: 600; color: #475569; margin-top: 4px;">
+<span>{client_name}</span> | <span style="color: #0f172a;">{formatted_date_time}</span> | <span style="font-weight: 700; color: #7a1518;">{gender_str}</span>
+</div>
+</div>
+<div style="text-align: right;">
+<span style="background: #7a1518; color: #ffffff; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 3px; letter-spacing: 0.5px;">PSPR METAPHYSICS</span>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 1.22fr 1.08fr 0.85fr 0.85fr; gap: 10px; margin-bottom: 12px;">
+<div style="border: 1px solid #7a1518; border-radius: 4px; overflow: hidden; font-size: 12px; background: #ffffff;">
+<div style="background: #7a1518; color: #ffffff; padding: 6px 10px; font-weight: bold; display: flex; justify-content: space-between;">
+<span>DAY MASTER</span>
+<span>日主 : {dm_full}</span>
+</div>
+<div style="padding: 6px 10px; line-height: 1.65;">
+<div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+<span style="color: #64748b;">Celestial Animal</span>
+<span style="font-weight: 600;">生肖 : {aux.get('celestial_animal', '-')}</span>
+</div>
+<div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+<span style="color: #64748b;">Noble People</span>
+<span style="font-weight: 600;">貴人 : {aux.get('noble_people', '-')}</span>
+</div>
+<div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+<span style="color: #64748b;">Intelligence</span>
+<span style="font-weight: 600;">文昌 : {aux.get('intelligence', '-')}</span>
+</div>
+<div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+<span style="color: #64748b;">Peach Blossom</span>
+<span style="font-weight: 600;">桃花 : {aux.get('peach_blossom', '-')}</span>
+</div>
+<div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+<span style="color: #64748b;">Sky Horse</span>
+<span style="font-weight: 600;">驛馬 : {aux.get('sky_horse', '-')}</span>
+</div>
+<div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+<span style="color: #64748b;">Solitary</span>
+<span style="font-weight: 600;">孤辰 : {aux.get('solitary', '-')}</span>
+</div>
+<div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+<span style="color: #64748b;">Life Palace</span>
+<span style="font-weight: 600;">命宮 : {aux.get('life_palace', '-')}</span>
+</div>
+<div style="display: flex; justify-content: space-between; padding: 2px 0;">
+<span style="color: #64748b;">Conception Palace</span>
+<span style="font-weight: 600;">胎元 : {aux.get('conception_palace', '-')}</span>
+</div>
+</div>
+</div>
+<div style="border: 1px solid #7a1518; border-radius: 4px; overflow: hidden; font-size: 12px; background: #ffffff;">
+<div style="background: #7a1518; color: #ffffff; padding: 6px 10px; font-weight: bold; display: flex; justify-content: space-between;">
+<span>QI MEN DESTINY PALACE</span>
+<span>寄門命宮 : {qm.get('palace', '東北 NE')}</span>
+</div>
+<div style="padding: 10px 10px; line-height: 2.1;">
+<div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 4px 0;">
+<span style="color: #64748b;">Life Stem</span>
+<span style="font-weight: 600;">命干 : {qm.get('stem', '-')}</span>
+</div>
+<div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 4px 0;">
+<span style="color: #64748b;">Door of Destiny</span>
+<span style="font-weight: 600;">門 : {qm.get('door', '-')}</span>
+</div>
+<div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 4px 0;">
+<span style="color: #64748b;">Star of Destiny</span>
+<span style="font-weight: 600;">星 : {qm.get('star', '-')}</span>
+</div>
+<div style="display: flex; justify-content: space-between; padding: 4px 0;">
+<span style="color: #64748b;">Guardian of Destiny</span>
+<span style="font-weight: 600;">神 : {qm.get('guardian', '-')}</span>
+</div>
+</div>
+</div>
+<div style="border: 1px solid #7a1518; border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; background: #ffffff; text-align: center;">
+<div style="background: #7a1518; color: #ffffff; padding: 6px 8px; font-weight: bold; font-size: 12px;">LIFE STAR</div>
+<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 14px 4px; flex: 1;">
+<div style="font-size: 34px; font-weight: 900; color: #7a1518; line-height: 1;">{gua.get('life_star_num', '5')}</div>
+<div style="font-size: 15px; font-weight: bold; color: #b45309; margin: 4px 0;">{gua.get('life_star_color', 'Yellow')}</div>
+<div style="font-size: 17px; font-weight: 900; color: #0f172a; margin-top: 4px;">{gua.get('life_star_zh', '五黃星命')}</div>
+<div style="font-size: 15px; font-weight: bold; color: #7a1518; margin-top: 4px;">{gua.get('life_star_elem', 'Earth 土')}</div>
+</div>
+</div>
+<div style="border: 1px solid #7a1518; border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; background: #ffffff; text-align: center;">
+<div style="background: #7a1518; color: #ffffff; padding: 6px 8px; font-weight: bold; font-size: 12px;">風水命卦 GUA</div>
+<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 14px 4px; flex: 1;">
+<div style="font-size: 46px; font-weight: 900; color: #0f172a; line-height: 1; margin: 2px 0;">{gua.get('fs_gua_char', '坤')}</div>
+<div style="font-size: 14px; font-weight: bold; color: #475569; margin-top: 4px;">{gua.get('fs_gua_name', 'Kun')}</div>
+<div style="font-size: 15px; font-weight: bold; color: #7a1518; margin-top: 6px;">{gua.get('fs_gua_dir', 'SouthWest')}</div>
+</div>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 1.1fr 2.1fr; gap: 10px; align-items: stretch;">
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<div style="border: 1px solid #7a1518; border-radius: 4px; overflow: hidden; font-size: 11px; background: #ffffff;">
+<div style="background: #7a1518; color: #ffffff; padding: 5px 8px; font-weight: bold; display: flex; justify-content: space-between;">
+<span>FAVORABLE DIRECTIONS</span>
+<span>本命吉方</span>
+</div>
+<div style="padding: 6px 8px; line-height: 1.7;">
+<div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+<span style="color: #475569;">Sheng Qi (Life Generating)</span> <b style="color: #047857;">生氣 : {fav.get('sq', '-')}</b>
+</div>
+<div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+<span style="color: #475569;">Tian Yi (Heavenly Doctor)</span> <b style="color: #047857;">天醫 : {fav.get('ty', '-')}</b>
+</div>
+<div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+<span style="color: #475569;">Yan Nian (Longevity)</span> <b style="color: #047857;">延年 : {fav.get('yn', '-')}</b>
+</div>
+<div style="display: flex; justify-content: space-between; padding: 2px 0;">
+<span style="color: #475569;">Fu Wei (Stability)</span> <b style="color: #047857;">伏位 : {fav.get('fw', '-')}</b>
+</div>
+</div>
+</div>
+<div style="border: 1px solid #7a1518; border-radius: 4px; overflow: hidden; font-size: 11px; background: #ffffff;">
+<div style="background: #7a1518; color: #ffffff; padding: 5px 8px; font-weight: bold; display: flex; justify-content: space-between;">
+<span>UNFAVORABLE DIRECTIONS</span>
+<span>本命凶方</span>
+</div>
+<div style="padding: 6px 8px; line-height: 1.7;">
+<div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+<span style="color: #475569;">Hou Hai (Mishaps)</span> <b style="color: #b91c1c;">禍害 : {unfav.get('hh', '-')}</b>
+</div>
+<div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+<span style="color: #475569;">Wu Gui (Five Ghosts)</span> <b style="color: #b91c1c;">五鬼 : {unfav.get('wg', '-')}</b>
+</div>
+<div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding: 2px 0;">
+<span style="color: #475569;">Liu Sha (Six Killings)</span> <b style="color: #b91c1c;">六煞 : {unfav.get('ls', '-')}</b>
+</div>
+<div style="display: flex; justify-content: space-between; padding: 2px 0;">
+<span style="color: #475569;">Jue Ming (Life Threatening)</span> <b style="color: #b91c1c;">絕命 : {unfav.get('jm', '-')}</b>
+</div>
+</div>
+</div>
+</div>
+<div style="border: 1px solid #7a1518; border-radius: 4px; overflow: hidden; background: #ffffff; display: flex; flex-direction: column;">
+<div style="background: #7a1518; color: #ffffff; padding: 6px 12px; font-weight: bold; font-size: 13px; display: flex; justify-content: space-between; align-items: center;">
+<span>NATAL CHART 本命八字 www.joeyyap.com</span>
+<span style="font-size: 11px; font-weight: normal; opacity: 0.9;">Classical Metaphysics</span>
+</div>
+<table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 13px; flex: 1;">
+<thead>
+<tr style="background: #fdfaf2; color: #856404; border-bottom: 1.5px solid #d4af37; font-weight: 600;">"""
     for col in order:
-        html += f"""            <th style="padding: 8px 4px; width: 22%; border-right: 1px solid #e2e8f0;">{col_titles[col]}</th>\n"""
-    html += """            <th style="padding: 8px 4px; width: 12%; font-size: 11px; color: #64748b;">Pillar</th>\n          </tr>\n        </thead>\n        <tbody>\n"""
+        raw_html += f"""<th style="padding: 8px 4px; width: 22%; border-right: 1px solid #e2e8f0;">{col_titles[col]}</th>"""
+    raw_html += """<th style="padding: 8px 4px; width: 12%; font-size: 11px; color: #64748b;"></th></tr></thead><tbody>"""
 
-    # ROW 1: Heavenly Stems (天干)
-    html += """          <!-- Row 1: Heavenly Stems -->\n          <tr style="border-bottom: 1.5px solid #d4af37; background: #ffffff;">\n"""
+    raw_html += """<tr style="border-bottom: 1.5px solid #d4af37; background: #ffffff;">"""
     for col in order:
         meta = p[col]
         god = meta['stem_god']
-        html += f"""            <td style="padding: 8px 4px; border-right: 1px solid #e2e8f0; vertical-align: middle;">
-              <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
-                <div style="border: 1px solid #cbd5e1; border-radius: 3px; padding: 2px 4px; font-size: 10px; line-height: 1.2; background: #f8fafc;">
-                  <div style="font-weight: bold; color: #0f172a;">{god['zh_full']}</div>
-                  <div style="color: #64748b; font-size: 9px;">{god['code']}</div>
-                </div>
-                <div>
-                  <div style="font-size: 28px; font-weight: bold; line-height: 1; color: #0f172a;">{meta['stem_char']}</div>
-                  <div style="font-size: 12px; font-weight: 600; color: #334155;">{meta['stem_name']}</div>
-                  <div style="font-size: 11px; color: #64748b;">{meta['stem_elem']}</div>
-                </div>
-              </div>
-            </td>\n"""
-    html += """            <td style="padding: 6px; border-left: 2px solid #856404; font-size: 11px; font-weight: bold; color: #856404; background: #fdfaf2; vertical-align: middle; line-height: 1.3;">
-              天干<br><span style="font-size: 9px; font-weight: normal; color: #64748b;">Heavenly<br>Stems</span>
-            </td>\n          </tr>\n"""
+        raw_html += f"""<td style="padding: 8px 4px; border-right: 1px solid #e2e8f0; vertical-align: middle;">
+<div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+<div style="border: 1px solid #cbd5e1; border-radius: 3px; padding: 2px 4px; font-size: 10px; line-height: 1.2; background: #f8fafc;">
+<div style="font-weight: bold; color: #0f172a;">{god['zh_full']}</div>
+<div style="color: #64748b; font-size: 9px;">{god['code']}</div>
+</div>
+<div>
+<div style="font-size: 28px; font-weight: bold; line-height: 1; color: #0f172a;">{meta['stem_char']}</div>
+<div style="font-size: 12px; font-weight: 600; color: #334155;">{meta['stem_name']}</div>
+<div style="font-size: 11px; color: #64748b;">{meta['stem_elem']}</div>
+</div>
+</div>
+</td>"""
+    raw_html += """<td style="padding: 6px; border-left: 2px solid #856404; font-size: 11px; font-weight: bold; color: #856404; background: #fdfaf2; vertical-align: middle; line-height: 1.3;">天干<br><span style="font-size: 9px; font-weight: normal; color: #64748b;">Heavenly<br>Stems</span></td></tr>"""
 
-    # ROW 2: Earthly Branches (地支)
-    html += """          <!-- Row 2: Earthly Branches -->\n          <tr style="border-bottom: 1.5px solid #d4af37; background: #fafafa;">\n"""
+    raw_html += """<tr style="border-bottom: 1.5px solid #d4af37; background: #fafafa;">"""
     for col in order:
         meta = p[col]
-        html += f"""            <td style="padding: 8px 4px; border-right: 1px solid #e2e8f0; vertical-align: middle;">
-              <div style="font-size: 28px; font-weight: bold; line-height: 1; color: #0f172a;">{meta['branch_char']}</div>
-              <div style="font-size: 12px; font-weight: 600; color: #334155;">{meta['branch_name']}</div>
-              <div style="font-size: 11px; font-weight: 500; color: #475569;">{meta['branch_animal']}</div>
-              <div style="font-size: 10px; color: #64748b;">{meta['branch_elem']}</div>
-            </td>\n"""
-    html += """            <td style="padding: 6px; border-left: 2px solid #856404; font-size: 11px; font-weight: bold; color: #856404; background: #fdfaf2; vertical-align: middle; line-height: 1.3;">
-              地支<br><span style="font-size: 9px; font-weight: normal; color: #64748b;">Earthly<br>Branches</span>
-            </td>\n          </tr>\n"""
+        raw_html += f"""<td style="padding: 8px 4px; border-right: 1px solid #e2e8f0; vertical-align: middle;">
+<div style="font-size: 28px; font-weight: bold; line-height: 1; color: #0f172a;">{meta['branch_char']}</div>
+<div style="font-size: 12px; font-weight: 600; color: #334155;">{meta['branch_name']}</div>
+<div style="font-size: 11px; font-weight: 500; color: #475569;">{meta['branch_animal']}</div>
+<div style="font-size: 10px; color: #64748b;">{meta['branch_elem']}</div>
+</td>"""
+    raw_html += """<td style="padding: 6px; border-left: 2px solid #856404; font-size: 11px; font-weight: bold; color: #856404; background: #fdfaf2; vertical-align: middle; line-height: 1.3;">地支<br><span style="font-size: 9px; font-weight: normal; color: #64748b;">Earthly<br>Branches</span></td></tr>"""
 
-    # ROW 3: Hidden Stems (藏干)
-    html += """          <!-- Row 3: Hidden Stems -->\n          <tr style="background: #ffffff;">\n"""
+    raw_html += """<tr style="background: #ffffff;">"""
     for col in order:
         meta = p[col]
         hs_list = meta['hidden_stems']
-        html += """            <td style="padding: 8px 4px; border-right: 1px solid #e2e8f0; vertical-align: top;">\n"""
-        html += """              <div style="display: flex; justify-content: space-around; align-items: flex-start;">\n"""
+        raw_html += """<td style="padding: 8px 4px; border-right: 1px solid #e2e8f0; vertical-align: top;">
+<div style="display: flex; justify-content: space-around; align-items: flex-start;">"""
         for hs in hs_list:
             god = hs['god']
-            html += f"""                <div style="padding: 0 3px; text-align: center;">
-                  <div style="font-size: 18px; font-weight: bold; color: #1e293b;">{hs['char']}</div>
-                  <div style="font-size: 11px; font-weight: 600; color: #334155;">{hs['name']}</div>
-                  <div style="font-size: 9px; color: #64748b;">{hs['polarity_elem']}</div>
-                  <div style="font-size: 10px; font-weight: bold; color: #856404; margin-top: 2px;">{god['zh_short']} <span style="font-size: 9px; color: #475569;">{god['code']}</span></div>
-                </div>\n"""
-        html += """              </div>\n            </td>\n"""
-    html += """            <td style="padding: 6px; border-left: 2px solid #856404; font-size: 11px; font-weight: bold; color: #856404; background: #fdfaf2; vertical-align: middle; line-height: 1.3;">
-              藏干<br><span style="font-size: 9px; font-weight: normal; color: #64748b;">Hidden<br>Stems</span>
-            </td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n  </div>\n</div>\n"""
-    return html
+            raw_html += f"""<div style="padding: 0 3px; text-align: center;">
+<div style="font-size: 18px; font-weight: bold; color: #1e293b;">{hs['char']}</div>
+<div style="font-size: 11px; font-weight: 600; color: #334155;">{hs['name']}</div>
+<div style="font-size: 9px; color: #64748b;">{hs['polarity_elem']}</div>
+<div style="font-size: 10px; font-weight: bold; color: #856404; margin-top: 2px;">{god['zh_short']} <span style="font-size: 9px; color: #475569;">{god['code']}</span></div>
+</div>"""
+        raw_html += """</div></td>"""
+    raw_html += """<td style="padding: 6px; border-left: 2px solid #856404; font-size: 11px; font-weight: bold; color: #856404; background: #fdfaf2; vertical-align: middle; line-height: 1.3;">藏干<br><span style="font-size: 9px; font-weight: normal; color: #64748b;">Hidden<br>Stems</span></td></tr></tbody></table></div></div></div>"""
+
+    cleaned_lines = [line.strip() for line in raw_html.splitlines() if line.strip() and not line.strip().startswith('<!--')]
+    return "\n".join(cleaned_lines)
+
 
 def generate_natal_chart_markdown(p: Dict[str, Any]) -> str:
     """

@@ -120,12 +120,8 @@ def consult_bazi(req: BaZiRequest):
         client_name=req.client_name or "Client"
     )
     res = call_gemini(prompt=prompt, skill_key="bazi")
-    if pillars:
-        chart_html = generate_natal_chart_html(pillars)
-        full_res = f"{chart_html}\n\n{res}"
-    else:
-        full_res = res
-    return {"skill": "bazi", "result": full_res}
+    chart_html = generate_natal_chart_html(pillars) if pillars else ""
+    return {"skill": "bazi", "chart_html": chart_html, "result": res}
 
 @app.post("/api/fengshui")
 def consult_fengshui(req: FengShuiRequest):
@@ -385,8 +381,26 @@ def index():
           throw new Error(`Server status ${res.status}: ${errText}`);
         }
         const data = await res.json();
-        const text = data.result || data.response || JSON.stringify(data, null, 2);
-        outContent.innerHTML = marked.parse(text);
+        let htmlOutput = '';
+        if (data.chart_html) {
+          htmlOutput += data.chart_html;
+        }
+        let text = data.result || data.response || '';
+        if (!data.chart_html && typeof text === 'string' && text.includes('class="joey-yap-personal-chart"')) {
+          const splitIdx = text.indexOf('</div>\n</div>');
+          if (splitIdx !== -1) {
+            const endDiv = splitIdx + '</div>\n</div>'.length;
+            htmlOutput += text.substring(0, endDiv);
+            text = text.substring(endDiv).trim();
+          }
+        }
+        if (text) {
+          htmlOutput += '<div style="margin-top:20px; line-height: 1.7;">' + marked.parse(text) + '</div>';
+        }
+        if (!htmlOutput) {
+          htmlOutput = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+        }
+        outContent.innerHTML = htmlOutput;
         outCard.style.display = 'block';
       } catch (err) {
         outContent.innerHTML = '<p style="color:#ef4444;">Error: ' + err.message + '</p>';
