@@ -1,0 +1,15 @@
+[Unit]
+Description=Chinese Metaphysics Suite (FastAPI & Telegram Bot)
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/metaphysics_app
+ExecStart=/usr/bin/python3 run_all.py
+Restart=always
+RestartSec=5
+EnvironmentFile=/home/ubuntu/metaphysics_app/.env
+
+[Install]
+WantedBy=multi-user.target
