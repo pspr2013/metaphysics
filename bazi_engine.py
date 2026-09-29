@@ -1159,7 +1159,8 @@ def generate_annual_qimen_elements_html(pillars: Dict[str, Any], current_year: i
     """
     Renders 'THE BAZI CHART - [current_year] QI MEN ELEMENTS [current_year]年八字命盤奇門格'
     mapping each natal pillar Heavenly Stem to its Annual Qi Men Star and Door.
-    Matches Joey Yap's authentic layout with left spanning title and traditional Chinese characters.
+    Uses a 2-column flexbox container to ensure the Left Red Banner spans the full height
+    and the 5-column table on the right never misaligns across any browser.
     """
     ann_stem_idx = (current_year - 4) % 10
     ann_branch_idx = (current_year - 4) % 12
@@ -1181,9 +1182,12 @@ def generate_annual_qimen_elements_html(pillars: Dict[str, Any], current_year: i
             s_star = pal['star']['char']
             if s_star == '沖':
                 s_star = '衝'
+            d_char = pal['door']['char']
+            d_en = pal['door']['en']
+            door_str = f"{d_char} {d_en}" if d_char != '-' else "- -"
             stem_map[s_char] = {
                 'star': f"{s_star} {pal['star']['en']}",
-                'door': f"{pal['door']['char']} {pal['door']['en']}"
+                'door': door_str
             }
     except Exception:
         pass
@@ -1196,58 +1200,77 @@ def generate_annual_qimen_elements_html(pillars: Dict[str, Any], current_year: i
         'year': '年干 Year Stem'
     }
 
+    # Fetch stars and doors for the 4 pillars
+    col_data = {}
+    for col in order:
+        s_char = pillars[col]['stem_char']
+        if s_char == '甲':
+            try:
+                from qimen_engine import get_xun_shou, STEM_LOOKUP
+                s_idx = pillars[col]['stem_idx']
+                b_idx = pillars[col]['branch_idx']
+                _, leader_stem, _ = get_xun_shou(s_idx, b_idx)
+                lookup_char = STEM_LOOKUP.get(leader_stem, {}).get('char', s_char)
+            except Exception:
+                lookup_char = s_char
+        else:
+            lookup_char = s_char
+        col_data[col] = stem_map.get(lookup_char, {'star': '—', 'door': '—'})
+
+    # Build Header Ths
+    headers_html = "".join([
+        f'<th style="padding: 7px 6px; border-right: 1px solid #334155; color: #fef08a; font-weight: 700; width: 21%;">{col_headers[c]}</th>'
+        for c in order
+    ])
+    
+    # Build Stars Tds
+    stars_html = "".join([
+        f'<td style="padding: 7px 6px; border-right: 1px solid #334155; font-weight: 700; color: #f8fafc; font-size: 11.5px;">{col_data[c]["star"]}</td>'
+        for c in order
+    ])
+    
+    # Build Doors Tds
+    doors_html = "".join([
+        f'<td style="padding: 7px 6px; border-right: 1px solid #334155; font-weight: 700; color: #38bdf8; font-size: 11.5px;">{col_data[c]["door"]}</td>'
+        for c in order
+    ])
+
     html = f"""
 <!-- {current_year} QI MEN ELEMENTS (八字命盤奇門格) -->
-<div style="background: #131d36; border: 1px solid #1e3a8a; border-radius: 8px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 4px 14px rgba(0,0,0,0.25);">
-  <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 11.5px;">
-    <thead>
-      <tr style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-bottom: 1.5px solid #d97706;">
-        <th rowspan="3" style="width: 34%; background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%); color: #ffffff; text-align: center; vertical-align: middle; padding: 10px 14px; border-right: 1.5px solid #d97706;">
-          <div style="font-size: 12px; font-weight: 800; color: #fef08a; letter-spacing: 0.5px;">THE BAZI CHART - {current_year} QI MEN ELEMENTS</div>
-          <div style="font-size: 11px; font-weight: 600; color: #fed7aa; margin-top: 3px;">{current_year}年八字命盤奇門格</div>
-        </th>
-"""
-    for col in order:
-        html += f"""        <th style="padding: 7px 6px; border-left: 1px solid #334155; color: #fef08a; font-weight: 700; width: 13.5%;">
-          {col_headers[col]}
-        </th>\n"""
-    html += """        <th style="padding: 7px 6px; border-left: 1px solid #334155; color: #ffffff; font-weight: 700; width: 12%; background: #1e293b;">
-          要素 Elements
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Row 1: Stars -->
-      <tr style="border-bottom: 1px solid #334155; background: rgba(15, 23, 42, 0.7);">
-"""
-    for col in order:
-        s_char = pillars[col]['stem_char']
-        el = stem_map.get(s_char, {'star': '—', 'door': '—'})
-        html += f"""        <td style="padding: 7px 6px; border-left: 1px solid #334155; font-weight: 700; color: #f8fafc; font-size: 11.5px;">
-          {el['star']}
-        </td>\n"""
-    html += """        <td style="padding: 7px 6px; border-left: 1px solid #334155; font-weight: 800; color: #fbbf24; font-size: 11px; background: #1e293b;">
-          星 Stars
-        </td>
-      </tr>
-      <!-- Row 2: Doors -->
-      <tr style="background: rgba(15, 23, 42, 0.55);">
-"""
-    for col in order:
-        s_char = pillars[col]['stem_char']
-        el = stem_map.get(s_char, {'star': '—', 'door': '—'})
-        html += f"""        <td style="padding: 7px 6px; border-left: 1px solid #334155; font-weight: 700; color: #38bdf8; font-size: 11.5px;">
-          {el['door']}
-        </td>\n"""
-    html += """        <td style="padding: 7px 6px; border-left: 1px solid #334155; font-weight: 800; color: #fbbf24; font-size: 11px; background: #1e293b;">
-          門 Doors
-        </td>
-      </tr>
-    </tbody>
-  </table>
+<div style="background: #131d36; border: 1px solid #1e3a8a; border-radius: 8px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 4px 14px rgba(0,0,0,0.25); display: flex;">
+  
+  <!-- LEFT: RED BANNER (Spanning full height of both rows) -->
+  <div style="width: 32%; background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%); border-right: 1.5px solid #d97706; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 10px 14px; box-sizing: border-box;">
+    <div style="font-size: 12px; font-weight: 800; color: #fef08a; letter-spacing: 0.5px; line-height: 1.35;">THE BAZI CHART - {current_year} QI MEN ELEMENTS</div>
+    <div style="font-size: 11px; font-weight: 600; color: #fed7aa; margin-top: 4px;">{current_year}年八字命盤奇門格</div>
+  </div>
+
+  <!-- RIGHT: 5-COLUMN TABLE -->
+  <div style="width: 68%;">
+    <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 11.5px; height: 100%;">
+      <tbody>
+        <!-- ROW 1: HEADER -->
+        <tr style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-bottom: 1.5px solid #d97706;">
+          {headers_html}
+          <th style="padding: 7px 6px; color: #ffffff; font-weight: 700; width: 16%; background: #1e293b;">要素 Elements</th>
+        </tr>
+        <!-- ROW 2: STARS -->
+        <tr style="border-bottom: 1px solid #334155; background: rgba(15, 23, 42, 0.7);">
+          {stars_html}
+          <td style="padding: 7px 6px; font-weight: 800; color: #fbbf24; font-size: 11px; background: #1e293b;">星 Stars</td>
+        </tr>
+        <!-- ROW 3: DOORS -->
+        <tr style="background: rgba(15, 23, 42, 0.55);">
+          {doors_html}
+          <td style="padding: 7px 6px; font-weight: 800; color: #fbbf24; font-size: 11px; background: #1e293b;">門 Doors</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 """
     return html
+
 
 
 def generate_annual_destiny_html(pillars: Dict[str, Any], current_year: int = 2026) -> str:
