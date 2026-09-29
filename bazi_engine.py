@@ -1177,18 +1177,31 @@ def generate_annual_qimen_elements_html(pillars: Dict[str, Any], current_year: i
     try:
         from qimen_engine import calculate_qimen_chart_from_pillars
         chart_ann = calculate_qimen_chart_from_pillars(p_annual, dun_type='Yin', ju_num=1)
-        for p_num, pal in chart_ann['palaces'].items():
+        for p_num in [1, 2, 3, 4, 6, 7, 8, 9]:
+            pal = chart_ann['palaces'][p_num]
             s_char = pal['heaven_stem']['char']
             s_star = pal['star']['char']
             if s_star == '沖':
                 s_star = '衝'
             d_char = pal['door']['char']
             d_en = pal['door']['en']
-            door_str = f"{d_char} {d_en}" if d_char != '-' else "- -"
+            door_str = f"{d_char} {d_en}"
             stem_map[s_char] = {
                 'star': f"{s_star} {pal['star']['en']}",
                 'door': door_str
             }
+        
+        # Central Palace 5 attaches to Kun Palace 2 (中五宮寄坤二宮)
+        pal5 = chart_ann['palaces'][5]
+        s_char5 = pal5['heaven_stem']['char']
+        pal2 = chart_ann['palaces'][2]
+        p2_star = pal2['star']['char']
+        if p2_star == '沖':
+            p2_star = '衝'
+        stem_map[s_char5] = {
+            'star': f"{p2_star} {pal2['star']['en']}",
+            'door': f"{pal2['door']['char']} {pal2['door']['en']}"
+        }
     except Exception:
         pass
 
