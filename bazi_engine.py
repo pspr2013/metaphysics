@@ -934,8 +934,11 @@ def calculate_mobility_directions(bazi_year: int, gender: str, target_year: int 
     """
     Computes authentic Qi Men Mobility Directions (本命流年奇門出行方)
     based on the client's Life Gua (Ming Gua / 命卦) and target year.
-    Flies the Eight Mobility Stars in forward Luoshu sequence through the 8 directions starting from the Life Gua,
-    with authentic annual cycle progression.
+    Implements the classical Nine Stars Nine Palace Flight (九星飛九宮):
+    - Annual Flying Star K enters center or guides flight.
+    - West Group (西四命: 2, 6, 7, 8): Center Star C = K, flies BACKWARD (逆飛).
+    - East Group (東四命: 1, 3, 4, 9): Center Star C = (9 - K) mod 9, flies FORWARD (順飛).
+    - The star in Center (Palace 5) remains internal; the remaining 8 stars occupy the 8 perimeter directions.
     """
     is_male = gender.lower().startswith('m')
     last_two = bazi_year % 100
@@ -962,33 +965,46 @@ def calculate_mobility_directions(bazi_year: int, gender: str, target_year: int 
         ('E', '東', 3),
         ('SE', '東南', 4)
     ]
-    # Authentic forward Luoshu flight order (skipping 5 center)
-    palace_flight = [1, 2, 3, 4, 6, 7, 8, 9]
-    if active_gua in palace_flight:
-        start_idx = palace_flight.index(active_gua)
-    else:
-        start_idx = 0
-    ordered_palaces = [palace_flight[(start_idx + i) % 8] for i in range(8)]
 
-    # Mobility Stars in authentic classical order
-    # Baseline for 2026 (Star 1 in center):
-    stars_sequence = [
-        ('招搖 Swagger', 'neutral'),
-        ('軒轅 Regulus', 'neutral'),
-        ('攝提 Extractor', 'neutral'),
-        ('天乙 Heavenly Noble', 'red'),
-        ('太陰 Great Moon', 'red'),
-        ('咸池 Salty Pool', 'neutral'),
-        ('青龍 Green Dragon', 'blue'),
-        ('天符 Heavenly Seal', 'neutral')
-    ]
-    
-    # Year offset (annual cycle shifting through 8 perimeter palaces)
-    year_shift = (target_year - 2026) % 8
-    shifted_stars = [stars_sequence[(i - year_shift) % 8] for i in range(8)]
-    palace_to_star = {p: star_info for p, star_info in zip(ordered_palaces, shifted_stars)}
+    # Annual Flying Star K (1 White for 2026, 2 Black for 2025, etc.)
+    k = (11 - (target_year % 9)) % 9
+    if k == 0:
+        k = 9
 
-    return [(code, zh, palace_to_star[p][0], palace_to_star[p][1]) for code, zh, p in display_dirs]
+    # West Group (2, 6, 7, 8) vs East Group (1, 3, 4, 9)
+    is_west = active_gua in [2, 5, 6, 7, 8]
+
+    # The 9 Stars of Jin Han Yu Jing (金函玉鏡九星)
+    star_catalog = {
+        1: ('太乙 Celestial Advisor', 'red'),
+        2: ('攝提 Extractor', 'neutral'),
+        3: ('軒轅 Regulus', 'neutral'),
+        4: ('招搖 Swagger', 'neutral'),
+        5: ('天符 Heavenly Seal', 'neutral'),
+        6: ('青龍 Green Dragon', 'red'),
+        7: ('咸池 Salty Pool', 'neutral'),
+        8: ('太陰 Great Moon', 'red'),
+        9: ('天乙 Heavenly Noble', 'red')
+    }
+
+    results = []
+    for code, zh, p in display_dirs:
+        if is_west:
+            # West Group: Backward flight with Center Star = K
+            c_w = k
+            s = (c_w + 5 - p) % 9
+        else:
+            # East Group: Forward flight with Center Star = (9 - K)
+            c_e = (9 - k) % 9
+            if c_e == 0:
+                c_e = 9
+            s = (p + c_e - 5) % 9
+        if s == 0:
+            s = 9
+        star_name, star_type = star_catalog[s]
+        results.append((code, zh, star_name, star_type))
+
+    return results
 
 
 def calculate_luck_pillars(p: Dict[str, Any], current_year: int = 2026) -> List[Dict[str, Any]]:
