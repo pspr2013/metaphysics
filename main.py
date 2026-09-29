@@ -32,6 +32,7 @@ class BaZiRequest(BaseModel):
     birth_time: Optional[str] = "Unknown"
     gender: str
     question: Optional[str] = "Provide a comprehensive BaZi reading and 10 Gods quality evaluation."
+    target_year: Optional[int] = 2026
 
 class FengShuiRequest(BaseModel):
     period: int
@@ -120,7 +121,7 @@ def consult_bazi(req: BaZiRequest):
         client_name=req.client_name or "Client"
     )
     res = call_gemini(prompt=prompt, skill_key="bazi")
-    chart_html = generate_natal_chart_html(pillars) if pillars else ""
+    chart_html = generate_natal_chart_html(pillars, current_year=req.target_year or 2026) if pillars else ""
     return {"skill": "bazi", "chart_html": chart_html, "result": res}
 
 @app.post("/api/fengshui")
@@ -458,6 +459,13 @@ def index():
         </select>
       </div>
       <div class="form-group">
+        <label>Target Annual Year (流年)</label>
+        <select id="bz-target-year">
+          <option value="2026" selected>2026 (Bing Wu 丙午 - Yang Fire Horse)</option>
+          <option value="2025">2025 (Yi Si 乙巳 - Yin Wood Snake)</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label>Specific Life Focus / Question</label>
         <textarea id="bz-question" rows="3" placeholder="Career transition, business wealth potential, relationship dynamics..."></textarea>
       </div>
@@ -650,7 +658,8 @@ def index():
         birth_date: birthDate,
         birth_time: document.getElementById('bz-time').value || '12:00',
         gender: document.getElementById('bz-gender').value,
-        question: document.getElementById('bz-question').value
+        question: document.getElementById('bz-question').value,
+        target_year: parseInt(document.getElementById('bz-target-year').value || '2026')
       });
     }
 

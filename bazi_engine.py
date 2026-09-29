@@ -855,22 +855,87 @@ ANNUAL_BAZI_STARS_2026 = {
     }
 }
 
-ANNUAL_QIMEN_PALACE_YEAR_STARS_2026 = {
-    1: [], # North (坎 1)
-    2: [('太陽', 'Sun'), ('歲合', 'Grand Duke Combination')], # Southwest (坤 2)
-    3: [('紅鸞', 'Red Matchmaker'), ('福德', 'Fortune Virtue')], # East (震 3)
-    4: [('天解', 'Sky Relief'), ('八座', 'Eight Seats')], # Southeast (巽 4)
-    6: [('月德', 'Monthly Virtue'), ('天乙', 'Heavenly Yi')], # Northwest (乾 6)
-    7: [('太陰', 'Moon'), ('太極', 'Tai Ji Nobleman')], # West (兌 7)
-    8: [('紫微', 'Emperor Star'), ('龍德', 'Dragon Virtue')], # Northeast (艮 8)
-    9: [] # South (離 9)
+ANNUAL_BAZI_STARS_2025 = {
+    0: { # 子 Zi (Rat)
+        'auspicious': [('天喜', 'Sky Happiness'), ('咸池', 'Salty Pool')],
+        'inauspicious': [('死符', 'Death Charm'), ('小耗', 'Lesser Consumer')]
+    },
+    1: { # 丑 Chou (Ox)
+        'auspicious': [('華蓋', 'Elegant Seal'), ('三台', 'Three Stages')],
+        'inauspicious': [('五鬼', 'Five Ghosts'), ('官符', 'Official Charm')]
+    },
+    2: { # 寅 Yin (Tiger)
+        'auspicious': [('天德', 'Heavenly Virtue'), ('福星', 'Fortune Star')],
+        'inauspicious': [('劫煞', 'Robbery Sha'), ('披麻', 'Wear Mourning')]
+    },
+    3: { # 卯 Mao (Rabbit)
+        'auspicious': [],
+        'inauspicious': [('天狗', 'Sky Dog'), ('吊客', 'Funeral Guest'), ('災煞', 'Calamity Sha')]
+    },
+    4: { # 辰 Chen (Dragon)
+        'auspicious': [('太陽', 'Sun'), ('天乙', 'Heavenly Yi')],
+        'inauspicious': [('天空', 'Sky Emptiness'), ('晦氣', 'Bad Qi')]
+    },
+    5: { # 巳 Si (Snake)
+        'auspicious': [('太歲', 'Grand Duke'), ('歲駕', 'Year Carriage')],
+        'inauspicious': [('劍鋒', 'Sword Edge'), ('伏屍', 'Hidden Corpse')]
+    },
+    6: { # 午 Wu (Horse)
+        'auspicious': [('紅鸞', 'Red Matchmaker'), ('文昌', 'Intelligence')],
+        'inauspicious': [('咸池', 'Salty Pool'), ('陌越', 'Mo Yue')]
+    },
+    7: { # 未 Wei (Goat)
+        'auspicious': [],
+        'inauspicious': [('喪門', 'Funeral Door'), ('地喪', 'Earth Mourning'), ('豹尾', 'Leopard Tail')]
+    },
+    8: { # 申 Shen (Monkey)
+        'auspicious': [('太陰', 'Moon'), ('歲合', 'Grand Duke Combination')],
+        'inauspicious': [('亡神', 'Death God'), ('勾神', 'Hook Spirit')]
+    },
+    9: { # 酉 You (Rooster)
+        'auspicious': [('將星', 'General Star'), ('金匱', 'Golden Lock'), ('八座', 'Eight Seats')],
+        'inauspicious': [('白虎', 'White Tiger')]
+    },
+    10: { # 戌 Xu (Dog)
+        'auspicious': [('月德', 'Monthly Virtue'), ('地解', 'Earth Relief')],
+        'inauspicious': [('死符', 'Death Charm'), ('小耗', 'Lesser Consumer')]
+    },
+    11: { # 亥 Hai (Pig)
+        'auspicious': [('驛馬', 'Sky Horse')],
+        'inauspicious': [('歲破', 'Year Breaker'), ('大耗', 'Greater Consumer'), ('闌干', 'Lan Gan')]
+    }
 }
 
-def calculate_mobility_directions(bazi_year: int, gender: str) -> List[Tuple[str, str, str, str]]:
+ANNUAL_QIMEN_PALACE_YEAR_STARS = {
+    2025: {
+        1: [('天喜', 'Sky Happiness', 'auspicious'), ('死符', 'Death Charm', 'inauspicious')], # North (坎 1)
+        2: [('太陽', 'Sun', 'auspicious'), ('驛馬', 'Sky Horse', 'auspicious'), ('喪門', 'Funeral Door', 'inauspicious')], # Southwest (坤 2)
+        3: [('天狗', 'Sky Dog', 'inauspicious'), ('吊客', 'Funeral Guest', 'inauspicious')], # East (震 3)
+        4: [('太歲', 'Grand Duke', 'auspicious'), ('將星', 'General Star', 'auspicious'), ('劍鋒', 'Sword Edge', 'inauspicious')], # Southeast (巽 4)
+        6: [('歲破', 'Year Breaker', 'inauspicious'), ('大耗', 'Greater Consumer', 'inauspicious')], # Northwest (乾 6)
+        7: [('金匱', 'Golden Lock', 'auspicious'), ('將星', 'General Star', 'auspicious'), ('白虎', 'White Tiger', 'inauspicious')], # West (兌 7)
+        8: [('華蓋', 'Elegant Seal', 'auspicious'), ('天解', 'Sky Relief', 'auspicious'), ('劫煞', 'Robbery Sha', 'inauspicious')], # Northeast (艮 8)
+        9: [('紅鸞', 'Red Matchmaker', 'auspicious'), ('咸池', 'Salty Pool', 'neutral'), ('捲舌', 'Curled Tongue', 'inauspicious')] # South (離 9)
+    },
+    2026: {
+        1: [('歲破', 'Year Breaker', 'inauspicious'), ('大耗', 'Greater Consumer', 'inauspicious')], # North (坎 1)
+        2: [('太陽', 'Sun', 'auspicious'), ('歲合', 'Grand Duke Combination', 'auspicious')], # Southwest (坤 2)
+        3: [('紅鸞', 'Red Matchmaker', 'auspicious'), ('福德', 'Fortune Virtue', 'auspicious')], # East (震 3)
+        4: [('天解', 'Sky Relief', 'auspicious'), ('八座', 'Eight Seats', 'auspicious')], # Southeast (巽 4)
+        6: [('月德', 'Monthly Virtue', 'auspicious'), ('天乙', 'Heavenly Yi', 'auspicious')], # Northwest (乾 6)
+        7: [('太陰', 'Moon', 'auspicious'), ('太極', 'Tai Ji Nobleman', 'auspicious')], # West (兌 7)
+        8: [('金匱', 'Golden Lock', 'auspicious'), ('五鬼 官符', 'Five Ghost Litigation', 'inauspicious')], # Northeast (艮 8)
+        9: [('太歲', 'Grand Duke', 'auspicious'), ('將星', 'General Star', 'auspicious')] # South (離 9)
+    }
+}
+ANNUAL_QIMEN_PALACE_YEAR_STARS_2026 = ANNUAL_QIMEN_PALACE_YEAR_STARS[2026]
+
+def calculate_mobility_directions(bazi_year: int, gender: str, target_year: int = 2026) -> List[Tuple[str, str, str, str]]:
     """
-    Computes authentic 2026 Qi Men Mobility Directions (本命流年奇門出行方)
-    based on the client's Life Gua (Ming Gua / 命卦).
-    Flies the Nine Mobility Stars in backward sequence through the 8 directions starting from the Life Gua.
+    Computes authentic Qi Men Mobility Directions (本命流年奇門出行方)
+    based on the client's Life Gua (Ming Gua / 命卦) and target year.
+    Flies the Eight Mobility Stars in forward Luoshu sequence through the 8 directions starting from the Life Gua,
+    with authentic annual cycle progression.
     """
     is_male = gender.lower().startswith('m')
     last_two = bazi_year % 100
@@ -897,144 +962,425 @@ def calculate_mobility_directions(bazi_year: int, gender: str) -> List[Tuple[str
         ('E', '東', 3),
         ('SE', '東南', 4)
     ]
-    palace_flight = [1, 9, 8, 7, 6, 4, 3, 2]
+    # Authentic forward Luoshu flight order (skipping 5 center)
+    palace_flight = [1, 2, 3, 4, 6, 7, 8, 9]
     if active_gua in palace_flight:
         start_idx = palace_flight.index(active_gua)
     else:
         start_idx = 0
     ordered_palaces = [palace_flight[(start_idx + i) % 8] for i in range(8)]
 
-    palace_to_star = {}
-    for i, p_num in enumerate(ordered_palaces):
-        if i == 0:
-            palace_to_star[p_num] = ('招搖 Swagger', 'neutral')
-        elif i == 1:
-            palace_to_star[p_num] = ('軒轅 Regulus', 'neutral')
-        elif i == 2:
-            palace_to_star[p_num] = ('攝提 Extractor', 'neutral')
-        elif i == 3:
-            palace_to_star[p_num] = ('太乙 Celestial Advisor', 'red')
-        elif i == 4:
-            if p_num == 6:
-                palace_to_star[p_num] = ('天乙 Heavenly Noble', 'red')
-            else:
-                palace_to_star[p_num] = ('太陰 Great Moon', 'red')
-        elif i == 5:
-            palace_to_star[p_num] = ('咸池 Salty Pool', 'neutral')
-        elif i == 6:
-            palace_to_star[p_num] = ('青龍 Green Dragon', 'blue')
-        elif i == 7:
-            palace_to_star[p_num] = ('天符 Heavenly Seal', 'neutral')
+    # Mobility Stars in authentic classical order
+    # Baseline for 2026 (Star 1 in center):
+    stars_sequence = [
+        ('招搖 Swagger', 'neutral'),
+        ('軒轅 Regulus', 'neutral'),
+        ('攝提 Extractor', 'neutral'),
+        ('天乙 Heavenly Noble', 'red'),
+        ('太陰 Great Moon', 'red'),
+        ('咸池 Salty Pool', 'neutral'),
+        ('青龍 Green Dragon', 'blue'),
+        ('天符 Heavenly Seal', 'neutral')
+    ]
+    
+    # Year offset (annual cycle shifting through 8 perimeter palaces)
+    year_shift = (target_year - 2026) % 8
+    shifted_stars = [stars_sequence[(i - year_shift) % 8] for i in range(8)]
+    palace_to_star = {p: star_info for p, star_info in zip(ordered_palaces, shifted_stars)}
 
     return [(code, zh, palace_to_star[p][0], palace_to_star[p][1]) for code, zh, p in display_dirs]
 
+
+def calculate_luck_pillars(p: Dict[str, Any], current_year: int = 2026) -> List[Dict[str, Any]]:
+    """
+    Computes 10-year Luck Pillars (大運) for the natal chart.
+    """
+    m_s_idx = p['month']['stem_idx']
+    m_b_idx = p['month']['branch_idx']
+    y_s_idx = p['year']['stem_idx']
+    gender = p.get('gender', 'Male')
+    is_male = gender.lower().startswith('m')
+    is_yang_year = (y_s_idx % 2 == 0)
+    forward = (is_yang_year and is_male) or (not is_yang_year and not is_male)
+    step = 1 if forward else -1
+
+    dm_s_idx = p['day']['stem_idx']
+    day_b_idx = p['day']['branch_idx']
+
+    # Xun Kong Wang (空亡 / Death & Emptiness) for Day Pillar
+    xun_branch_start = (day_b_idx - dm_s_idx) % 12
+    kong_wang_branches = [(xun_branch_start + 10) % 12, (xun_branch_start + 11) % 12]
+
+    birth_year = p.get('birth_year', 1986)
+    client_age_now = current_year - birth_year
+
+    luck_pillars = []
+    for i in range(1, 10):
+        s_i = (m_s_idx + i * step) % 10
+        b_i = (m_b_idx + i * step) % 12
+        age = i * 10
+        is_kw = b_i in kong_wang_branches
+        god = get_10_god(dm_s_idx, s_i)
+        hs = BRANCH_HIDDEN_STEMS_MAP[b_i]
+        is_current = (age <= client_age_now < age + 10) or (age == 40 and client_age_now == 40)
+        luck_pillars.append({
+            'age': age,
+            'stem_char': STEM_CHARS[s_i],
+            'stem_name': STEM_NAMES[s_i],
+            'stem_elem': STEM_ELEMENTS[s_i],
+            'branch_char': BRANCH_CHARS[b_i],
+            'branch_name': BRANCH_NAMES[b_i],
+            'branch_animal': BRANCH_SHORT_ANIMALS[b_i],
+            'branch_elem': BRANCH_ELEMENTS[b_i],
+            'god': god,
+            'is_kw': is_kw,
+            'is_current': is_current,
+            'hidden_stems': hs
+        })
+    return luck_pillars
+
+def generate_luck_pillars_html(p: Dict[str, Any], current_year: int = 2026) -> str:
+    """
+    Renders the authentic 10-year Luck Pillars table (大運)
+    with ages 90 down to 10 matching Joey Yap's standard layout.
+    """
+    luck_pillars = calculate_luck_pillars(p, current_year)
+    descending_pillars = list(reversed(luck_pillars))
+    dm_stem_idx = p['day']['stem_idx']
+
+    html = """
+<!-- LUCK PILLARS (大運) -->
+<div style="background: #131d36; border: 1px solid #1e3a8a; border-radius: 8px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 4px 14px rgba(0,0,0,0.25);">
+  <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 11px;">
+    <thead>
+      <!-- AGE ROW -->
+      <tr style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-bottom: 1.5px solid #d97706;">
+"""
+    for lp in descending_pillars:
+        if lp['is_current']:
+            age_badge = f'<div style="font-size: 9px; font-weight: 800; color: #fbbf24; background: rgba(245, 158, 11, 0.2); border: 1px solid #d97706; border-radius: 3px; padding: 1px 4px; display: inline-block;">Here {lp["age"]} 在此</div>'
+        else:
+            age_badge = f'<span style="font-weight: 700; color: #94a3b8; font-size: 11px;">{lp["age"]}</span>'
+        html += f"""        <th style="padding: 6px 4px; border-right: 1px solid #334155; width: 10%;">
+          {age_badge}
+        </th>\n"""
+    html += """        <th style="padding: 6px 8px; font-weight: 800; color: #fbbf24; text-align: center; width: 10%; background: #1e293b;">
+          歲數<br><span style="font-size: 9px; font-weight: normal; color: #94a3b8;">Age</span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- STEMS ROW -->
+      <tr style="border-bottom: 1px solid #334155; background: rgba(15, 23, 42, 0.7);">
+"""
+    for lp in descending_pillars:
+        s_char = lp['stem_char']
+        s_color = get_stem_element_color(s_char)
+        god = lp['god']
+        html += f"""        <td style="padding: 6px 3px; border-right: 1px solid #334155; vertical-align: top;">
+          <div style="font-size: 8.5px; font-weight: 800; color: #f59e0b; background: rgba(245, 158, 11, 0.1); border-radius: 3px; padding: 1px; margin-bottom: 2px;">
+            {god['zh_short']} <span style="color: #cbd5e1;">{god['code']}</span>
+          </div>
+          <div style="font-size: 22px; font-weight: 900; color: {s_color}; line-height: 1;">{s_char}</div>
+          <div style="font-size: 10px; font-weight: 700; color: #f8fafc; margin-top: 1px;">{lp['stem_name']}</div>
+          <div style="font-size: 8.5px; color: #94a3b8;">{lp['stem_elem']}</div>
+        </td>\n"""
+    html += """        <td style="padding: 6px 4px; font-size: 11px; font-weight: 700; color: #fbbf24; background: #1e293b; vertical-align: middle; line-height: 1.3;">
+          大運<br><span style="font-size: 9px; font-weight: normal; color: #94a3b8;">Luck<br>Pillars</span>
+        </td>
+      </tr>
+
+      <!-- BRANCHES ROW -->
+      <tr style="border-bottom: 1px solid #334155; background: rgba(15, 23, 42, 0.55);">
+"""
+    for lp in descending_pillars:
+        b_char = lp['branch_char']
+        b_color = get_branch_element_color(b_char)
+        kw_badge = '<div style="font-size: 8px; font-weight: 800; color: #f87171; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 3px; padding: 0.5px; margin-bottom: 2px;">空亡 DE</div>' if lp['is_kw'] else '<div style="height: 13px;"></div>'
+        html += f"""        <td style="padding: 6px 3px; border-right: 1px solid #334155; vertical-align: top;">
+          {kw_badge}
+          <div style="font-size: 20px; font-weight: 900; color: {b_color}; line-height: 1;">{b_char}</div>
+          <div style="font-size: 10px; font-weight: 700; color: #f8fafc; margin-top: 1px;">{lp['branch_name']}</div>
+          <div style="font-size: 8.5px; color: #cbd5e1;">{lp['branch_animal']}</div>
+          <div style="font-size: 8px; color: #94a3b8;">{lp['branch_elem'].split()[-1]}</div>
+        </td>\n"""
+    html += """        <td style="padding: 6px 4px; font-size: 11px; font-weight: 700; color: #fbbf24; background: #1e293b; vertical-align: middle; line-height: 1.3;">
+          地支<br><span style="font-size: 9px; font-weight: normal; color: #94a3b8;">Branches</span>
+        </td>
+      </tr>
+
+      <!-- HIDDEN STEMS ROW -->
+      <tr style="background: rgba(15, 23, 42, 0.7);">
+"""
+    for lp in descending_pillars:
+        hs_list = lp['hidden_stems']
+        hs_cards = []
+        for hs in hs_list:
+            char = hs['char']
+            color = get_stem_element_color(char)
+            god = get_10_god(dm_stem_idx, hs['stem_idx'])
+            hs_cards.append(f"""<div style="display: flex; flex-direction: column; align-items: center; min-width: 22px; padding: 2px 1px;">
+              <span style="font-size: 13px; font-weight: 900; color: {color}; line-height: 1;">{char}</span>
+              <span style="font-size: 7.5px; color: #94a3b8; line-height: 1; margin-top: 1px;">{hs['name']}</span>
+              <span style="font-size: 7.5px; font-weight: 700; color: #f59e0b; margin-top: 1px;">{god['code']}</span>
+            </div>""")
+        html += f"""        <td style="padding: 4px 2px; border-right: 1px solid #334155; vertical-align: top;">
+          <div style="display: flex; justify-content: center; gap: 2px; flex-wrap: wrap;">
+            {"".join(hs_cards)}
+          </div>
+        </td>\n"""
+    html += """        <td style="padding: 6px 4px; font-size: 11px; font-weight: 700; color: #fbbf24; background: #1e293b; vertical-align: middle; line-height: 1.3;">
+          藏干<br><span style="font-size: 9px; font-weight: normal; color: #94a3b8;">Hidden<br>Stems</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+"""
+    return html
+
+def generate_annual_qimen_elements_html(pillars: Dict[str, Any], current_year: int = 2026) -> str:
+    """
+    Renders 'THE BAZI CHART - [current_year] QI MEN ELEMENTS [current_year]年八字命盤奇門格'
+    mapping each natal pillar Heavenly Stem to its Annual Qi Men Star and Door.
+    Matches Joey Yap's authentic layout with left spanning title and traditional Chinese characters.
+    """
+    ann_stem_idx = (current_year - 4) % 10
+    ann_branch_idx = (current_year - 4) % 12
+    ann_stem_name = STEM_NAMES[ann_stem_idx]
+    ann_branch_name = BRANCH_NAMES[ann_branch_idx]
+    
+    p_annual = {
+        'hour': {'stem_name': ann_stem_name, 'branch_name': ann_branch_name},
+        'day': {'stem_name': ann_stem_name, 'branch_name': ann_branch_name},
+        'month': {'stem_name': ann_stem_name, 'branch_name': ann_branch_name},
+        'year': {'stem_name': ann_stem_name, 'branch_name': ann_branch_name}
+    }
+    stem_map = {}
+    try:
+        from qimen_engine import calculate_qimen_chart_from_pillars
+        chart_ann = calculate_qimen_chart_from_pillars(p_annual, dun_type='Yin', ju_num=1)
+        for p_num, pal in chart_ann['palaces'].items():
+            s_char = pal['heaven_stem']['char']
+            s_star = pal['star']['char']
+            if s_star == '沖':
+                s_star = '衝'
+            stem_map[s_char] = {
+                'star': f"{s_star} {pal['star']['en']}",
+                'door': f"{pal['door']['char']} {pal['door']['en']}"
+            }
+    except Exception:
+        pass
+
+    order = ['hour', 'day', 'month', 'year']
+    col_headers = {
+        'hour': '時干 Hour Stem',
+        'day': '日干 Day Stem',
+        'month': '月干 Month Stem',
+        'year': '年干 Year Stem'
+    }
+
+    html = f"""
+<!-- {current_year} QI MEN ELEMENTS (八字命盤奇門格) -->
+<div style="background: #131d36; border: 1px solid #1e3a8a; border-radius: 8px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 4px 14px rgba(0,0,0,0.25);">
+  <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 11.5px;">
+    <thead>
+      <tr style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-bottom: 1.5px solid #d97706;">
+        <th rowspan="3" style="width: 34%; background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%); color: #ffffff; text-align: center; vertical-align: middle; padding: 10px 14px; border-right: 1.5px solid #d97706;">
+          <div style="font-size: 12px; font-weight: 800; color: #fef08a; letter-spacing: 0.5px;">THE BAZI CHART - {current_year} QI MEN ELEMENTS</div>
+          <div style="font-size: 11px; font-weight: 600; color: #fed7aa; margin-top: 3px;">{current_year}年八字命盤奇門格</div>
+        </th>
+"""
+    for col in order:
+        html += f"""        <th style="padding: 7px 6px; border-left: 1px solid #334155; color: #fef08a; font-weight: 700; width: 13.5%;">
+          {col_headers[col]}
+        </th>\n"""
+    html += """        <th style="padding: 7px 6px; border-left: 1px solid #334155; color: #ffffff; font-weight: 700; width: 12%; background: #1e293b;">
+          要素 Elements
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Row 1: Stars -->
+      <tr style="border-bottom: 1px solid #334155; background: rgba(15, 23, 42, 0.7);">
+"""
+    for col in order:
+        s_char = pillars[col]['stem_char']
+        el = stem_map.get(s_char, {'star': '—', 'door': '—'})
+        html += f"""        <td style="padding: 7px 6px; border-left: 1px solid #334155; font-weight: 700; color: #f8fafc; font-size: 11.5px;">
+          {el['star']}
+        </td>\n"""
+    html += """        <td style="padding: 7px 6px; border-left: 1px solid #334155; font-weight: 800; color: #fbbf24; font-size: 11px; background: #1e293b;">
+          星 Stars
+        </td>
+      </tr>
+      <!-- Row 2: Doors -->
+      <tr style="background: rgba(15, 23, 42, 0.55);">
+"""
+    for col in order:
+        s_char = pillars[col]['stem_char']
+        el = stem_map.get(s_char, {'star': '—', 'door': '—'})
+        html += f"""        <td style="padding: 7px 6px; border-left: 1px solid #334155; font-weight: 700; color: #38bdf8; font-size: 11.5px;">
+          {el['door']}
+        </td>\n"""
+    html += """        <td style="padding: 7px 6px; border-left: 1px solid #334155; font-weight: 800; color: #fbbf24; font-size: 11px; background: #1e293b;">
+          門 Doors
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+"""
+    return html
+
+
 def generate_annual_destiny_html(pillars: Dict[str, Any], current_year: int = 2026) -> str:
     """
-    Renders authentic 2026 Annual BaZi Stars, Qi Men Mobility Directions,
-    and Annual Qi Men Life Palace in a highly legible, spacious, executive presentation.
+    Renders authentic Annual BaZi Stars, Qi Men Mobility Directions,
+    and Annual Qi Men Life Palace in a unified executive layout matching Joey Yap's authentic presentation.
+    Dynamically supports current_year (such as 2025, 2026, and future years).
     """
     dm_stem_idx = pillars['day']['stem_idx']
-    birth_year = pillars.get('birth_year', 1981)
+    birth_year = pillars.get('birth_year', 1986)
     gender = pillars.get('gender', 'Male')
     
-    # 2026 Annual Pillar: Bing Wu (丙午)
-    bing_god = get_10_god(dm_stem_idx, 2)
-    ding_god = get_10_god(dm_stem_idx, 3)
-    ji_god = get_10_god(dm_stem_idx, 5)
+    # Astronomical Heavenly Stem and Earthly Branch for current_year
+    ann_stem_idx = (current_year - 4) % 10
+    ann_branch_idx = (current_year - 4) % 12
+    ann_stem_char = STEM_CHARS[ann_stem_idx]
+    ann_stem_name = STEM_NAMES[ann_stem_idx]
+    ann_stem_elem = STEM_ELEMENTS[ann_stem_idx]
+    ann_stem_color = get_stem_element_color(ann_stem_char)
+    ann_branch_char = BRANCH_CHARS[ann_branch_idx]
+    ann_branch_name = BRANCH_NAMES[ann_branch_idx]
+    ann_branch_animal = BRANCH_ANIMALS[ann_branch_idx]
+    ann_branch_elem = BRANCH_ELEMENTS[ann_branch_idx]
+    ann_branch_color = get_branch_element_color(ann_branch_char)
+    
+    ann_stem_god = get_10_god(dm_stem_idx, ann_stem_idx)
+    
+    # Dynamic Hidden Stems for current_year
+    ann_hs_list = BRANCH_HIDDEN_STEMS_MAP.get(ann_branch_idx, [])
     
     order = ['hour', 'day', 'month', 'year']
     col_titles = {
-        'hour': '時支 Hour',
-        'day': '日支 Day',
-        'month': '月支 Month',
-        'year': '年支 Year'
+        'hour': '時支 Hour Branch',
+        'day': '日支 Day Branch',
+        'month': '月支 Month Branch',
+        'year': '年支 Year Branch'
     }
     
-    # Dynamic Mobility Directions for this person
-    mobility_directions = calculate_mobility_directions(birth_year, gender)
+    # Dynamic Mobility Directions for target year
+    mobility_directions = calculate_mobility_directions(birth_year, gender, target_year=current_year)
 
-    # Calculate 2026 Annual Qimen for Life Palace
-    p_2026 = {
-        'hour': {'stem_name': 'Bing', 'branch_name': 'Wu'},
-        'day': {'stem_name': 'Bing', 'branch_name': 'Wu'},
-        'month': {'stem_name': 'Bing', 'branch_name': 'Wu'},
-        'year': {'stem_name': 'Bing', 'branch_name': 'Wu'}
+    # Dynamic Annual Qimen for Life Palace
+    p_annual = {
+        'hour': {'stem_name': ann_stem_name, 'branch_name': ann_branch_name},
+        'day': {'stem_name': ann_stem_name, 'branch_name': ann_branch_name},
+        'month': {'stem_name': ann_stem_name, 'branch_name': ann_branch_name},
+        'year': {'stem_name': ann_stem_name, 'branch_name': ann_branch_name}
     }
     
     try:
         from qimen_engine import calculate_qimen_chart_from_pillars, PALACES_INFO
-        chart_2026 = calculate_qimen_chart_from_pillars(p_2026, dun_type='Yin', ju_num=1)
+        chart_ann = calculate_qimen_chart_from_pillars(p_annual, dun_type='Yin', ju_num=1)
         qm_natal = pillars.get('qimen_destiny', {})
-        palace_str = qm_natal.get('palace', '南 S')
-        dest_p_num = 9
-        for p_num, info in PALACES_INFO.items():
-            if info['dir'] in palace_str or info['trigram'] in palace_str:
-                dest_p_num = p_num
-                break
+        dest_p_num = qm_natal.get('palace_num')
+        if not dest_p_num:
+            palace_str = qm_natal.get('palace', '')
+            for p_num, info in PALACES_INFO.items():
+                if info['dir'] == palace_str.split()[-1] or info['trigram'] in palace_str:
+                    dest_p_num = p_num
+                    break
+        if not dest_p_num:
+            dest_p_num = 8
                 
-        pal_2026 = chart_2026['palaces'][dest_p_num]
-        qm_stem = f"{pal_2026['heaven_stem']['char']} {pal_2026['heaven_stem']['pinyin']}"
-        qm_door = f"{pal_2026['door']['char']} {pal_2026['door']['en']}"
-        qm_star = f"天{pal_2026['star']['char']} {pal_2026['star']['en']}"
-        qm_deity = f"{pal_2026['deity']['char']} {pal_2026['deity']['en']}"
+        pal_ann = chart_ann['palaces'][dest_p_num]
+        qm_stem = f"{pal_ann['heaven_stem']['char']} {pal_ann['heaven_stem']['pinyin']}"
+        qm_door = f"{pal_ann['door']['char']} {pal_ann['door']['en']}"
+        qm_star = f"天{pal_ann['star']['char']} {pal_ann['star']['en']}"
+        qm_deity = f"{pal_ann['deity']['char']} {pal_ann['deity']['en']}"
         palace_name = f"{PALACES_INFO[dest_p_num]['dir']} ({PALACES_INFO[dest_p_num]['trigram']}宮 {dest_p_num})"
     except Exception:
-        qm_stem = "庚 Geng"
-        qm_door = "休 Rest"
-        qm_star = "天任 Ambassador"
-        qm_deity = "地 Earth"
-        palace_name = "南 S (離宮 9)"
-        dest_p_num = 9
+        qm_stem = "辛 Xin"
+        qm_door = "死 Death"
+        qm_star = "天柱 Pillar"
+        qm_deity = "蛇 Snake"
+        palace_name = "東北 NE (艮宮 8)"
+        dest_p_num = 8
 
     # Door auspicious determination
     is_door_auspicious = any(qm_door.startswith(d) for d in ['開', 'Open', '休', 'Rest', '生', 'Life'])
-    if is_door_auspicious:
-        door_box_style = "background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35);"
-        door_title_color = "#34d399"
-        door_val_color = "#10b981"
-        door_badge = '<div style="font-size: 9.5px; color: #34d399; font-weight: 700; margin-top: 2px;">★ 吉門 Auspicious</div>'
-    else:
-        door_box_style = "background: rgba(30, 41, 59, 0.6); border: 1px solid #334155;"
-        door_title_color = "#94a3b8"
-        door_val_color = "#e2e8f0"
-        door_badge = ''
+    door_box_style = "background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35);" if is_door_auspicious else "background: rgba(30, 41, 59, 0.6); border: 1px solid #334155;"
+    door_title_color = "#34d399" if is_door_auspicious else "#94a3b8"
+    door_val_color = "#10b981" if is_door_auspicious else "#e2e8f0"
+    door_badge = '<div style="font-size: 8.5px; color: #34d399; font-weight: 700; margin-top: 1px;">★ 吉門 Auspicious</div>' if is_door_auspicious else ''
 
     # Star auspicious determination
     is_star_auspicious = any(qm_star.startswith(s) for s in ['天心', '天任', '天禽', '天輔'])
-    if is_star_auspicious:
-        star_box_style = "background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.35);"
-        star_title_color = "#fbbf24"
-        star_val_color = "#f59e0b"
-        star_badge = '<div style="font-size: 9.5px; color: #fbbf24; font-weight: 700; margin-top: 2px;">★ 吉星 Auspicious</div>'
-    else:
-        star_box_style = "background: rgba(30, 41, 59, 0.6); border: 1px solid #334155;"
-        star_title_color = "#94a3b8"
-        star_val_color = "#e2e8f0"
-        star_badge = ''
+    star_box_style = "background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.35);" if is_star_auspicious else "background: rgba(30, 41, 59, 0.6); border: 1px solid #334155;"
+    star_title_color = "#fbbf24" if is_star_auspicious else "#94a3b8"
+    star_val_color = "#f59e0b" if is_star_auspicious else "#e2e8f0"
+    star_badge = '<div style="font-size: 8.5px; color: #fbbf24; font-weight: 700; margin-top: 1px;">★ 吉星 Auspicious</div>' if is_star_auspicious else ''
 
     # Qi Men Palace Year Stars
-    palace_year_stars = ANNUAL_QIMEN_PALACE_YEAR_STARS_2026.get(dest_p_num, [])
+    year_stars_dict = ANNUAL_QIMEN_PALACE_YEAR_STARS.get(current_year, ANNUAL_QIMEN_PALACE_YEAR_STARS.get(2026, {}))
+    palace_year_stars = year_stars_dict.get(dest_p_num, [])
+    if palace_year_stars:
+        stars_inner_html = "".join([
+            f'<div style="font-size: 10px; font-weight: 800; color: {"#f87171" if cat == "auspicious" else "#cbd5e1"}; white-space: nowrap; line-height: 1.35; margin-top: 1.5px;">{zh_s} <span style="font-size: 9px; font-weight: 600; color: {"#fca5a5" if cat == "auspicious" else "#94a3b8"};">{en_s}</span></div>'
+            for zh_s, en_s, cat in palace_year_stars
+        ])
+        stars_box_html = f"""        <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 6px; padding: 5px 3px; text-align: center; display: flex; flex-direction: column; justify-content: center;">
+          <div style="font-size: 9px; font-weight: 800; color: #f87171; text-transform: uppercase;">Year Stars 年星</div>
+          <div style="margin-top: 1px;">{stars_inner_html}</div>
+        </div>"""
+    else:
+        stars_box_html = """        <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid #334155; border-radius: 6px; padding: 5px 3px; text-align: center; display: flex; flex-direction: column; justify-content: center;">
+          <div style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Year Stars 年星</div>
+          <div style="font-size: 15px; font-weight: 900; color: #64748b; margin-top: 2px;">—</div>
+        </div>"""
+
+    # Annual BaZi Stars dict
+    ann_bazi_stars_dict = ANNUAL_BAZI_STARS_2025 if current_year == 2025 else ANNUAL_BAZI_STARS_2026
+
+    # Format Hidden Stems Cards
+    hs_cards_html = []
+    for hs in ann_hs_list:
+        god = get_10_god(dm_stem_idx, hs['stem_idx'])
+        h_color = get_stem_element_color(hs['char'])
+        clean_el = hs['polarity_elem'].replace('水','').replace('木','').replace('火','').replace('土','').replace('金','')
+        hs_cards_html.append(f"""
+                <div style="background: rgba(30, 41, 59, 0.75); border: 1px solid #334155; border-radius: 5px; padding: 5px 2px; flex: 1; text-align: center; min-width: 38px;">
+                  <div style="font-size: 17px; font-weight: 900; color: {h_color}; line-height: 1;">{hs['char']}</div>
+                  <div style="font-size: 9.5px; font-weight: 700; color: #f8fafc; margin-top: 1px;">{hs['name']}</div>
+                  <div style="font-size: 8px; color: #94a3b8;">{clean_el}</div>
+                  <div style="font-size: 8.5px; font-weight: 800; color: #fbbf24; margin-top: 3px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 3px; padding: 1px; white-space: nowrap;">
+                    {god['zh_short']} {god['code']}
+                  </div>
+                </div>""")
+    hs_cards_str = "".join(hs_cards_html)
 
     html = f"""
-<!-- 2026 ANNUAL DESTINY & STARS (MATCHING NATAL CHART THEME) -->
+<!-- {current_year} ANNUAL DESTINY & STARS (MATCHING NATAL CHART THEME) -->
 <div style="background: #131d36; border: 1px solid #1e3a8a; border-radius: 10px; overflow: hidden; margin-bottom: 18px; box-shadow: 0 6px 20px rgba(0,0,0,0.3); font-family: 'Kantumruy Pro', 'Inter', -apple-system, sans-serif;">
   
   <!-- MAIN HEADER BAR -->
-  <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-bottom: 2px solid #f59e0b; color: #ffffff; padding: 10px 16px; font-weight: 700; font-size: 14px; display: flex; justify-content: space-between; align-items: center;">
+  <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-bottom: 2px solid #f59e0b; color: #ffffff; padding: 10px 16px; font-weight: 700; font-size: 13.5px; display: flex; justify-content: space-between; align-items: center;">
     <span style="color: #fbbf24; letter-spacing: 0.03em;">{current_year} ANNUAL DESTINY & STARS 流年吉凶星與奇門</span>
-    <span style="font-size: 12px; font-weight: 500; color: #94a3b8;">Bing Wu Year 丙午年 · Yang Fire Horse</span>
+    <span style="font-size: 12px; font-weight: 500; color: #94a3b8;">{ann_stem_name} {ann_branch_name} Year {ann_stem_char}{ann_branch_char}年 · {ann_stem_elem} {ann_branch_animal.split()[-1]}</span>
   </div>
 
-  <!-- TOP SECTION: MOBILITY + ANNUAL STARS -->
-  <div class="annual-top-grid" style="display: grid; grid-template-columns: 28% 72%; border-bottom: 1px solid #334155;">
+  <!-- 2-COLUMN GRID: LEFT MOBILITY, RIGHT ANNUAL TABLE -->
+  <div class="annual-main-grid" style="display: grid; grid-template-columns: 28% 72%;">
     
     <!-- LEFT: MOBILITY DIRECTIONS -->
-    <div style="border-right: 1px solid #334155; display: flex; flex-direction: column; background: rgba(15, 23, 42, 0.7);">
-      <div style="background: #1e293b; border-bottom: 1px solid #334155; color: #fbbf24; padding: 8px 12px; font-weight: 700; font-size: 12px; display: flex; justify-content: space-between; align-items: center;">
+    <div style="border-right: 1px solid #334155; display: flex; flex-direction: column; background: rgba(15, 23, 42, 0.75);">
+      <div style="background: #1e293b; border-bottom: 1px solid #334155; color: #fbbf24; padding: 8px 12px; font-weight: 700; font-size: 11.5px; display: flex; justify-content: space-between; align-items: center;">
         <span>MOBILITY DIRECTIONS</span>
-        <span style="font-size: 11px; font-weight: 500; color: #94a3b8;">本命奇門出行方</span>
+        <span style="font-size: 10.5px; font-weight: 500; color: #94a3b8;">本命奇門出行方</span>
       </div>
-      <div style="padding: 8px 10px; flex: 1; display: flex; flex-direction: column; justify-content: space-around; gap: 5px;">
+      <div style="padding: 8px 10px; flex: 1; display: flex; flex-direction: column; justify-content: space-around; gap: 4px;">
 """
     for code, zh, star_str, style_type in mobility_directions:
         if style_type == 'blue':
@@ -1042,13 +1388,13 @@ def generate_annual_destiny_html(pillars: Dict[str, Any], current_year: int = 20
             code_style = "color: #38bdf8;"
             zh_style = "color: #7dd3fc;"
             star_style = "color: #38bdf8; font-weight: 700;"
-            tag_badge = '<span style="font-size: 9.5px; background: rgba(14, 165, 233, 0.3); color: #38bdf8; border: 1px solid #0284c7; padding: 1px 5px; border-radius: 3px; margin-left: 6px;">吉</span>'
+            tag_badge = '<span style="font-size: 9px; background: rgba(14, 165, 233, 0.3); color: #38bdf8; border: 1px solid #0284c7; padding: 1px 4px; border-radius: 3px; margin-left: 6px;">吉</span>'
         elif style_type == 'red':
             badge_bg = "background: rgba(239, 68, 68, 0.12); border: 1px solid #dc2626;"
             code_style = "color: #f87171;"
             zh_style = "color: #fca5a5;"
             star_style = "color: #f87171; font-weight: 700;"
-            tag_badge = '<span style="font-size: 9.5px; background: rgba(239, 68, 68, 0.3); color: #f87171; border: 1px solid #dc2626; padding: 1px 5px; border-radius: 3px; margin-left: 6px;">吉</span>'
+            tag_badge = '<span style="font-size: 9px; background: rgba(239, 68, 68, 0.3); color: #f87171; border: 1px solid #dc2626; padding: 1px 4px; border-radius: 3px; margin-left: 6px;">吉</span>'
         else:
             badge_bg = "background: rgba(30, 41, 59, 0.5); border: 1px solid #334155;"
             code_style = "color: #f8fafc;"
@@ -1056,9 +1402,9 @@ def generate_annual_destiny_html(pillars: Dict[str, Any], current_year: int = 20
             star_style = "color: #cbd5e1; font-weight: 500;"
             tag_badge = ''
 
-        html += f"""        <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 8px; border-radius: 5px; font-size: 11.5px; {badge_bg}">
+        html += f"""        <div style="display: flex; align-items: center; justify-content: space-between; padding: 3.5px 8px; border-radius: 4px; font-size: 11px; {badge_bg}">
           <div style="display: flex; align-items: center; gap: 6px;">
-            <span style="font-weight: 800; min-width: 22px; {code_style}">{code}</span>
+            <span style="font-weight: 800; min-width: 20px; {code_style}">{code}</span>
             <span style="font-weight: 700; {zh_style}">{zh}</span>
           </div>
           <div style="{star_style} display: flex; align-items: center;">
@@ -1069,11 +1415,11 @@ def generate_annual_destiny_html(pillars: Dict[str, Any], current_year: int = 20
     html += f"""      </div>
     </div>
     
-    <!-- RIGHT: ANNUAL BAZI STARS -->
-    <div style="display: flex; flex-direction: column;">
-      <div style="background: #1e293b; border-bottom: 1px solid #334155; color: #fbbf24; padding: 8px 12px; font-weight: 700; font-size: 12px; display: flex; justify-content: space-between; align-items: center;">
+    <!-- RIGHT: UNIFIED ANNUAL TABLE -->
+    <div style="display: flex; flex-direction: column; background: rgba(15, 23, 42, 0.5);">
+      <div style="background: #1e293b; border-bottom: 1px solid #334155; color: #fbbf24; padding: 8px 12px; font-weight: 700; font-size: 11.5px; display: flex; justify-content: space-between; align-items: center;">
         <span>ANNUAL BAZI STARS</span>
-        <span style="font-size: 11px; font-weight: 500; color: #94a3b8;">本命八字流年吉凶星</span>
+        <span style="font-size: 10.5px; font-weight: 500; color: #94a3b8;">本命八字流年吉凶星</span>
       </div>
       <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 11px; flex: 1;">
         <thead>
@@ -1084,172 +1430,152 @@ def generate_annual_destiny_html(pillars: Dict[str, Any], current_year: int = 20
         b_char = pillars[col]['branch_char']
         b_anim = pillars[col]['branch_animal'].split()[-1]
         b_color = get_branch_element_color(b_char)
-        html += f"""            <th style="padding: 8px 6px; border-right: 1px solid #334155; width: 21%; text-align: center;">
-              <div style="font-size: 11px; color: #fbbf24; font-weight: 700;">{col_titles[col]}</div>
-              <div style="font-size: 16px; font-weight: 900; color: {b_color}; margin-top: 2px;">{b_char} <span style="font-size: 11.5px; font-weight: 600; color: #cbd5e1;">({b_anim})</span></div>
+        html += f"""            <th style="padding: 7px 5px; border-right: 1px solid #334155; width: 20.5%; text-align: center;">
+              <div style="font-size: 10.5px; color: #fbbf24; font-weight: 700;">{col_titles[col]}</div>
+              <div style="font-size: 15px; font-weight: 900; color: {b_color}; margin-top: 1px;">{b_char} <span style="font-size: 11px; font-weight: 600; color: #cbd5e1;">({b_anim})</span></div>
             </th>\n"""
 
-    html += f"""            <th style="padding: 8px 6px; font-weight: 800; color: #fbbf24; text-align: center; width: 16%; border-left: 2px solid #f59e0b; background: rgba(239, 68, 68, 0.15);">
-              <div style="font-size: 16px; font-weight: 900; color: #ef4444;">{current_year}</div>
-              <div style="font-size: 11px; font-weight: 700; color: #fbbf24;">流年 Annual</div>
+    html += f"""            <th style="padding: 7px 5px; font-weight: 800; color: #fbbf24; text-align: center; width: 18%; border-left: 2px solid #f59e0b; background: rgba(239, 68, 68, 0.15);">
+              <div style="font-size: 15px; font-weight: 900; color: #ef4444;">{current_year}</div>
+              <div style="font-size: 10.5px; font-weight: 700; color: #fbbf24;">流年 Annual</div>
             </th>
           </tr>
         </thead>
         <tbody>
+          <!-- ROW 1: STARS & ANNUAL STEM/BRANCH -->
           <tr>
 """
     for col in order:
         b_idx = pillars[col]['branch_idx']
-        stars_info = ANNUAL_BAZI_STARS_2026.get(b_idx, {'auspicious': [], 'inauspicious': []})
+        stars_info = ann_bazi_stars_dict.get(b_idx, {'auspicious': [], 'inauspicious': []})
         ausp = stars_info['auspicious']
         inausp = stars_info['inauspicious']
         
-        html += """            <td style="padding: 8px 6px; vertical-align: top; border-right: 1px solid #334155; background: rgba(15, 23, 42, 0.7);">\n"""
+        html += """            <td style="padding: 6px 5px; vertical-align: top; border-right: 1px solid #334155; background: rgba(15, 23, 42, 0.7);">\n"""
         
         # Auspicious Header & Badges
-        html += """              <div style="font-size: 10px; font-weight: 800; color: #fbbf24; text-transform: uppercase; margin-bottom: 5px; display: flex; align-items: center; gap: 3px; letter-spacing: 0.3px;">
+        html += """              <div style="font-size: 9.5px; font-weight: 800; color: #fbbf24; text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 3px; letter-spacing: 0.3px;">
                 <span>★</span> 吉星 Auspicious
               </div>\n"""
         if not ausp:
-            html += """              <div style="font-size: 10.5px; color: #64748b; font-style: italic; margin-bottom: 8px;">— None</div>\n"""
+            html += """              <div style="font-size: 10px; color: #64748b; font-style: italic; margin-bottom: 6px;">— None</div>\n"""
         else:
             for zh_s, en_s in ausp:
-                html += f"""              <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(30, 41, 59, 0.6); border: 1px solid #475569; border-left: 3px solid #f59e0b; border-radius: 4px; padding: 2.5px 6px; margin-bottom: 3.5px; font-size: 11px;">
+                html += f"""              <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(30, 41, 59, 0.6); border: 1px solid #475569; border-left: 3px solid #f59e0b; border-radius: 4px; padding: 2px 5px; margin-bottom: 3px; font-size: 10.5px;">
                 <span style="font-weight: 800; color: #fbbf24; white-space: nowrap;">{zh_s}</span>
-                <span style="font-size: 9.5px; color: #e2e8f0; font-weight: 600; text-align: right; margin-left: 4px;">{en_s}</span>
+                <span style="font-size: 9px; color: #e2e8f0; font-weight: 600; text-align: right; margin-left: 4px;">{en_s}</span>
               </div>\n"""
         
         # Inauspicious Header & Badges
-        html += """              <div style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin: 10px 0 5px 0; display: flex; align-items: center; gap: 3px; letter-spacing: 0.3px;">
+        html += """              <div style="font-size: 9.5px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin: 8px 0 4px 0; display: flex; align-items: center; gap: 3px; letter-spacing: 0.3px;">
                 <span>▲</span> 凶煞 Afflictions
               </div>\n"""
         if not inausp:
-            html += """              <div style="font-size: 10.5px; color: #64748b; font-style: italic;">— None</div>\n"""
+            html += """              <div style="font-size: 10px; color: #64748b; font-style: italic;">— None</div>\n"""
         else:
             for zh_s, en_s in inausp:
-                html += f"""              <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(15, 23, 42, 0.6); border: 1px solid #334155; border-left: 3px solid #64748b; border-radius: 4px; padding: 2.5px 6px; margin-bottom: 3px; font-size: 10.5px;">
+                html += f"""              <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(15, 23, 42, 0.6); border: 1px solid #334155; border-left: 3px solid #64748b; border-radius: 4px; padding: 2px 5px; margin-bottom: 2.5px; font-size: 10px;">
                 <span style="font-weight: 700; color: #cbd5e1; white-space: nowrap;">{zh_s}</span>
-                <span style="font-size: 9px; color: #94a3b8; font-weight: 500; text-align: right; margin-left: 4px;">{en_s}</span>
+                <span style="font-size: 8.5px; color: #94a3b8; font-weight: 500; text-align: right; margin-left: 4px;">{en_s}</span>
               </div>\n"""
 
         html += """            </td>\n"""
 
-    # 5th Column: 2026 Annual Stem & Branch
-    html += f"""            <td style="padding: 10px 6px; vertical-align: middle; text-align: center; border-left: 2px solid #f59e0b; background: rgba(30, 41, 59, 0.4);">
-              
-              <!-- Stem Box -->
-              <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; border-radius: 6px; padding: 8px 6px; margin-bottom: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
-                <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 2px;">
-                  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px 4px; border-radius: 4px; font-size: 9px; font-weight: 800; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); line-height: 1.1;">
-                    <span>{bing_god['zh_full']}</span>
-                    <span style="font-size: 8.5px; margin-top: 1px;">{bing_god['code']}</span>
+    # 5th Column: Annual Stem & Branch
+    html += f"""            <td style="padding: 6px 5px; vertical-align: middle; text-align: center; border-left: 2px solid #f59e0b; background: rgba(30, 41, 59, 0.4);">
+              <div style="display: flex; flex-direction: column; gap: 6px; justify-content: center; height: 100%;">
+                
+                <!-- Stem Box -->
+                <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid #334155; border-radius: 6px; padding: 6px 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.25);">
+                  <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 1px;">
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5px 3.5px; border-radius: 4px; font-size: 8px; font-weight: 800; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); line-height: 1.1;">
+                      <span>{ann_stem_god['zh_full']}</span>
+                      <span style="font-size: 7.5px; margin-top: 1px;">{ann_stem_god['code']}</span>
+                    </div>
+                    <div style="font-size: 26px; font-weight: 900; color: {ann_stem_color}; line-height: 1;">{ann_stem_char}</div>
                   </div>
-                  <div style="font-size: 32px; font-weight: 900; color: #ef4444; line-height: 1;">丙</div>
+                  <div style="font-size: 10.5px; font-weight: 700; color: #f8fafc; margin-top: 1px;">{ann_stem_name}</div>
+                  <div style="font-size: 9px; color: #94a3b8;">{ann_stem_elem}</div>
                 </div>
-                <div style="font-size: 11px; font-weight: 700; color: #f8fafc; margin-top: 2px;">Bing</div>
-                <div style="font-size: 9.5px; color: #94a3b8;">+Fire 陽火</div>
-              </div>
 
-              <!-- Branch Box -->
-              <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; border-radius: 6px; padding: 8px 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
-                <div style="font-size: 30px; font-weight: 900; color: #ef4444; line-height: 1;">午</div>
-                <div style="font-size: 11px; font-weight: 700; color: #f8fafc; margin-top: 2px;">Wu <span style="font-size: 10px; color: #cbd5e1;">(Horse 馬)</span></div>
-                <div style="font-size: 9.5px; color: #94a3b8;">Yang Fire 午火</div>
-              </div>
+                <!-- Branch Box -->
+                <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid #334155; border-radius: 6px; padding: 6px 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.25);">
+                  <div style="font-size: 26px; font-weight: 900; color: {ann_branch_color}; line-height: 1;">{ann_branch_char}</div>
+                  <div style="font-size: 10.5px; font-weight: 700; color: #f8fafc; margin-top: 1px;">{ann_branch_name} <span style="font-size: 9.5px; color: #cbd5e1;">({ann_branch_animal.split()[-1]})</span></div>
+                  <div style="font-size: 9px; color: #94a3b8;">{ann_branch_elem}</div>
+                </div>
 
+              </div>
             </td>
+          </tr>
+
+          <!-- ROW 2: QI MEN LIFE PALACE (Cols 1-4) & HIDDEN STEMS (Col 5) -->
+          <tr style="border-top: 2px solid #f59e0b;">
+            
+            <!-- Cols 1-4: QI MEN LIFE PALACE -->
+            <td colspan="4" style="padding: 0; vertical-align: top; border-right: 2px solid #f59e0b; background: #131d36;">
+              <!-- Header Bar -->
+              <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff; padding: 5px 10px; font-weight: 700; font-size: 11px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155;">
+                <div>
+                  <span style="color: #fbbf24; font-weight: 800;">{current_year} QI MEN LIFE PALACE</span>
+                  <span style="font-size: 10px; font-weight: 500; color: #94a3b8; margin-left: 6px;">流年奇門命宮</span>
+                </div>
+                <div style="font-size: 10px; font-weight: 700; color: #fbbf24; background: rgba(245, 158, 11, 0.15); border: 1px solid #d97706; padding: 1px 6px; border-radius: 3px;">{palace_name}</div>
+              </div>
+              
+              <!-- 5 Life Palace Cards Grid -->
+              <div style="padding: 8px 8px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; background: rgba(15, 23, 42, 0.7);">
+                
+                <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid #334155; border-radius: 5px; padding: 5px 3px; text-align: center;">
+                  <div style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">天干 Stem</div>
+                  <div style="font-size: 15px; font-weight: 900; color: #e2e8f0; margin-top: 2px;">{qm_stem}</div>
+                  <div style="font-size: 8.5px; color: #64748b; margin-top: 1px;">Heaven Plate</div>
+                </div>
+
+                <div style="{door_box_style} border-radius: 5px; padding: 5px 3px; text-align: center;">
+                  <div style="font-size: 9px; font-weight: 700; color: {door_title_color}; text-transform: uppercase;">門 Door</div>
+                  <div style="font-size: 15px; font-weight: 900; color: {door_val_color}; margin-top: 2px;">{qm_door}</div>
+                  {door_badge}
+                </div>
+
+                <div style="{star_box_style} border-radius: 5px; padding: 5px 3px; text-align: center;">
+                  <div style="font-size: 9px; font-weight: 700; color: {star_title_color}; text-transform: uppercase;">星 Star</div>
+                  <div style="font-size: 15px; font-weight: 900; color: {star_val_color}; margin-top: 2px;">{qm_star}</div>
+                  {star_badge}
+                </div>
+
+                <div style="background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99, 102, 241, 0.35); border-radius: 5px; padding: 5px 3px; text-align: center;">
+                  <div style="font-size: 9px; font-weight: 700; color: #818cf8; text-transform: uppercase;">神 Deity</div>
+                  <div style="font-size: 15px; font-weight: 900; color: #a5b4fc; margin-top: 2px;">{qm_deity}</div>
+                </div>
+
+                {stars_box_html}
+
+              </div>
+            </td>
+            
+            <!-- Col 5: Annual Hidden Stems directly below Annual Branch -->
+            <td style="padding: 6px 4px; vertical-align: middle; text-align: center; background: rgba(30, 41, 59, 0.4);">
+              <div style="font-size: 9.5px; font-weight: 800; color: #fbbf24; margin-bottom: 4px; text-transform: uppercase;">
+                藏干 <span style="font-size: 8.5px; color: #94a3b8; font-weight: normal;">Hidden Stems</span>
+              </div>
+              <div style="display: flex; justify-content: center; gap: 4px;">
+                {hs_cards_str}
+              </div>
+            </td>
+
           </tr>
         </tbody>
       </table>
     </div>
   </div>
-  
-  <!-- BOTTOM SECTION: QI MEN LIFE PALACE + 2026 HIDDEN STEMS -->
-  <div class="annual-bottom-grid" style="display: grid; grid-template-columns: 84% 16%; background: #131d36; border-top: 2px solid #f59e0b;">
-    
-    <!-- LEFT: QI MEN LIFE PALACE TABLE -->
-    <div style="border-right: 1px solid #334155;">
-      <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff; padding: 8px 12px; font-weight: 700; font-size: 12px; letter-spacing: 0.3px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155;">
-        <div>
-          <span style="color: #fbbf24; font-weight: 800;">{current_year} QI MEN LIFE PALACE</span>
-          <span style="font-size: 11px; font-weight: 500; color: #94a3b8; margin-left: 6px;">流年奇門命宮</span>
-        </div>
-        <div style="font-size: 11px; font-weight: 700; color: #fbbf24; background: rgba(245, 158, 11, 0.15); border: 1px solid #d97706; padding: 2px 8px; border-radius: 4px;">{palace_name}</div>
-      </div>
-      
-      <!-- 5 Life Palace Cards Grid -->
-      <div style="padding: 10px 12px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; background: rgba(15, 23, 42, 0.7);">
-        
-        <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid #334155; border-radius: 6px; padding: 8px 6px; text-align: center;">
-          <div style="font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">天干 Stem</div>
-          <div style="font-size: 17px; font-weight: 900; color: #e2e8f0; margin-top: 4px;">{qm_stem}</div>
-          <div style="font-size: 9.5px; color: #64748b; margin-top: 2px;">Heaven Plate</div>
-        </div>
-
-        <div style="{door_box_style} border-radius: 6px; padding: 8px 6px; text-align: center;">
-          <div style="font-size: 10px; font-weight: 700; color: {door_title_color}; text-transform: uppercase;">門 Door</div>
-          <div style="font-size: 17px; font-weight: 900; color: {door_val_color}; margin-top: 4px;">{qm_door}</div>
-          {door_badge}
-        </div>
-
-        <div style="{star_box_style} border-radius: 6px; padding: 8px 6px; text-align: center;">
-          <div style="font-size: 10px; font-weight: 700; color: {star_title_color}; text-transform: uppercase;">星 Star</div>
-          <div style="font-size: 17px; font-weight: 900; color: {star_val_color}; margin-top: 4px;">{qm_star}</div>
-          {star_badge}
-        </div>
-
-        <div style="background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99, 102, 241, 0.35); border-radius: 6px; padding: 8px 6px; text-align: center;">
-          <div style="font-size: 10px; font-weight: 700; color: #818cf8; text-transform: uppercase;">神 Deity</div>
-          <div style="font-size: 17px; font-weight: 900; color: #a5b4fc; margin-top: 4px;">{qm_deity}</div>
-        </div>
-"""
-    if palace_year_stars:
-        stars_inner_html = "".join([
-            f'<div style="font-size: 11px; font-weight: 800; color: #f87171; white-space: nowrap; line-height: 1.25; margin-top: 2px;">{zh_s} <span style="font-size: 9.5px; font-weight: 600; color: #fca5a5;">{en_s}</span></div>'
-            for zh_s, en_s in palace_year_stars
-        ])
-        html += f"""        <div style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 6px; padding: 6px 4px; text-align: center; display: flex; flex-direction: column; justify-content: center;">
-          <div style="font-size: 10px; font-weight: 800; color: #f87171; text-transform: uppercase;">Year Stars 年星</div>
-          <div style="margin-top: 2px;">{stars_inner_html}</div>
-        </div>\n"""
-    else:
-        html += """        <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid #334155; border-radius: 6px; padding: 8px 6px; text-align: center;">
-          <div style="font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Year Stars 年星</div>
-          <div style="font-size: 18px; font-weight: 900; color: #64748b; margin-top: 4px;">—</div>
-        </div>\n"""
-
-    html += f"""
-      </div>
-    </div>
-    
-    <!-- RIGHT: 2026 HIDDEN STEMS -->
-    <div style="padding: 10px 8px; text-align: center; background: rgba(30, 41, 59, 0.4); display: flex; flex-direction: column; justify-content: center; align-items: center;">
-      <div style="font-size: 11px; font-weight: 700; color: #fbbf24; margin-bottom: 6px; text-transform: uppercase; line-height: 1.2;">
-        2026 藏干<br><span style="font-size: 9.5px; font-weight: normal; color: #94a3b8;">Hidden Stems</span>
-      </div>
-      <div style="display: flex; justify-content: center; gap: 6px; width: 100%;">
-        <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid #334155; border-radius: 5px; padding: 6px 4px; flex: 1; text-align: center;">
-          <div style="font-size: 20px; font-weight: 900; color: #ef4444; line-height: 1;">丁</div>
-          <div style="font-size: 10px; font-weight: 700; color: #f8fafc; margin-top: 2px;">Ding</div>
-          <div style="font-size: 9px; color: #94a3b8;">-Fire火</div>
-          <div style="font-size: 9.5px; font-weight: 800; color: #f59e0b; margin-top: 3px; background: rgba(245, 158, 11, 0.1); border-radius: 3px; padding: 1px;">{ding_god['zh_short']} {ding_god['code']}</div>
-        </div>
-        <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid #334155; border-radius: 5px; padding: 6px 4px; flex: 1; text-align: center;">
-          <div style="font-size: 20px; font-weight: 900; color: #f59e0b; line-height: 1;">己</div>
-          <div style="font-size: 10px; font-weight: 700; color: #f8fafc; margin-top: 2px;">Ji</div>
-          <div style="font-size: 9px; color: #94a3b8;">-Earth土</div>
-          <div style="font-size: 9.5px; font-weight: 800; color: #f59e0b; margin-top: 3px; background: rgba(245, 158, 11, 0.1); border-radius: 3px; padding: 1px;">{ji_god['zh_short']} {ji_god['code']}</div>
-        </div>
-      </div>
-    </div>
-    
-  </div>
-  
 </div>
 """
     return html
 
-def generate_natal_chart_html(p: Dict[str, Any]) -> str:
+
+def generate_natal_chart_html(p: Dict[str, Any], current_year: int = 2026) -> str:
+
     """
     Renders an authentic, classical Chinese Metaphysics Personal Natal Chart
     with Header Profile, Day Master and Stars, Qi Men Destiny Palace, Life Star,
@@ -1306,11 +1632,11 @@ def generate_natal_chart_html(p: Dict[str, Any]) -> str:
 @media (max-width: 860px) {{
   .personal-natal-chart .top-summary-grid {{ grid-template-columns: 1fr 1fr !important; }}
   .personal-natal-chart .directions-grid {{ grid-template-columns: 1fr !important; }}
-  .personal-natal-chart .annual-top-grid {{ grid-template-columns: 1fr !important; }}
-  .personal-natal-chart .annual-bottom-grid {{ grid-template-columns: 1fr !important; }}
+  .personal-natal-chart .annual-main-grid {{ grid-template-columns: 1fr !important; }}
 }}
 @media (max-width: 580px) {{
   .personal-natal-chart .top-summary-grid {{ grid-template-columns: 1fr !important; }}
+  .personal-natal-chart .annual-main-grid {{ grid-template-columns: 1fr !important; }}
 }}
 </style>
 <div class="personal-natal-chart" style="font-family: 'Kantumruy Pro', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 1060px; margin: 15px auto; background: #0f172a; border: 1px solid #1e3a8a; border-top: 3px solid #f59e0b; border-radius: 12px; box-shadow: 0 12px 36px rgba(0,0,0,0.5); color: #f8fafc; overflow: hidden; padding: 20px;">
@@ -1462,8 +1788,14 @@ def generate_natal_chart_html(p: Dict[str, Any]) -> str:
     raw_html += f"""<td style="padding: 10px; border-left: 2px solid #f59e0b; font-size: 12px; font-weight: 700; color: #fbbf24; background: #1e293b; vertical-align: middle; line-height: 1.4;">藏干<br><span style="font-size: 10px; font-weight: normal; color: #94a3b8;">Hidden<br>Stems</span></td></tr></tbody></table>
 </div>"""
 
-    # 2026 ANNUAL BAZI STARS & QI MEN DESTINY & MOBILITY DIRECTIONS
-    raw_html += generate_annual_destiny_html(p, current_year=2026)
+    # 10-YEAR LUCK PILLARS (大運)
+    raw_html += generate_luck_pillars_html(p, current_year=current_year)
+
+    # QI MEN ELEMENTS (八字命盤奇門格)
+    raw_html += generate_annual_qimen_elements_html(p, current_year=current_year)
+
+    # ANNUAL BAZI STARS & QI MEN DESTINY & MOBILITY DIRECTIONS
+    raw_html += generate_annual_destiny_html(p, current_year=current_year)
 
     # BOTTOM ROW: 8 MANSIONS (FAVORABLE & UNFAVORABLE DIRECTIONS)
     raw_html += f"""<div class="directions-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
