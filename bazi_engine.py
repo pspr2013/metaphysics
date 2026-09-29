@@ -31,54 +31,54 @@ BRANCH_ELEMENTS = [
     '火 Yang Fire', '± Yin Earth', '金 Yang Metal', '金 Yin Metal', '± Yang Earth', '水 Yin Water'
 ]
 
-# Hidden Stems mapping in classical order (matching standard Joey Yap Natal Chart ephemeris)
+# Hidden Stems mapping in classical order (matching standard Joey Yap layout: Main Qi centered & prominent)
 BRANCH_HIDDEN_STEMS_MAP = {
-    0: [{'char': '癸', 'name': 'Gui', 'polarity_elem': '-Water水', 'stem_idx': 9}], # Zi
+    0: [{'char': '癸', 'name': 'Gui', 'polarity_elem': '-Water水', 'stem_idx': 9, 'is_main': True}], # Zi
     1: [
-        {'char': '癸', 'name': 'Gui', 'polarity_elem': '-Water水', 'stem_idx': 9},
-        {'char': '辛', 'name': 'Xin', 'polarity_elem': '-Metal金', 'stem_idx': 7},
-        {'char': '己', 'name': 'Ji', 'polarity_elem': '-Earth土', 'stem_idx': 5}
+        {'char': '辛', 'name': 'Xin', 'polarity_elem': '-Metal金', 'stem_idx': 7, 'is_main': False},
+        {'char': '己', 'name': 'Ji', 'polarity_elem': '-Earth土', 'stem_idx': 5, 'is_main': True},
+        {'char': '癸', 'name': 'Gui', 'polarity_elem': '-Water水', 'stem_idx': 9, 'is_main': False}
     ], # Chou
     2: [
-        {'char': '戊', 'name': 'Wu', 'polarity_elem': '+Earth土', 'stem_idx': 4},
-        {'char': '甲', 'name': 'Jia', 'polarity_elem': '+Wood木', 'stem_idx': 0},
-        {'char': '丙', 'name': 'Bing', 'polarity_elem': '+Fire火', 'stem_idx': 2}
+        {'char': '戊', 'name': 'Wu', 'polarity_elem': '+Earth土', 'stem_idx': 4, 'is_main': False},
+        {'char': '甲', 'name': 'Jia', 'polarity_elem': '+Wood木', 'stem_idx': 0, 'is_main': True},
+        {'char': '丙', 'name': 'Bing', 'polarity_elem': '+Fire火', 'stem_idx': 2, 'is_main': False}
     ], # Yin
-    3: [{'char': '乙', 'name': 'Yi', 'polarity_elem': '-Wood木', 'stem_idx': 1}], # Mao
+    3: [{'char': '乙', 'name': 'Yi', 'polarity_elem': '-Wood木', 'stem_idx': 1, 'is_main': True}], # Mao
     4: [
-        {'char': '乙', 'name': 'Yi', 'polarity_elem': '-Wood木', 'stem_idx': 1},
-        {'char': '癸', 'name': 'Gui', 'polarity_elem': '-Water水', 'stem_idx': 9},
-        {'char': '戊', 'name': 'Wu', 'polarity_elem': '+Earth土', 'stem_idx': 4}
+        {'char': '癸', 'name': 'Gui', 'polarity_elem': '-Water水', 'stem_idx': 9, 'is_main': False},
+        {'char': '戊', 'name': 'Wu', 'polarity_elem': '+Earth土', 'stem_idx': 4, 'is_main': True},
+        {'char': '乙', 'name': 'Yi', 'polarity_elem': '-Wood木', 'stem_idx': 1, 'is_main': False}
     ], # Chen
     5: [
-        {'char': '庚', 'name': 'Geng', 'polarity_elem': '+Metal金', 'stem_idx': 6},
-        {'char': '丙', 'name': 'Bing', 'polarity_elem': '+Fire火', 'stem_idx': 2},
-        {'char': '戊', 'name': 'Wu', 'polarity_elem': '+Earth土', 'stem_idx': 4}
+        {'char': '庚', 'name': 'Geng', 'polarity_elem': '+Metal金', 'stem_idx': 6, 'is_main': False},
+        {'char': '丙', 'name': 'Bing', 'polarity_elem': '+Fire火', 'stem_idx': 2, 'is_main': True},
+        {'char': '戊', 'name': 'Wu', 'polarity_elem': '+Earth土', 'stem_idx': 4, 'is_main': False}
     ], # Si
     6: [
-        {'char': '丁', 'name': 'Ding', 'polarity_elem': '-Fire火', 'stem_idx': 3},
-        {'char': '己', 'name': 'Ji', 'polarity_elem': '-Earth土', 'stem_idx': 5}
+        {'char': '丁', 'name': 'Ding', 'polarity_elem': '-Fire火', 'stem_idx': 3, 'is_main': True},
+        {'char': '己', 'name': 'Ji', 'polarity_elem': '-Earth土', 'stem_idx': 5, 'is_main': False}
     ], # Wu
     7: [
-        {'char': '丁', 'name': 'Ding', 'polarity_elem': '-Fire火', 'stem_idx': 3},
-        {'char': '己', 'name': 'Ji', 'polarity_elem': '-Earth土', 'stem_idx': 5},
-        {'char': '乙', 'name': 'Yi', 'polarity_elem': '-Wood木', 'stem_idx': 1}
+        {'char': '丁', 'name': 'Ding', 'polarity_elem': '-Fire火', 'stem_idx': 3, 'is_main': False},
+        {'char': '己', 'name': 'Ji', 'polarity_elem': '-Earth土', 'stem_idx': 5, 'is_main': True},
+        {'char': '乙', 'name': 'Yi', 'polarity_elem': '-Wood木', 'stem_idx': 1, 'is_main': False}
     ], # Wei
     8: [
-        {'char': '戊', 'name': 'Wu', 'polarity_elem': '+Earth土', 'stem_idx': 4},
-        {'char': '壬', 'name': 'Ren', 'polarity_elem': '+Water水', 'stem_idx': 8},
-        {'char': '庚', 'name': 'Geng', 'polarity_elem': '+Metal金', 'stem_idx': 6}
+        {'char': '戊', 'name': 'Wu', 'polarity_elem': '+Earth土', 'stem_idx': 4, 'is_main': False},
+        {'char': '庚', 'name': 'Geng', 'polarity_elem': '+Metal金', 'stem_idx': 6, 'is_main': True},
+        {'char': '壬', 'name': 'Ren', 'polarity_elem': '+Water水', 'stem_idx': 8, 'is_main': False}
     ], # Shen
-    9: [{'char': '辛', 'name': 'Xin', 'polarity_elem': '-Metal金', 'stem_idx': 7}], # You
+    9: [{'char': '辛', 'name': 'Xin', 'polarity_elem': '-Metal金', 'stem_idx': 7, 'is_main': True}], # You
     10: [
-        {'char': '丁', 'name': 'Ding', 'polarity_elem': '-Fire火', 'stem_idx': 3},
-        {'char': '戊', 'name': 'Wu', 'polarity_elem': '+Earth土', 'stem_idx': 4},
-        {'char': '辛', 'name': 'Xin', 'polarity_elem': '-Metal金', 'stem_idx': 7}
+        {'char': '丁', 'name': 'Ding', 'polarity_elem': '-Fire火', 'stem_idx': 3, 'is_main': False},
+        {'char': '戊', 'name': 'Wu', 'polarity_elem': '+Earth土', 'stem_idx': 4, 'is_main': True},
+        {'char': '辛', 'name': 'Xin', 'polarity_elem': '-Metal金', 'stem_idx': 7, 'is_main': False}
     ], # Xu
     11: [
-        {'char': '壬', 'name': 'Ren', 'polarity_elem': '+Water水', 'stem_idx': 8},
-        {'char': '甲', 'name': 'Jia', 'polarity_elem': '+Wood木', 'stem_idx': 0}
-    ] # Hai: Ren (Main Qi), Jia (Middle Qi)
+        {'char': '壬', 'name': 'Ren', 'polarity_elem': '+Water水', 'stem_idx': 8, 'is_main': True},
+        {'char': '甲', 'name': 'Jia', 'polarity_elem': '+Wood木', 'stem_idx': 0, 'is_main': False}
+    ] # Hai
 }
 
 # Reference Date: 2000-01-01 was Wu Wu (Stem: Wu=4, Branch: Wu=6)
@@ -1135,13 +1135,21 @@ def generate_luck_pillars_html(p: Dict[str, Any], current_year: int = 2026) -> s
             char = hs['char']
             color = get_stem_element_color(char)
             god = get_10_god(dm_stem_idx, hs['stem_idx'])
-            hs_cards.append(f"""<div style="display: flex; flex-direction: column; align-items: center; min-width: 22px; padding: 2px 1px;">
-              <span style="font-size: 13px; font-weight: 900; color: {color}; line-height: 1;">{char}</span>
-              <span style="font-size: 7.5px; color: #94a3b8; line-height: 1; margin-top: 1px;">{hs['name']}</span>
-              <span style="font-size: 7.5px; font-weight: 700; color: #f59e0b; margin-top: 1px;">{god['code']}</span>
+            is_main = hs.get('is_main', False)
+            if is_main:
+                hs_cards.append(f"""<div style="display: flex; flex-direction: column; align-items: center; min-width: 21px; padding: 0 1px;">
+              <span style="font-size: 16px; font-weight: 900; color: {color}; line-height: 1.1;">{char}</span>
+              <span style="font-size: 8px; font-weight: 700; color: #f8fafc; line-height: 1.1; margin-top: 2px;">{hs['name']}</span>
+              <span style="font-size: 8px; font-weight: 800; color: #f59e0b; line-height: 1.1; margin-top: 2px;">{god['code']}</span>
+            </div>""")
+            else:
+                hs_cards.append(f"""<div style="display: flex; flex-direction: column; align-items: center; min-width: 17px; padding: 0 1px; opacity: 0.85;">
+              <span style="font-size: 11px; font-weight: 700; color: {color}; line-height: 1.1;">{char}</span>
+              <span style="font-size: 7px; color: #94a3b8; line-height: 1.1; margin-top: 2px;">{hs['name']}</span>
+              <span style="font-size: 7.5px; font-weight: 700; color: #f59e0b; line-height: 1.1; margin-top: 2px;">{god['code']}</span>
             </div>""")
         html += f"""        <td style="padding: 4px 2px; border-right: 1px solid #334155; vertical-align: top;">
-          <div style="display: flex; justify-content: center; gap: 2px; flex-wrap: wrap;">
+          <div style="display: flex; justify-content: center; align-items: flex-end; gap: 2.5px; flex-wrap: nowrap;">
             {"".join(hs_cards)}
           </div>
         </td>\n"""
@@ -1402,12 +1410,24 @@ def generate_annual_destiny_html(pillars: Dict[str, Any], current_year: int = 20
         god = get_10_god(dm_stem_idx, hs['stem_idx'])
         h_color = get_stem_element_color(hs['char'])
         clean_el = hs['polarity_elem'].replace('水','').replace('木','').replace('火','').replace('土','').replace('金','')
-        hs_cards_html.append(f"""
-                <div style="background: rgba(30, 41, 59, 0.75); border: 1px solid #334155; border-radius: 5px; padding: 5px 2px; flex: 1; text-align: center; min-width: 38px;">
-                  <div style="font-size: 17px; font-weight: 900; color: {h_color}; line-height: 1;">{hs['char']}</div>
+        is_main = hs.get('is_main', False)
+        if is_main:
+            hs_cards_html.append(f"""
+                <div style="background: rgba(30, 41, 59, 0.85); border: 1.5px solid rgba(245, 158, 11, 0.45); border-radius: 5px; padding: 5px 3px; flex: 1.15; text-align: center; min-width: 38px;">
+                  <div style="font-size: 19px; font-weight: 900; color: {h_color}; line-height: 1;">{hs['char']}</div>
                   <div style="font-size: 9.5px; font-weight: 700; color: #f8fafc; margin-top: 1px;">{hs['name']}</div>
-                  <div style="font-size: 8px; color: #94a3b8;">{clean_el}</div>
-                  <div style="font-size: 8.5px; font-weight: 800; color: #fbbf24; margin-top: 3px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 3px; padding: 1px; white-space: nowrap;">
+                  <div style="font-size: 8px; color: #cbd5e1;">{clean_el}</div>
+                  <div style="font-size: 8.5px; font-weight: 800; color: #fbbf24; margin-top: 3px; background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 3px; padding: 1px; white-space: nowrap;">
+                    {god['zh_short']} {god['code']}
+                  </div>
+                </div>""")
+        else:
+            hs_cards_html.append(f"""
+                <div style="background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 5px; padding: 4px 2px; flex: 0.85; text-align: center; min-width: 30px; opacity: 0.88;">
+                  <div style="font-size: 14px; font-weight: 800; color: {h_color}; line-height: 1;">{hs['char']}</div>
+                  <div style="font-size: 8.5px; font-weight: 600; color: #cbd5e1; margin-top: 1px;">{hs['name']}</div>
+                  <div style="font-size: 7.5px; color: #94a3b8;">{clean_el}</div>
+                  <div style="font-size: 8px; font-weight: 700; color: #f59e0b; margin-top: 3px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 3px; padding: 1px; white-space: nowrap;">
                     {god['zh_short']} {god['code']}
                   </div>
                 </div>""")
@@ -1611,7 +1631,7 @@ def generate_annual_destiny_html(pillars: Dict[str, Any], current_year: int = 20
               <div style="font-size: 9.5px; font-weight: 800; color: #fbbf24; margin-bottom: 4px; text-transform: uppercase;">
                 藏干 <span style="font-size: 8.5px; color: #94a3b8; font-weight: normal;">Hidden Stems</span>
               </div>
-              <div style="display: flex; justify-content: center; gap: 4px;">
+              <div style="display: flex; justify-content: center; align-items: flex-end; gap: 4px; flex-wrap: nowrap;">
                 {hs_cards_str}
               </div>
             </td>
@@ -1822,18 +1842,29 @@ def generate_natal_chart_html(p: Dict[str, Any], current_year: int = 2026) -> st
         meta = p[col]
         hs_list = meta['hidden_stems']
         raw_html += """<td style="padding: 12px 8px; border-right: 1px solid #334155; vertical-align: top;">
-  <div style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">"""
+  <div style="display: flex; justify-content: center; align-items: flex-end; gap: 6px; flex-wrap: nowrap;">"""
         for hs in hs_list:
             god = hs['god']
             char = hs['char']
             color = get_stem_element_color(char)
+            is_main = hs.get('is_main', False)
             clean_elem = hs['polarity_elem'].replace('水','').replace('木','').replace('火','').replace('土','').replace('金','')
-            raw_html += f"""<div style="background: rgba(30, 41, 59, 0.6); border: 1px solid #334155; border-radius: 6px; padding: 6px 8px; text-align: center; min-width: 58px; flex: 1; max-width: 80px;">
-  <div style="font-size: 20px; font-weight: 900; color: {color}; line-height: 1;">{char}</div>
-  <div style="font-size: 11px; font-weight: 600; color: #f8fafc; margin-top: 2px;">{hs['name']}</div>
-  <div style="font-size: 10px; color: #94a3b8;">{clean_elem}</div>
-  <div style="font-size: 10px; font-weight: 700; color: #f59e0b; margin-top: 4px; background: rgba(245, 158, 11, 0.1); border-radius: 3px; padding: 1px 3px;">
-    {god['zh_short']} <span style="font-size: 9px; color: #94a3b8;">{god['code']}</span>
+            if is_main:
+                raw_html += f"""<div style="background: rgba(30, 41, 59, 0.85); border: 1.5px solid rgba(245, 158, 11, 0.45); border-radius: 6px; padding: 7px 8px; text-align: center; min-width: 60px; flex: 1.2; max-width: 86px; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+  <div style="font-size: 24px; font-weight: 900; color: {color}; line-height: 1;">{char}</div>
+  <div style="font-size: 11.5px; font-weight: 700; color: #f8fafc; margin-top: 2px;">{hs['name']}</div>
+  <div style="font-size: 10px; color: #cbd5e1;">{clean_elem}</div>
+  <div style="font-size: 10px; font-weight: 800; color: #fbbf24; margin-top: 4px; background: rgba(245, 158, 11, 0.18); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 3px; padding: 1px 3px;">
+    {god['zh_short']} <span style="font-size: 9.5px; color: #cbd5e1;">{god['code']}</span>
+  </div>
+</div>"""
+            else:
+                raw_html += f"""<div style="background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 6px; padding: 5px 6px; text-align: center; min-width: 48px; flex: 0.9; max-width: 70px; opacity: 0.88;">
+  <div style="font-size: 16px; font-weight: 700; color: {color}; line-height: 1;">{char}</div>
+  <div style="font-size: 10px; font-weight: 600; color: #cbd5e1; margin-top: 2px;">{hs['name']}</div>
+  <div style="font-size: 9px; color: #94a3b8;">{clean_elem}</div>
+  <div style="font-size: 9.5px; font-weight: 700; color: #f59e0b; margin-top: 4px; background: rgba(245, 158, 11, 0.1); border-radius: 3px; padding: 1px 3px;">
+    {god['zh_short']} <span style="font-size: 8.5px; color: #94a3b8;">{god['code']}</span>
   </div>
 </div>"""
         raw_html += """</div></td>"""
