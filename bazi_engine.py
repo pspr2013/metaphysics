@@ -1269,15 +1269,29 @@ def get_annual_qimen_palace_year_stars(year: int) -> Dict[int, List[Tuple[str, s
 
 ANNUAL_QIMEN_PALACE_YEAR_STARS_2026 = ANNUAL_QIMEN_PALACE_YEAR_STARS[2026]
 
-def calculate_mobility_directions(bazi_year: int = 1981, gender: str = "Male", target_year: int = 2026) -> List[Tuple[str, str, str, str]]:
+def calculate_mobility_directions(
+    bazi_year: int = 1981,
+    gender: str = "Male",
+    target_year: int = 2026,
+    destiny_palace_num: Optional[int] = None
+) -> List[Tuple[str, str, str, str]]:
     """
     Computes authentic Qi Men Mobility Directions (本命流年奇門出行方)
+    aligned with the user's personal Qi Men Destiny Palace (命宮)
     following the classical Jin Han Yu Jing Nine Stars (金函玉鏡九星) flight:
-    - Annual Flying Star K enters center (e.g. 1 White for 2026, 2 Black for 2025).
-    - Center Star C for the Nine Stars is C = (10 - K) mod 9 (e.g. Star 9 Heavenly Noble in Center for 2026).
-    - The Nine Stars fly forward (順飛) through the Nine Palaces from Center (Palace 5).
-    - The Star in Center (Palace 5) remains internal (not an exit direction).
-    - The 8 perimeter palaces (W, S, SW, N, NW, NE, E, SE) provide the 8 mobility directions.
+    
+    1. 太乙 (Celestial Advisor) [吉]
+    2. 攝提 (Extractor) [凶]
+    3. 軒轅 (Regulus) [平]
+    4. 招搖 (Swagger) [凶]
+    5. 天符 (Heavenly Seal) [凶]
+    6. 青龍 (Green Dragon) [吉]
+    7. 咸池 (Salty Pool) [凶]
+    8. 太陰 (Great Moon) [吉]
+    9. 天乙 (Heavenly Noble) [吉]
+    
+    The Nine Stars fly through the 9 palaces aligned with the personal Life Palace,
+    dynamically shifting with the annual Qi Men energy for target_year.
     """
     display_dirs = [
         ('W', '西', 7),
@@ -1290,17 +1304,22 @@ def calculate_mobility_directions(bazi_year: int = 1981, gender: str = "Male", t
         ('SE', '東南', 4)
     ]
 
-    # Annual Flying Star K (1 White for 2026, 2 Black for 2025, etc.)
-    k = (11 - (target_year % 9)) % 9
-    if k == 0:
-        k = 9
+    if not destiny_palace_num or destiny_palace_num < 1 or destiny_palace_num > 9:
+        rem = (bazi_year - 4) % 9
+        is_male = str(gender).lower().startswith('m')
+        destiny_palace_num = (11 - rem) % 9 if is_male else (rem + 4) % 9
+        if destiny_palace_num == 0 or destiny_palace_num == 5:
+            destiny_palace_num = 2 if is_male else 8
 
-    # Center Star C = (10 - k) (Star 9 Tian Yi enters center for 2026)
-    c = (10 - k) % 9
-    if c == 0:
-        c = 9
+    # Annual offset from base year 2026
+    delta = target_year - 2026
 
-    # The 9 Stars of Jin Han Yu Jing (金函玉鏡九星)
+    # 9-palace forward flight from personal Destiny Palace
+    palace_to_star = {}
+    for s in range(1, 10):
+        p = ((destiny_palace_num - 1 + delta + (s - 1)) % 9) + 1
+        palace_to_star[p] = s
+
     star_catalog = {
         1: ('太乙 Celestial Advisor', 'red'),
         2: ('攝提 Extractor', 'neutral'),
@@ -1315,10 +1334,9 @@ def calculate_mobility_directions(bazi_year: int = 1981, gender: str = "Male", t
 
     results = []
     for code, zh, p in display_dirs:
-        # Forward flight: Star in palace p = (c + p - 5) mod 9
-        s = (c + p - 5) % 9
-        if s == 0:
-            s = 9
+        s = palace_to_star.get(p)
+        if s is None:
+            s = palace_to_star.get(5, 3)
         star_name, star_type = star_catalog[s]
         results.append((code, zh, star_name, star_type))
 
@@ -1647,9 +1665,6 @@ def generate_annual_destiny_html(pillars: Dict[str, Any], current_year: int = 20
         'month': '月支 Month Branch',
         'year': '年支 Year Branch'
     }
-    
-    # Dynamic Mobility Directions for target year
-    mobility_directions = calculate_mobility_directions(birth_year, gender, target_year=current_year)
 
     # Dynamic Annual Qimen for Life Palace
     p_annual = {
@@ -1671,7 +1686,7 @@ def generate_annual_destiny_html(pillars: Dict[str, Any], current_year: int = 20
                     dest_p_num = p_num
                     break
         if not dest_p_num:
-            dest_p_num = 8
+            dest_p_num = 3
                 
         pal_ann = chart_ann['palaces'][dest_p_num]
         qm_stem = f"{pal_ann['heaven_stem']['char']} {pal_ann['heaven_stem']['pinyin']}"
@@ -1680,12 +1695,15 @@ def generate_annual_destiny_html(pillars: Dict[str, Any], current_year: int = 20
         qm_deity = f"{pal_ann['deity']['char']} {pal_ann['deity']['en']}"
         palace_name = f"{PALACES_INFO[dest_p_num]['dir']} ({PALACES_INFO[dest_p_num]['trigram']}宮 {dest_p_num})"
     except Exception:
+        dest_p_num = 3
         qm_stem = "辛 Xin"
         qm_door = "死 Death"
         qm_star = "天柱 Pillar"
         qm_deity = "蛇 Snake"
-        palace_name = "東北 NE (艮宮 8)"
-        dest_p_num = 8
+        palace_name = "東 E (震宮 3)"
+
+    # Dynamic Mobility Directions for target year aligned with Personal Qi Men Life Palace
+    mobility_directions = calculate_mobility_directions(birth_year, gender, target_year=current_year, destiny_palace_num=dest_p_num)
 
     # Door auspicious determination
     is_door_auspicious = any(qm_door.startswith(d) for d in ['開', 'Open', '休', 'Rest', '生', 'Life'])
@@ -2341,17 +2359,24 @@ def generate_natal_chart_markdown(p: Dict[str, Any]) -> str:
 
     birth_year = p.get('birth_year', 1981)
     gender = p.get('gender', 'Male')
-    mob_dirs = calculate_mobility_directions(birth_year, gender)
+    qm_dest = p.get('qimen_destiny', {})
+    dest_p_num = qm_dest.get('palace_num', 3)
+    mob_dirs = calculate_mobility_directions(birth_year, gender, target_year=target_year, destiny_palace_num=dest_p_num)
     mob_line1 = " | ".join([f"**{c} {z}:** {s}" for c, z, s, _ in mob_dirs[:3]])
     mob_line2 = " | ".join([f"**{c} {z}:** {s}" for c, z, s, _ in mob_dirs[3:6]])
     mob_line3 = " | ".join([f"**{c} {z}:** {s}" for c, z, s, _ in mob_dirs[6:]])
 
+    ann_s_idx = (target_year - 4) % 10
+    ann_b_idx = (target_year - 4) % 12
+    ann_p_char = f"{STEM_CHARS[ann_s_idx]}{BRANCH_CHARS[ann_b_idx]}"
+    ann_p_name = f"{STEM_NAMES[ann_s_idx]} {BRANCH_NAMES[ann_b_idx]} ({STEM_ELEMENTS[ann_s_idx]} {BRANCH_ANIMALS[ann_b_idx]})"
+
     md += (
-        "\n### 2026 ANNUAL BAZI STARS 本命八字流年吉凶星 (丙午 Year of the Fire Horse)\n\n"
-        "| 時支 Hour Branch | 日支 Day Branch | 月支 Month Branch | 年支 Year Branch | 2026 Annual Pillar |\n"
+        f"\n### {target_year} ANNUAL BAZI STARS 本命八字流年吉凶星 ({ann_p_char} {ann_p_name})\n\n"
+        f"| 時支 Hour Branch | 日支 Day Branch | 月支 Month Branch | 年支 Year Branch | {target_year} Annual Pillar |\n"
         "| :--- | :--- | :--- | :--- | :--- |\n"
-        f"| {h_ann} | {d_ann} | {m_ann} | {y_ann} | **丙午** Yang Fire Horse<br>Hidden: 丁 己 |\n\n"
-        "### 2026 QIMEN MOBILITY DIRECTIONS 本命流年奇門出行方\n"
+        f"| {h_ann} | {d_ann} | {m_ann} | {y_ann} | **{ann_p_char}** {ann_p_name} |\n\n"
+        f"### {target_year} QIMEN MOBILITY DIRECTIONS 本命流年奇門出行方\n"
         f"- {mob_line1}\n"
         f"- {mob_line2}\n"
         f"- {mob_line3}\n\n"
