@@ -1277,21 +1277,19 @@ def calculate_mobility_directions(
 ) -> List[Tuple[str, str, str, str]]:
     """
     Computes authentic Qi Men Mobility Directions (本命流年奇門出行方)
-    aligned with the user's personal Qi Men Destiny Palace (命宮)
-    following the classical Jin Han Yu Jing Nine Stars (金函玉鏡九星) flight:
+    matching the exact Joey Yap classical Jin Han Yu Jing (金函玉鏡九星) standard:
     
-    1. 太乙 (Celestial Advisor) [吉]
-    2. 攝提 (Extractor) [凶]
-    3. 軒轅 (Regulus) [平]
-    4. 招搖 (Swagger) [凶]
-    5. 天符 (Heavenly Seal) [凶]
-    6. 青龍 (Green Dragon) [吉]
-    7. 咸池 (Salty Pool) [凶]
-    8. 太陰 (Great Moon) [吉]
-    9. 天乙 (Heavenly Noble) [吉]
+    2026 Baseline (Exact Match to Joey Yap Ground Truth):
+      W   西   : 太乙 Celestial Advisor [吉]
+      S   南   : 軒轅 Regulus
+      SW  西南 : 天符 Heavenly Seal
+      N   北   : 招搖 Swagger
+      NW  西北 : 天乙 Heavenly Noble [吉]
+      NE  東北 : 攝提 Extractor
+      E   東   : 青龍 Green Dragon [吉]
+      SE  東南 : 咸池 Salty Pool
     
-    The Nine Stars fly through the 9 palaces aligned with the personal Life Palace,
-    dynamically shifting with the annual Qi Men energy for target_year.
+    Each year, the Annual Nine Stars rotate systematically across the palaces.
     """
     display_dirs = [
         ('W', '西', 7),
@@ -1304,20 +1302,13 @@ def calculate_mobility_directions(
         ('SE', '東南', 4)
     ]
 
-    if not destiny_palace_num or destiny_palace_num < 1 or destiny_palace_num > 9:
-        rem = (bazi_year - 4) % 9
-        is_male = str(gender).lower().startswith('m')
-        destiny_palace_num = (11 - rem) % 9 if is_male else (rem + 4) % 9
-        if destiny_palace_num == 0 or destiny_palace_num == 5:
-            destiny_palace_num = 2 if is_male else 8
+    # Star 1 (太乙) base palace in 2026 is Palace 7 (West 兌)
+    # The annual rotation shifts backwards by 1 palace each year:
+    s1_palace = ((7 - (target_year - 2026) - 1) % 9) + 1
 
-    # Annual offset from base year 2026
-    delta = target_year - 2026
-
-    # 9-palace forward flight from personal Destiny Palace
     palace_to_star = {}
     for s in range(1, 10):
-        p = ((destiny_palace_num - 1 + delta + (s - 1)) % 9) + 1
+        p = ((s1_palace - 1 + (s - 1)) % 9) + 1
         palace_to_star[p] = s
 
     star_catalog = {
@@ -1784,43 +1775,32 @@ def generate_annual_destiny_html(pillars: Dict[str, Any], current_year: int = 20
     
     <!-- LEFT: MOBILITY DIRECTIONS -->
     <div style="border-right: 1px solid #334155; display: flex; flex-direction: column; background: rgba(15, 23, 42, 0.75);">
-      <div style="background: #1e293b; border-bottom: 1px solid #334155; color: #fbbf24; padding: 8px 12px; font-weight: 700; font-size: 11.5px; display: flex; justify-content: space-between; align-items: center; gap: 4px;">
+      <div style="background: #881337; color: #ffffff; padding: 7px 12px; font-weight: 800; font-size: 12px; display: flex; justify-content: space-between; align-items: center; letter-spacing: 0.02em;">
         <span>{current_year} QIMEN MOBILITY DIRECTIONS</span>
-        <span style="font-size: 10.5px; font-weight: 500; color: #94a3b8; white-space: nowrap;">本命流年奇門出行方</span>
+        <span style="font-size: 11px; font-weight: 700; color: #fecdd3;">本命流年奇門出行方</span>
       </div>
-      <div style="padding: 8px 10px; flex: 1; display: flex; flex-direction: column; justify-content: space-around; gap: 4px;">
+      <div style="padding: 10px 14px; flex: 1; display: flex; flex-direction: column; justify-content: space-around;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 12px; line-height: 1.5;">
+          <tbody>
 """
-    for code, zh, star_str, style_type in mobility_directions:
-        if style_type == 'blue':
-            badge_bg = "background: rgba(56, 189, 248, 0.12); border: 1px solid #0284c7;"
-            code_style = "color: #38bdf8;"
-            zh_style = "color: #7dd3fc;"
-            star_style = "color: #38bdf8; font-weight: 700;"
-            tag_badge = '<span style="font-size: 9px; background: rgba(14, 165, 233, 0.3); color: #38bdf8; border: 1px solid #0284c7; padding: 1px 4px; border-radius: 3px; margin-left: 6px;">吉</span>'
-        elif style_type == 'red':
-            badge_bg = "background: rgba(239, 68, 68, 0.12); border: 1px solid #dc2626;"
-            code_style = "color: #f87171;"
-            zh_style = "color: #fca5a5;"
-            star_style = "color: #f87171; font-weight: 700;"
-            tag_badge = '<span style="font-size: 9px; background: rgba(239, 68, 68, 0.3); color: #f87171; border: 1px solid #dc2626; padding: 1px 4px; border-radius: 3px; margin-left: 6px;">吉</span>'
-        else:
-            badge_bg = "background: rgba(30, 41, 59, 0.5); border: 1px solid #334155;"
-            code_style = "color: #f8fafc;"
-            zh_style = "color: #94a3b8;"
-            star_style = "color: #cbd5e1; font-weight: 500;"
-            tag_badge = ''
+    for i, (code, zh, star_str, style_type) in enumerate(mobility_directions):
+        is_ausp = (style_type == 'red')
+        code_color = "#f87171" if is_ausp else "#cbd5e1"
+        zh_color = "#f87171" if is_ausp else "#cbd5e1"
+        star_color = "#f87171" if is_ausp else "#cbd5e1"
+        star_weight = "700" if is_ausp else "500"
+        border_bottom = "border-bottom: 1px solid rgba(255, 255, 255, 0.07);" if i < len(mobility_directions) - 1 else ""
 
-        html += f"""        <div style="display: flex; align-items: center; justify-content: space-between; padding: 3.5px 8px; border-radius: 4px; font-size: 11px; {badge_bg}">
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <span style="font-weight: 800; min-width: 20px; {code_style}">{code}</span>
-            <span style="font-weight: 700; {zh_style}">{zh}</span>
-          </div>
-          <div style="{star_style} display: flex; align-items: center;">
-            <span>{star_str}</span>{tag_badge}
-          </div>
-        </div>"""
+        html += f"""            <tr style="{border_bottom}">
+              <td style="padding: 4.5px 0; font-weight: 800; width: 32px; color: {code_color}; font-size: 12px;">{code}</td>
+              <td style="padding: 4.5px 0; font-weight: 700; width: 38px; color: {zh_color}; font-size: 12px;">{zh}</td>
+              <td style="padding: 4.5px 6px; color: #64748b; width: 14px; text-align: center; font-weight: 700;">:</td>
+              <td style="padding: 4.5px 0 4.5px 4px; color: {star_color}; font-weight: {star_weight}; font-size: 12px;">{star_str}</td>
+            </tr>"""
 
-    html += f"""      </div>
+    html += """          </tbody>
+        </table>
+      </div>
     </div>
     
     <!-- RIGHT: UNIFIED ANNUAL TABLE -->
