@@ -133,7 +133,8 @@ def consult_bazi(req: BaZiRequest):
         birth_time_str=req.birth_time,
         gender=req.gender,
         question=q,
-        client_name=req.client_name or "Client"
+        client_name=req.client_name or "Client",
+        target_year=target_yr
     )
     res = call_gemini(prompt=prompt, skill_key="bazi")
     chart_html = generate_natal_chart_html(pillars, current_year=target_yr) if pillars else ""

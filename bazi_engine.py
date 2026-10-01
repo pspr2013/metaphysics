@@ -1086,6 +1086,119 @@ ANNUAL_BAZI_STARS_2025 = {
     }
 }
 
+ANNUAL_BAZI_STARS_2027 = {
+    0: { # 子 Zi (Rat)
+        'auspicious': [('月德', 'Monthly Virtue'), ('桃花', 'Peach Blossom'), ('咸池', 'Salty Pool')],
+        'inauspicious': [('死符', 'Death Charm'), ('小耗', 'Lesser Consumer'), ('六害', 'Six Harm'), ('劫煞', 'Robbery Sha')]
+    },
+    1: { # 丑 Chou (Ox) - SUI PO
+        'auspicious': [('月空', 'Month Emptiness')],
+        'inauspicious': [('歲破', 'Year Breaker'), ('大耗', 'Greater Consumer'), ('闌杆', 'Obstacle'), ('災煞', 'Calamity Sha'), ('天哭', 'Sky Cry')]
+    },
+    2: { # 寅 Yin (Tiger)
+        'auspicious': [('天喜', 'Sky Happiness'), ('龍德', 'Dragon Virtue'), ('紫微', 'Emperor Star')],
+        'inauspicious': [('暴敗', 'Brutal Defeat'), ('天厄', 'Dark Sky')]
+    },
+    3: { # 卯 Mao (Rabbit) - SAN HE
+        'auspicious': [('將星', 'General Star'), ('天德', 'Heavenly Virtue'), ('福德', 'Fortune Virtue'), ('福星', 'Prosperity Star')],
+        'inauspicious': [('卷舌', 'Curled Tongue'), ('披麻', 'Wear Mourning')]
+    },
+    4: { # 辰 Chen (Dragon)
+        'auspicious': [('八座', 'Eight Seats'), ('天解', 'Sky Relief'), ('解神', 'Relief God')],
+        'inauspicious': [('天狗', 'Heavenly Dog'), ('吊客', 'Condolence Visitor'), ('寡宿', 'Lonesome Star')]
+    },
+    5: { # 巳 Si (Snake) - SKY HORSE
+        'auspicious': [('驛馬', 'Sky Horse'), ('陌越', 'Surpassing Path')],
+        'inauspicious': [('病符', 'Sickness Charm'), ('亡神', 'Death God')]
+    },
+    6: { # 午 Wu (Horse) - SUI HE
+        'auspicious': [('歲合', 'Grand Duke Combination'), ('太陽', 'Sun'), ('祿神', 'Thriving'), ('板鞍', 'Pulling Saddle')],
+        'inauspicious': [('晦氣', 'Bad Qi'), ('天空', 'Sky Emptiness')]
+    },
+    7: { # 未 Wei (Goat) - TAI SUI
+        'auspicious': [('華蓋', 'Elegant Seal')],
+        'inauspicious': [('太歲', 'Tai Sui'), ('劍鋒', 'Sword Edge'), ('伏屍', 'Lying Corpse'), ('黃旛', 'Yellow Flag')]
+    },
+    8: { # 申 Shen (Monkey) - HONG LUAN
+        'auspicious': [('紅鸞', 'Red Matchmaker'), ('金輿', 'Golden Carriage')],
+        'inauspicious': [('喪門', 'Funeral Door'), ('地喪', 'Earth Funeral'), ('披頭', 'Disheveled Hair'), ('孤辰', 'Solitary')]
+    },
+    9: { # 酉 You (Rooster) - NOBLEMAN
+        'auspicious': [('天乙貴人', 'Heavenly Yi Nobleman'), ('太陰', 'Moon')],
+        'inauspicious': [('白虎', 'White Tiger'), ('大煞', 'Great Sha'), ('飛廉', 'Flying Chaste'), ('天雄', 'Sky Warrior')]
+    },
+    10: { # 戌 Xu (Dog)
+        'auspicious': [('三台', 'Three Stages')],
+        'inauspicious': [('五鬼', 'Five Ghosts'), ('官符', 'Official Charm'), ('飛符', 'Flying Charm')]
+    },
+    11: { # 亥 Hai (Pig) - SAN HE & NOBLEMAN
+        'auspicious': [('天乙貴人', 'Heavenly Yi Nobleman'), ('金匱', 'Golden Lock')],
+        'inauspicious': [('貫索', 'Piercing Rope'), ('勾神', 'Hook Spirit'), ('卒暴', 'Great Assembly'), ('六厄', 'Six Calamity')]
+    }
+}
+
+SIX_COMBINATIONS_MAP = {0: 1, 1: 0, 2: 11, 11: 2, 3: 10, 10: 3, 4: 9, 9: 4, 5: 8, 8: 5, 6: 7, 7: 6}
+
+OFFSET_SHEN_SHA_MAP = {
+    0: {'auspicious': [], 'inauspicious': [('太歲', 'Tai Sui'), ('劍鋒', 'Sword Edge'), ('伏屍', 'Lying Corpse'), ('黃旛', 'Yellow Flag')]},
+    1: {'auspicious': [('太陽', 'Sun'), ('板鞍', 'Pulling Saddle')], 'inauspicious': [('晦氣', 'Bad Qi'), ('天空', 'Sky Emptiness')]},
+    2: {'auspicious': [], 'inauspicious': [('喪門', 'Funeral Door'), ('地喪', 'Earth Funeral'), ('披頭', 'Disheveled Hair'), ('孤辰', 'Solitary')]},
+    3: {'auspicious': [('太陰', 'Moon')], 'inauspicious': [('貫索', 'Piercing Rope'), ('勾神', 'Hook Spirit'), ('卒暴', 'Great Assembly'), ('六厄', 'Six Calamity')]},
+    4: {'auspicious': [('三台', 'Three Stages')], 'inauspicious': [('五鬼', 'Five Ghosts'), ('官符', 'Official Charm'), ('飛符', 'Flying Charm')]},
+    5: {'auspicious': [('月德', 'Monthly Virtue')], 'inauspicious': [('死符', 'Death Charm'), ('小耗', 'Lesser Consumer'), ('劫煞', 'Robbery Sha')]},
+    6: {'auspicious': [('月空', 'Month Emptiness')], 'inauspicious': [('歲破', 'Year Breaker'), ('大耗', 'Greater Consumer'), ('闌杆', 'Obstacle'), ('災煞', 'Calamity Sha'), ('天哭', 'Sky Cry')]},
+    7: {'auspicious': [('龍德', 'Dragon Virtue'), ('紫微', 'Emperor Star')], 'inauspicious': [('暴敗', 'Brutal Defeat'), ('天厄', 'Dark Sky')]},
+    8: {'auspicious': [], 'inauspicious': [('白虎', 'White Tiger'), ('大煞', 'Great Sha'), ('飛廉', 'Flying Chaste'), ('天雄', 'Sky Warrior')]},
+    9: {'auspicious': [('天德', 'Heavenly Virtue'), ('福德', 'Fortune Virtue'), ('福星', 'Prosperity Star')], 'inauspicious': [('卷舌', 'Curled Tongue'), ('披麻', 'Wear Mourning')]},
+    10: {'auspicious': [('八座', 'Eight Seats'), ('天解', 'Sky Relief'), ('解神', 'Relief God')], 'inauspicious': [('天狗', 'Heavenly Dog'), ('吊客', 'Condolence Visitor'), ('寡宿', 'Lonesome Star')]},
+    11: {'auspicious': [('陌越', 'Surpassing Path')], 'inauspicious': [('病符', 'Sickness Charm'), ('亡神', 'Death God')]}
+}
+
+def calculate_dynamic_annual_bazi_stars(year: int) -> Dict[int, Dict[str, List[Tuple[str, str]]]]:
+    t_branch = (year - 4) % 12
+    t_stem = (year - 4) % 10
+    stars_by_branch = {}
+    for b in range(12):
+        k = (b - t_branch) % 12
+        base = OFFSET_SHEN_SHA_MAP[k]
+        stars_by_branch[b] = {
+            'auspicious': list(base['auspicious']),
+            'inauspicious': list(base['inauspicious'])
+        }
+    sui_he_b = SIX_COMBINATIONS_MAP.get(t_branch)
+    if sui_he_b is not None:
+        stars_by_branch[sui_he_b]['auspicious'].insert(0, ('歲合', 'Grand Duke Combination'))
+    hong_luan_b = (3 - t_branch) % 12
+    tian_xi_b = (9 - t_branch) % 12
+    stars_by_branch[hong_luan_b]['auspicious'].append(('紅鸞', 'Red Matchmaker'))
+    stars_by_branch[tian_xi_b]['auspicious'].append(('天喜', 'Sky Happiness'))
+    pb_map = {11: 0, 3: 0, 7: 0, 2: 3, 6: 3, 10: 3, 5: 6, 9: 6, 1: 6, 8: 9, 0: 9, 4: 9}
+    pb_b = pb_map[t_branch]
+    stars_by_branch[pb_b]['auspicious'].append(('桃花', 'Peach Blossom'))
+    stars_by_branch[pb_b]['auspicious'].append(('咸池', 'Salty Pool'))
+    sh_map = {11: 5, 3: 5, 7: 5, 2: 8, 6: 8, 10: 8, 5: 11, 9: 11, 1: 11, 8: 2, 0: 2, 4: 2}
+    stars_by_branch[sh_map[t_branch]]['auspicious'].append(('驛馬', 'Sky Horse'))
+    jx_map = {11: 3, 3: 3, 7: 3, 2: 6, 6: 6, 10: 6, 5: 9, 9: 9, 1: 9, 8: 0, 0: 0, 4: 0}
+    hg_map = {11: 7, 3: 7, 7: 7, 2: 10, 6: 10, 10: 10, 5: 1, 9: 1, 1: 1, 8: 4, 0: 4, 4: 4}
+    stars_by_branch[jx_map[t_branch]]['auspicious'].append(('將星', 'General Star'))
+    stars_by_branch[hg_map[t_branch]]['auspicious'].append(('華蓋', 'Elegant Seal'))
+    lu_map = {0: 2, 1: 3, 2: 5, 3: 6, 4: 5, 5: 6, 6: 8, 7: 9, 8: 11, 9: 0}
+    stars_by_branch[lu_map[t_stem]]['auspicious'].append(('祿神', 'Thriving'))
+    ty_map = {0: [1, 7], 1: [0, 8], 2: [9, 11], 3: [9, 11], 4: [1, 7], 5: [0, 8], 6: [1, 7], 7: [2, 6], 8: [3, 5], 9: [3, 5]}
+    for ty_b in ty_map.get(t_stem, []):
+        stars_by_branch[ty_b]['auspicious'].append(('天乙貴人', 'Heavenly Yi Nobleman'))
+    return stars_by_branch
+
+def get_annual_bazi_stars(year: int) -> Dict[int, Dict[str, List[Tuple[str, str]]]]:
+    if year == 2026:
+        return ANNUAL_BAZI_STARS_2026
+    elif year == 2025:
+        return ANNUAL_BAZI_STARS_2025
+    elif year == 2027:
+        return ANNUAL_BAZI_STARS_2027
+    else:
+        return calculate_dynamic_annual_bazi_stars(year)
+
 ANNUAL_QIMEN_PALACE_YEAR_STARS = {
     2025: {
         1: [('天喜', 'Sky Happiness', 'auspicious'), ('死符', 'Death Charm', 'inauspicious')], # North (坎 1)
@@ -1106,8 +1219,54 @@ ANNUAL_QIMEN_PALACE_YEAR_STARS = {
         7: [('太陰', 'Moon', 'auspicious'), ('太極', 'Tai Ji Nobleman', 'auspicious')], # West (兌 7)
         8: [('金匱', 'Golden Lock', 'auspicious'), ('五鬼 官符', 'Five Ghost Litigation', 'inauspicious')], # Northeast (艮 8)
         9: [('太歲', 'Grand Duke', 'auspicious'), ('將星', 'General Star', 'auspicious')] # South (離 9)
+    },
+    2027: {
+        1: [('桃花', 'Peach Blossom', 'auspicious'), ('死符', 'Death Charm', 'inauspicious')], # North (坎 1 - Zi)
+        2: [('太歲', 'Grand Duke', 'auspicious'), ('華蓋', 'Elegant Seal', 'auspicious'), ('紅鸞', 'Red Matchmaker', 'auspicious')], # Southwest (坤 2 - Wei/Shen)
+        3: [('將星', 'General Star', 'auspicious'), ('天德', 'Heavenly Virtue', 'auspicious'), ('福德', 'Fortune Virtue', 'auspicious')], # East (震 3 - Mao)
+        4: [('驛馬', 'Sky Horse', 'auspicious'), ('天解', 'Sky Relief', 'auspicious')], # Southeast (巽 4 - Chen/Si)
+        6: [('天乙', 'Heavenly Yi', 'auspicious'), ('月德', 'Monthly Virtue', 'auspicious')], # Northwest (乾 6 - Xu/Hai)
+        7: [('天乙', 'Heavenly Yi', 'auspicious'), ('太陰', 'Moon', 'auspicious')], # West (兌 7 - You)
+        8: [('歲破', 'Year Breaker', 'inauspicious'), ('大耗', 'Greater Consumer', 'inauspicious'), ('天喜', 'Sky Happiness', 'auspicious'), ('龍德', 'Dragon Virtue', 'auspicious')], # Northeast (艮 8 - Chou/Yin)
+        9: [('歲合', 'Grand Duke Combination', 'auspicious'), ('太陽', 'Sun', 'auspicious'), ('祿神', 'Thriving', 'auspicious')] # South (離 9 - Wu)
+    },
+    2028: {
+        1: [('將星', 'General Star', 'auspicious'), ('天喜', 'Sky Happiness', 'auspicious')],
+        2: [('太歲', 'Grand Duke', 'auspicious'), ('紅鸞', 'Red Matchmaker', 'auspicious')],
+        3: [('歲破', 'Year Breaker', 'inauspicious'), ('大耗', 'Greater Consumer', 'inauspicious')],
+        4: [('歲合', 'Grand Duke Combination', 'auspicious'), ('華蓋', 'Elegant Seal', 'auspicious')],
+        6: [('天德', 'Heavenly Virtue', 'auspicious'), ('福星', 'Fortune Star', 'auspicious')],
+        7: [('桃花', 'Peach Blossom', 'auspicious'), ('太極', 'Tai Ji Nobleman', 'auspicious')],
+        8: [('驛馬', 'Sky Horse', 'auspicious'), ('歲破', 'Year Breaker', 'inauspicious')],
+        9: [('天乙', 'Heavenly Yi', 'auspicious'), ('太陽', 'Sun', 'auspicious')]
+    },
+    2029: {
+        1: [('天喜', 'Sky Happiness', 'auspicious'), ('月德', 'Monthly Virtue', 'auspicious')],
+        2: [('天乙', 'Heavenly Yi', 'auspicious'), ('金輿', 'Golden Carriage', 'auspicious')],
+        3: [('歲破', 'Year Breaker', 'inauspicious'), ('大耗', 'Greater Consumer', 'inauspicious')],
+        4: [('歲合', 'Grand Duke Combination', 'auspicious'), ('太陽', 'Sun', 'auspicious')],
+        6: [('驛馬', 'Sky Horse', 'auspicious'), ('天解', 'Sky Relief', 'auspicious')],
+        7: [('太歲', 'Grand Duke', 'auspicious'), ('將星', 'General Star', 'auspicious')],
+        8: [('華蓋', 'Elegant Seal', 'auspicious'), ('龍德', 'Dragon Virtue', 'auspicious')],
+        9: [('紅鸞', 'Red Matchmaker', 'auspicious'), ('桃花', 'Peach Blossom', 'auspicious')]
+    },
+    2030: {
+        1: [('天德', 'Heavenly Virtue', 'auspicious'), ('福德', 'Fortune Virtue', 'auspicious')],
+        2: [('驛馬', 'Sky Horse', 'auspicious'), ('三台', 'Three Stages', 'auspicious')],
+        3: [('歲合', 'Grand Duke Combination', 'auspicious'), ('桃花', 'Peach Blossom', 'auspicious')],
+        4: [('歲破', 'Year Breaker', 'inauspicious'), ('大耗', 'Greater Consumer', 'inauspicious'), ('紅鸞', 'Red Matchmaker', 'auspicious')],
+        6: [('太歲', 'Grand Duke', 'auspicious'), ('華蓋', 'Elegant Seal', 'auspicious'), ('天喜', 'Sky Happiness', 'auspicious')],
+        7: [('月德', 'Monthly Virtue', 'auspicious'), ('八座', 'Eight Seats', 'auspicious')],
+        8: [('天乙', 'Heavenly Yi', 'auspicious'), ('太陽', 'Sun', 'auspicious')],
+        9: [('將星', 'General Star', 'auspicious'), ('金匱', 'Golden Lock', 'auspicious')]
     }
 }
+
+def get_annual_qimen_palace_year_stars(year: int) -> Dict[int, List[Tuple[str, str, str]]]:
+    if year in ANNUAL_QIMEN_PALACE_YEAR_STARS:
+        return ANNUAL_QIMEN_PALACE_YEAR_STARS[year]
+    return ANNUAL_QIMEN_PALACE_YEAR_STARS[2026]
+
 ANNUAL_QIMEN_PALACE_YEAR_STARS_2026 = ANNUAL_QIMEN_PALACE_YEAR_STARS[2026]
 
 def calculate_mobility_directions(bazi_year: int = 1981, gender: str = "Male", target_year: int = 2026) -> List[Tuple[str, str, str, str]]:
@@ -1543,7 +1702,7 @@ def generate_annual_destiny_html(pillars: Dict[str, Any], current_year: int = 20
     star_badge = '<div style="font-size: 8.5px; color: #fbbf24; font-weight: 700; margin-top: 1px;">★ 吉星 Auspicious</div>' if is_star_auspicious else ''
 
     # Qi Men Palace Year Stars
-    year_stars_dict = ANNUAL_QIMEN_PALACE_YEAR_STARS.get(current_year, ANNUAL_QIMEN_PALACE_YEAR_STARS.get(2026, {}))
+    year_stars_dict = get_annual_qimen_palace_year_stars(current_year)
     palace_year_stars = year_stars_dict.get(dest_p_num, [])
     if palace_year_stars:
         stars_inner_html = "".join([
@@ -1561,7 +1720,7 @@ def generate_annual_destiny_html(pillars: Dict[str, Any], current_year: int = 20
         </div>"""
 
     # Annual BaZi Stars dict
-    ann_bazi_stars_dict = ANNUAL_BAZI_STARS_2025 if current_year == 2025 else ANNUAL_BAZI_STARS_2026
+    ann_bazi_stars_dict = get_annual_bazi_stars(current_year)
 
     # Format Hidden Stems Cards
     hs_cards_html = []
@@ -2163,8 +2322,11 @@ def generate_natal_chart_markdown(p: Dict[str, Any]) -> str:
         f"* **Qi Men Destiny Palace (奇門命宮):** {p.get('qimen_destiny', {}).get('palace', '-')} | **Life Stem (命干):** {p.get('qimen_destiny', {}).get('stem', '-')} | **Door (門):** {p.get('qimen_destiny', {}).get('door', '-')} | **Star (星):** {p.get('qimen_destiny', {}).get('star', '-')} | **Guardian (神):** {p.get('qimen_destiny', {}).get('guardian', '-')}\n"
     )
 
+    target_year = p.get('current_year', datetime.now().year)
+    ann_stars_map = get_annual_bazi_stars(target_year)
+
     def format_ann_stars(b_idx: int) -> str:
-        info = ANNUAL_BAZI_STARS_2026.get(b_idx, {'auspicious': [], 'inauspicious': []})
+        info = ann_stars_map.get(b_idx, {'auspicious': [], 'inauspicious': []})
         ausp_str = ", ".join([f"{zh} {en}" for zh, en in info['auspicious']])
         inausp_str = ", ".join([f"{zh} {en}" for zh, en in info['inauspicious']])
         parts = []
@@ -2196,7 +2358,7 @@ def generate_natal_chart_markdown(p: Dict[str, Any]) -> str:
     )
     return md
 
-def build_grounded_bazi_prompt(birth_date_str: str, birth_time_str: str, gender: str, question: str, client_name: str = "Client") -> Tuple[str, Optional[Dict[str, Any]]]:
+def build_grounded_bazi_prompt(birth_date_str: str, birth_time_str: str, gender: str, question: str, client_name: str = "Client", target_year: Optional[int] = None) -> Tuple[str, Optional[Dict[str, Any]]]:
     """
     Computes exact astronomical pillars, formats prompt, and returns (prompt, pillars_dict).
     """
@@ -2211,7 +2373,12 @@ def build_grounded_bazi_prompt(birth_date_str: str, birth_time_str: str, gender:
             gender = "Male"
 
     if year and month and day:
+        if not target_year:
+            m_yr = re.search(r'\b(202[4-9]|203[0-5])\b', question)
+            target_year = int(m_yr.group(1)) if m_yr else 2026
+
         pillars = calculate_four_pillars(year, month, day, hour, minute, gender=gender, client_name=client_name)
+        pillars['current_year'] = target_year
         d = pillars['day']
         y = pillars['year']
         m = pillars['month']
