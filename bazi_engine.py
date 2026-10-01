@@ -2322,7 +2322,7 @@ def generate_natal_chart_markdown(p: Dict[str, Any]) -> str:
         f"* **Qi Men Destiny Palace (奇門命宮):** {p.get('qimen_destiny', {}).get('palace', '-')} | **Life Stem (命干):** {p.get('qimen_destiny', {}).get('stem', '-')} | **Door (門):** {p.get('qimen_destiny', {}).get('door', '-')} | **Star (星):** {p.get('qimen_destiny', {}).get('star', '-')} | **Guardian (神):** {p.get('qimen_destiny', {}).get('guardian', '-')}\n"
     )
 
-    target_year = p.get('current_year', datetime.now().year)
+    target_year = int(p.get('current_year') or 2026)
     ann_stars_map = get_annual_bazi_stars(target_year)
 
     def format_ann_stars(b_idx: int) -> str:

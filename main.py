@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
@@ -124,21 +124,25 @@ def consult(req: ConsultRequest):
 
 @app.post("/api/bazi")
 def consult_bazi(req: BaZiRequest):
-    target_yr = req.target_year or 2026
-    q = req.question or "Provide a comprehensive BaZi reading and 10 Gods quality evaluation."
-    if str(target_yr) not in q:
-        q = f"{q} (Annual Analysis Target Year: {target_yr})"
-    prompt, pillars = build_grounded_bazi_prompt(
-        birth_date_str=req.birth_date,
-        birth_time_str=req.birth_time,
-        gender=req.gender,
-        question=q,
-        client_name=req.client_name or "Client",
-        target_year=target_yr
-    )
-    res = call_gemini(prompt=prompt, skill_key="bazi")
-    chart_html = generate_natal_chart_html(pillars, current_year=target_yr) if pillars else ""
-    return {"skill": "bazi", "chart_html": chart_html, "result": res}
+    try:
+        target_yr = int(req.target_year) if req.target_year else 2026
+        q = req.question or "Provide a comprehensive BaZi reading and 10 Gods quality evaluation."
+        if str(target_yr) not in q:
+            q = f"{q} (Annual Analysis Target Year: {target_yr})"
+        prompt, pillars = build_grounded_bazi_prompt(
+            birth_date_str=req.birth_date,
+            birth_time_str=req.birth_time,
+            gender=req.gender,
+            question=q,
+            client_name=req.client_name or "Client",
+            target_year=target_yr
+        )
+        res = call_gemini(prompt=prompt, skill_key="bazi")
+        chart_html = generate_natal_chart_html(pillars, current_year=target_yr) if pillars else ""
+        return {"skill": "bazi", "chart_html": chart_html, "result": res}
+    except Exception as e:
+        logger.error(f"Error in consult_bazi: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/fengshui")
 def consult_fengshui(req: FengShuiRequest):
