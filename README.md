@@ -1,12 +1,11 @@
 # Classical Chinese Metaphysics & QiMen Suite (Zhi Run Fa Engine)
 
-A unified, production-ready Web Application (FastAPI + HTML Dashboard) and interactive Telegram Bot that integrates all 5 classical Chinese Metaphysics frameworks based on Phann Sophearith's authentic reference curriculum:
+A unified, production-ready Web Application (FastAPI + HTML Dashboard) and interactive Telegram Bot that integrates all 4 classical Chinese Metaphysics frameworks based on Phann Sophearith's authentic reference curriculum:
 
 1. **BaZi Reading & Destiny Analysis (PSPR)** (`/api/bazi`, `/bazi`)
 2. **Classical Feng Shui Homebuyer & Property Audit** (`/api/fengshui`, `/fengshui`)
 3. **Qi Men Dun Jia Feng Shui (Zhi Run Fa)** (`/api/qimen-fengshui`, `/qimen_fs`)
 4. **Qi Men Date Selection & Directional Activation (Zhi Run Fa)** (`/api/qimen-date`, `/qimen_date`)
-5. **Ten Thousand Year Calendar Ephemeris** (`/api/calendar`, `/calendar`)
 
 ---
 
@@ -26,8 +25,7 @@ metaphysics_app/
 │   ├── bazi_reading.md              # Phann Sophearith BaZi PSPR framework
 │   ├── fengshui_audit.md            # Feng Shui for Homebuyers (Exterior & Interior)
 │   ├── qimen_fengshui.md            # 13 household sectors & Zhi Run Fa Hour Chart
-│   ├── qimen_date_selection.md      # Date selection, BaZi clash filters & Qi Men
-│   └── ten_thousand_calendar.md     # Solar terms, 60 Jia Zi & ephemeris
+│   └── qimen_date_selection.md      # Date selection, BaZi clash filters & Qi Men
 ├── config.py                        # Environment & prompt loader
 ├── gemini_engine.py                 # Direct Gemini API integration (urllib / zero-dependency)
 ├── main.py                          # FastAPI REST API + HTML Dashboard + Webhook
@@ -108,20 +106,18 @@ sudo journalctl -u metaphysics_suite -f
 | `/qimen_fs` | Qi Men Feng Shui audit & forecasting | `/qimen_fs Period 8, Facing South Li, Door at Xu NW1` |
 | `/bazi` | Four Pillars & 10 Gods PSPR | `/bazi 1988-08-08 09:30 Male Career & wealth potential` |
 | `/fengshui` | Classical landforms & 9 Palaces | `/fengshui Period 8 Facing East Door at SE` |
-| `/calendar` | Ephemeris & 60 Jia Zi conversion | `/calendar Convert 2026-10-15 14:00 to 4 Pillars` |
 
 ---
 
 ## 📡 REST API Endpoints
 - `GET /`: Interactive web interface
 - `GET /health`: Health status & loaded skills
-- `GET /api/skills`: Metadata for all 5 skills
+- `GET /api/skills`: Metadata for all 4 skills
 - `POST /api/consult`: Universal consultation (`{"skill_id": "...", "query": "..."}`)
 - `POST /api/qimen-date`: Dedicated Qi Men date selection
 - `POST /api/qimen-fengshui`: Dedicated Qi Men Feng Shui audit
 - `POST /api/bazi`: Dedicated BaZi chart analysis
 - `POST /api/fengshui`: Dedicated Feng Shui property audit
-- `POST /api/calendar`: Dedicated 10K calendar conversion
 - `POST /api/telegram/webhook`: Webhook endpoint for Telegram updates
 - `GET /api/telegram-set-webhook`: Helper to activate Telegram webhook (`?url=...`)
 - `GET /api/telegram-delete-webhook`: Helper to revert Telegram bot to polling

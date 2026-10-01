@@ -17,7 +17,7 @@ logger = logging.getLogger("metaphysics_app")
 
 app = FastAPI(
     title="Classical Chinese Metaphysics & QiMen Suite (Zhi Run Fa)",
-    description="Unified API & Web Suite integrating Classical BaZi, Feng Shui, Qi Men Dun Jia (Zhi Run Fa), and Calendar ephemeris.",
+    description="Unified API & Web Suite integrating Classical BaZi, Feng Shui, and Qi Men Dun Jia (Zhi Run Fa).",
     version="1.0.0"
 )
 
@@ -104,12 +104,23 @@ def get_skills():
 
 @app.post("/api/consult")
 def consult(req: ConsultRequest):
+    prompt_to_send = req.query
+    skill_key = req.skill_id
+
+    from bazi_engine import parse_date_and_time
+    y, m, d, _, _ = parse_date_and_time(req.query, req.context)
+    if y and m and d:
+        combined_text = f"{req.query} {req.context or ''}"
+        prompt_to_send, _ = build_grounded_bazi_prompt(combined_text, combined_text, "Unspecified", req.query)
+        if not skill_key:
+            skill_key = "bazi"
+
     response_text = call_gemini(
-        prompt=req.query,
-        skill_key=req.skill_id,
+        prompt=prompt_to_send,
+        skill_key=skill_key,
         user_context=req.context
     )
-    return {"skill_id": req.skill_id, "response": response_text}
+    return {"skill_id": skill_key or req.skill_id, "response": response_text}
 
 @app.post("/api/bazi")
 def consult_bazi(req: BaZiRequest):
@@ -164,10 +175,6 @@ def consult_qimen_date(req: QiMenDateRequest):
     res = call_gemini(prompt=prompt, skill_key="qimen_date")
     return {"skill": "qimen_date", "result": res}
 
-@app.post("/api/calendar")
-def consult_calendar(req: ConsultRequest):
-    res = call_gemini(prompt=req.query, skill_key="calendar")
-    return {"skill": "calendar", "result": res}
 
 
 
@@ -379,7 +386,7 @@ def index():
   <div class="container">
     <header>
       <h1>Classical Chinese Metaphysics Suite</h1>
-      <p class="sub">Classical Chinese Metaphysics — BaZi, Feng Shui, Qi Men Dun Jia & Ephemeris Engine</p>
+      <p class="sub">Classical Chinese Metaphysics — BaZi, Feng Shui & Qi Men Dun Jia Suite</p>
       <span class="badge">Qi Men Engine: Zhi Run Fa (置閏法)</span>
     </header>
 
@@ -388,7 +395,6 @@ def index():
       <button class="tab-btn" onclick="switchTab('qimen_fs', this)">🧭 Qi Men Feng Shui</button>
       <button class="tab-btn" onclick="switchTab('bazi', this)">🔮 BaZi Reading</button>
       <button class="tab-btn" onclick="switchTab('fengshui', this)">🏡 Feng Shui Audit</button>
-      <button class="tab-btn" onclick="switchTab('calendar', this)">📜 10K Calendar</button>
     </div>
 
     <!-- Qi Men Date Selection Form -->
@@ -444,7 +450,7 @@ def index():
         <input type="text" id="bz-name" placeholder="Enter client name">
       </div>
       <div class="form-group">
-        <label>Birth Date (MM/DD/YYYY)</label>
+        <label>Birth Date</label>
         <input type="date" id="bz-date">
       </div>
       <div class="form-group">
@@ -498,15 +504,6 @@ def index():
       <button class="submit-btn" onclick="submitFengShui()">Perform Audit</button>
     </div>
 
-    <!-- Calendar Form -->
-    <div id="panel-calendar" class="card tab-panel" style="display:none;">
-      <h3 style="margin-bottom: 15px; color: #f59e0b;">Ten Thousand Year Calendar Ephemeris</h3>
-      <div class="form-group">
-        <label>Calendar Calculation Query</label>
-        <textarea id="cal-query" rows="4" placeholder="e.g. Convert 1988-08-08 14:30 to 4 Pillars, identify Solar Term, and calculate 24 Mountain bearings."></textarea>
-      </div>
-      <button class="submit-btn" onclick="submitCalendar()">Calculate Ephemeris</button>
-    </div>
 
     <div id="loading" class="loading">Consulting Chinese Metaphysics Engine... Please wait.</div>
 
@@ -672,11 +669,7 @@ def index():
       });
     }
 
-    function submitCalendar() {
-      sendRequest('/api/calendar', {
-        query: document.getElementById('cal-query').value
-      });
-    }
+
   </script>
 </body>
 </html>

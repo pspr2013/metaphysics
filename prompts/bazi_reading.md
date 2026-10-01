@@ -25,6 +25,24 @@ Use this skill when the user:
 
 ## 1. Calculation Workflow
 
+### CRITICAL MANDATORY GROUNDING RULE:
+1. **Pre-computed Ephemeris Ground Truth**: When pre-computed astronomical Four Pillars or Natal Chart tables are provided in the prompt, you MUST adopt those EXACT pillars, Heavenly Stems, Earthly Branches, Day Master, Hidden Stems, 10 Gods, 12 Growth Phases, and Na Yin Elements without altering, recalculating, or guessing.
+2. **Never Hallucinate Day Pillars**: Day Pillars CANNOT be estimated by rough heuristics or mental math; they follow an unbroken 60-day astronomical sequence. Never replace a calculated Day Pillar with an ungrounded guess (e.g. NEVER replace 壬子 Ren Zi with 甲午 Jia Wu or 辛卯 Xin Mao).
+3. **Reference Ground Truth Benchmark**:
+   - **Birth Data**: June 3, 1981 (`1981-06-03`) at 13:30 (1:30 PM), Male (Yin Male 陰男).
+   - **Year Pillar**: **Xin You (辛酉)** Yin Metal Rooster | Ten God: Direct Resource (正印 DR) | 12 Growth: Bath / Desire (沐浴) | Na Yin: Pomegranate Wood (石榴木).
+   - **Month Pillar**: **Gui Si (癸巳)** Yin Water Snake | Ten God: Rob Wealth (劫財 RW) | 12 Growth: Extinction (絕) | Na Yin: Long Stream Water (長流水).
+   - **Day Pillar**: **Ren Zi (壬子)** Yang Water Rat | Day Master: **Ren (壬) Yang Water** sitting on **Zi (子) Rat** | 12 Growth: Prosperity / Peak (帝旺) | Na Yin: Mulberry Wood (桑柘木). (NEVER alter to Jia Wu 甲午 or Xin Mao 辛卯!)
+   - **Hour Pillar**: **Ding Wei (丁未)** Yin Fire Goat | Ten God: Direct Wealth (正財 DW) | 12 Growth: Nourishing (養) | Na Yin: Heavenly River Water (天河水). (NEVER alter to Xin Wei 辛未 or Yi Wei 乙未!)
+   - **Hidden Stems**:
+     - Year (酉): 辛 Xin (-Metal金, 印 DR)
+     - Month (巳): 庚 Geng (+Metal金, 偏印 PIR), 丙 Bing (+Fire火, 偏財 PIW), 戊 Wu (+Earth土, 七殺 7K)
+     - Day (子): 癸 Gui (-Water水, 劫 RW)
+     - Hour (未): 丁 Ding (-Fire火, 財 DW), 己 Ji (-Earth土, 官 DO), 乙 Yi (-Wood木, 傷 HO)
+   - **Auxiliary Stars**: Noble People (巳 Snake, 卯 Rabbit), Intelligence (文昌: 寅 Tiger), Peach Blossom (桃花: 酉 Rooster), Sky Horse (驛馬: 寅 Tiger), Solitary (孤辰: 寅 Tiger), Life Palace (命宮: 壬辰 Yang Water Dragon), Conception Palace (胎元: 甲申 Yang Wood Monkey).
+   - **Qi Men Destiny Palace**: East (東 E, Palace 3 Zhen) | Life Stem: 壬 Ren | Door: 開 Open | Star: 天蓬 Grass | Guardian: 符 Chief.
+   - **Life Star**: 1 White 一白星命 Water 水 | Feng Shui Gua: 坎 Kan North.
+
 Follow this sequence to formulate a chart with precision:
 
 1. Confirm birth data: Gregorian birth date (year, month, day), birth hour (converted to local solar time), and gender.

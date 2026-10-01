@@ -87,6 +87,138 @@ REF_STEM_IDX = 4
 REF_BRANCH_IDX = 6
 
 # ==========================================
+# 60 JIA ZI NA YIN (納音五行) & 12 GROWTH PHASES (十二長生)
+# ==========================================
+
+NA_YIN_MAP: Dict[Tuple[int, int], Dict[str, str]] = {
+    # 甲子, 乙丑 -> 海中金
+    (0, 0): {'zh': '海中金', 'en': 'Sea Metal', 'elem': 'Metal', 'full': 'Sea Metal (海中金)'},
+    (1, 1): {'zh': '海中金', 'en': 'Sea Metal', 'elem': 'Metal', 'full': 'Sea Metal (海中金)'},
+    # 丙寅, 丁卯 -> 爐中火
+    (2, 2): {'zh': '爐中火', 'en': 'Furnace Fire', 'elem': 'Fire', 'full': 'Furnace Fire (爐中火)'},
+    (3, 3): {'zh': '爐中火', 'en': 'Furnace Fire', 'elem': 'Fire', 'full': 'Furnace Fire (爐中火)'},
+    # 戊辰, 己巳 -> 大林木
+    (4, 4): {'zh': '大林木', 'en': 'Great Forest Wood', 'elem': 'Wood', 'full': 'Great Forest Wood (大林木)'},
+    (5, 5): {'zh': '大林木', 'en': 'Great Forest Wood', 'elem': 'Wood', 'full': 'Great Forest Wood (大林木)'},
+    # 庚午, 辛未 -> 路旁土
+    (6, 6): {'zh': '路旁土', 'en': 'Roadside Earth', 'elem': 'Earth', 'full': 'Roadside Earth (路旁土)'},
+    (7, 7): {'zh': '路旁土', 'en': 'Roadside Earth', 'elem': 'Earth', 'full': 'Roadside Earth (路旁土)'},
+    # 壬申, 癸酉 -> 劍鋒金
+    (8, 8): {'zh': '劍鋒金', 'en': 'Sword Edge Metal', 'elem': 'Metal', 'full': 'Sword Edge Metal (劍鋒金)'},
+    (9, 9): {'zh': '劍鋒金', 'en': 'Sword Edge Metal', 'elem': 'Metal', 'full': 'Sword Edge Metal (劍鋒金)'},
+    # 甲戌, 乙亥 -> 山頭火
+    (0, 10): {'zh': '山頭火', 'en': 'Mountaintop Fire', 'elem': 'Fire', 'full': 'Mountaintop Fire (山頭火)'},
+    (1, 11): {'zh': '山頭火', 'en': 'Mountaintop Fire', 'elem': 'Fire', 'full': 'Mountaintop Fire (山頭火)'},
+    # 丙子, 丁丑 -> 澗下水
+    (2, 0): {'zh': '澗下水', 'en': 'Mountain Stream Water', 'elem': 'Water', 'full': 'Mountain Stream Water (澗下水)'},
+    (3, 1): {'zh': '澗下水', 'en': 'Mountain Stream Water', 'elem': 'Water', 'full': 'Mountain Stream Water (澗下水)'},
+    # 戊寅, 己卯 -> 城頭土
+    (4, 2): {'zh': '城頭土', 'en': 'City Wall Earth', 'elem': 'Earth', 'full': 'City Wall Earth (城頭土)'},
+    (5, 3): {'zh': '城頭土', 'en': 'City Wall Earth', 'elem': 'Earth', 'full': 'City Wall Earth (城頭土)'},
+    # 庚辰, 辛巳 -> 白蠟金
+    (6, 4): {'zh': '白蠟金', 'en': 'White Wax Metal', 'elem': 'Metal', 'full': 'White Wax Metal (白蠟金)'},
+    (7, 5): {'zh': '白蠟金', 'en': 'White Wax Metal', 'elem': 'Metal', 'full': 'White Wax Metal (白蠟金)'},
+    # 壬午, 癸未 -> 楊柳木
+    (8, 6): {'zh': '楊柳木', 'en': 'Willow Wood', 'elem': 'Wood', 'full': 'Willow Wood (楊柳木)'},
+    (9, 7): {'zh': '楊柳木', 'en': 'Willow Wood', 'elem': 'Wood', 'full': 'Willow Wood (楊柳木)'},
+    # 甲申, 乙酉 -> 泉中水
+    (0, 8): {'zh': '泉中水', 'en': 'Spring Water', 'elem': 'Water', 'full': 'Spring Water (泉中水)'},
+    (1, 9): {'zh': '泉中水', 'en': 'Spring Water', 'elem': 'Water', 'full': 'Spring Water (泉中水)'},
+    # 丙戌, 丁亥 -> 屋上土
+    (2, 10): {'zh': '屋上土', 'en': 'Roof Top Earth', 'elem': 'Earth', 'full': 'Roof Top Earth (屋上土)'},
+    (3, 11): {'zh': '屋上土', 'en': 'Roof Top Earth', 'elem': 'Earth', 'full': 'Roof Top Earth (屋上土)'},
+    # 戊子, 己丑 -> 霹靂火
+    (4, 0): {'zh': '霹靂火', 'en': 'Thunder Fire', 'elem': 'Fire', 'full': 'Thunder Fire (霹靂火)'},
+    (5, 1): {'zh': '霹靂火', 'en': 'Thunder Fire', 'elem': 'Fire', 'full': 'Thunder Fire (霹靂火)'},
+    # 庚寅, 辛卯 -> 松柏木
+    (6, 2): {'zh': '松柏木', 'en': 'Pine and Cypress Wood', 'elem': 'Wood', 'full': 'Pine and Cypress Wood (松柏木)'},
+    (7, 3): {'zh': '松柏木', 'en': 'Pine and Cypress Wood', 'elem': 'Wood', 'full': 'Pine and Cypress Wood (松柏木)'},
+    # 壬辰, 癸巳 -> 長流水
+    (8, 4): {'zh': '長流水', 'en': 'Long Stream Water', 'elem': 'Water', 'full': 'Long Stream Water (長流水)'},
+    (9, 5): {'zh': '長流水', 'en': 'Long Stream Water', 'elem': 'Water', 'full': 'Long Stream Water (長流水)'},
+    # 甲午, 乙未 -> 沙中金
+    (0, 6): {'zh': '沙中金', 'en': 'Sand Gold', 'elem': 'Metal', 'full': 'Sand Gold (沙中金)'},
+    (1, 7): {'zh': '沙中金', 'en': 'Sand Gold', 'elem': 'Metal', 'full': 'Sand Gold (沙中金)'},
+    # 丙申, 丁酉 -> 山下火
+    (2, 8): {'zh': '山下火', 'en': 'Foot of Mountain Fire', 'elem': 'Fire', 'full': 'Foot of Mountain Fire (山下火)'},
+    (3, 9): {'zh': '山下火', 'en': 'Foot of Mountain Fire', 'elem': 'Fire', 'full': 'Foot of Mountain Fire (山下火)'},
+    # 戊戌, 己亥 -> 平地木
+    (4, 10): {'zh': '平地木', 'en': 'Flatland Wood', 'elem': 'Wood', 'full': 'Flatland Wood (平地木)'},
+    (5, 11): {'zh': '平地木', 'en': 'Flatland Wood', 'elem': 'Wood', 'full': 'Flatland Wood (平地木)'},
+    # 庚子, 辛丑 -> 壁上土
+    (6, 0): {'zh': '壁上土', 'en': 'Wall Earth', 'elem': 'Earth', 'full': 'Wall Earth (壁上土)'},
+    (7, 1): {'zh': '壁上土', 'en': 'Wall Earth', 'elem': 'Earth', 'full': 'Wall Earth (壁上土)'},
+    # 壬寅, 癸卯 -> 金箔金
+    (8, 2): {'zh': '金箔金', 'en': 'Gold Foil Metal', 'elem': 'Metal', 'full': 'Gold Foil Metal (金箔金)'},
+    (9, 3): {'zh': '金箔金', 'en': 'Gold Foil Metal', 'elem': 'Metal', 'full': 'Gold Foil Metal (金箔金)'},
+    # 甲辰, 乙巳 -> 覆燈火
+    (0, 4): {'zh': '覆燈火', 'en': 'Lamp Fire', 'elem': 'Fire', 'full': 'Lamp Fire (覆燈火)'},
+    (1, 5): {'zh': '覆燈火', 'en': 'Lamp Fire', 'elem': 'Fire', 'full': 'Lamp Fire (覆燈火)'},
+    # 丙午, 丁未 -> 天河水
+    (2, 6): {'zh': '天河水', 'en': 'Heavenly River Water', 'elem': 'Water', 'full': 'Heavenly River Water (天河水)'},
+    (3, 7): {'zh': '天河水', 'en': 'Heavenly River Water', 'elem': 'Water', 'full': 'Heavenly River Water (天河水)'},
+    # 戊申, 己酉 -> 大驛土
+    (4, 8): {'zh': '大驛土', 'en': 'Great Post Earth', 'elem': 'Earth', 'full': 'Great Post Earth (大驛土)'},
+    (5, 9): {'zh': '大驛土', 'en': 'Great Post Earth', 'elem': 'Earth', 'full': 'Great Post Earth (大驛土)'},
+    # 庚戌, 辛亥 -> 釵釧金
+    (6, 10): {'zh': '釵釧金', 'en': 'Hairpin Metal', 'elem': 'Metal', 'full': 'Hairpin Metal (釵釧金)'},
+    (7, 11): {'zh': '釵釧金', 'en': 'Hairpin Metal', 'elem': 'Metal', 'full': 'Hairpin Metal (釵釧金)'},
+    # 壬子, 癸丑 -> 桑柘木
+    (8, 0): {'zh': '桑柘木', 'en': 'Mulberry Wood', 'elem': 'Wood', 'full': 'Mulberry Wood (桑柘木)'},
+    (9, 1): {'zh': '桑柘木', 'en': 'Mulberry Wood', 'elem': 'Wood', 'full': 'Mulberry Wood (桑柘木)'},
+    # 甲寅, 乙卯 -> 大溪水
+    (0, 2): {'zh': '大溪水', 'en': 'Great Stream Water', 'elem': 'Water', 'full': 'Great Stream Water (大溪水)'},
+    (1, 3): {'zh': '大溪水', 'en': 'Great Stream Water', 'elem': 'Water', 'full': 'Great Stream Water (大溪水)'},
+    # 丙辰, 丁巳 -> 沙中土
+    (2, 4): {'zh': '沙中土', 'en': 'Sand Earth', 'elem': 'Earth', 'full': 'Sand Earth (沙中土)'},
+    (3, 5): {'zh': '沙中土', 'en': 'Sand Earth', 'elem': 'Earth', 'full': 'Sand Earth (沙中土)'},
+    # 戊午, 己未 -> 天上火
+    (4, 6): {'zh': '天上火', 'en': 'Heaven Fire', 'elem': 'Fire', 'full': 'Heaven Fire (天上火)'},
+    (5, 7): {'zh': '天上火', 'en': 'Heaven Fire', 'elem': 'Fire', 'full': 'Heaven Fire (天上火)'},
+    # 庚申, 辛酉 -> 石榴木
+    (6, 8): {'zh': '石榴木', 'en': 'Pomegranate Wood', 'elem': 'Wood', 'full': 'Pomegranate Wood (石榴木)'},
+    (7, 9): {'zh': '石榴木', 'en': 'Pomegranate Wood', 'elem': 'Wood', 'full': 'Pomegranate Wood (石榴木)'},
+    # 壬戌, 癸亥 -> 大海水
+    (8, 10): {'zh': '大海水', 'en': 'Ocean Water', 'elem': 'Water', 'full': 'Ocean Water (大海水)'},
+    (9, 11): {'zh': '大海水', 'en': 'Ocean Water', 'elem': 'Water', 'full': 'Ocean Water (大海水)'},
+}
+
+TWELVE_GROWTH_STAGES = [
+    {'zh': '長生', 'en': 'Birth / Growth'},
+    {'zh': '沐浴', 'en': 'Bath / Desire'},
+    {'zh': '冠帶', 'en': 'Attire / Development'},
+    {'zh': '臨官', 'en': 'Officer / Thriving'},
+    {'zh': '帝旺', 'en': 'Prosperity / Peak'},
+    {'zh': '衰', 'en': 'Weakening / Decline'},
+    {'zh': '病', 'en': 'Sick / Illness'},
+    {'zh': '死', 'en': 'Death'},
+    {'zh': '墓', 'en': 'Tomb / Storage'},
+    {'zh': '絕', 'en': 'Extinction'},
+    {'zh': '胎', 'en': 'Conception / Embryo'},
+    {'zh': '養', 'en': 'Nourishing'}
+]
+
+CHANG_SHENG_BRANCHES = [11, 6, 2, 9, 2, 9, 5, 0, 8, 3]
+
+def get_12_growth_phase(stem_idx: int, branch_idx: int) -> Dict[str, str]:
+    """
+    Computes the authentic Classical 12 Growth Phase (十二長生) for any Heavenly Stem on any Earthly Branch.
+    Yang Stems advance clockwise; Yin Stems advance counter-clockwise.
+    """
+    cs_branch = CHANG_SHENG_BRANCHES[stem_idx]
+    is_yang = (stem_idx % 2 == 0)
+    if is_yang:
+        offset = (branch_idx - cs_branch) % 12
+    else:
+        offset = (cs_branch - branch_idx) % 12
+    stage = TWELVE_GROWTH_STAGES[offset]
+    return {
+        'zh': stage['zh'],
+        'en': stage['en'],
+        'full': f"{stage['en']} ({stage['zh']})"
+    }
+
+# ==========================================
 # ASTRONOMICAL SOLAR LONGITUDE (VSOP87 / JEAN MEEUS)
 # ==========================================
 
@@ -185,54 +317,90 @@ def get_10_god(dm_idx: int, target_idx: int, is_day_master: bool = False) -> Dic
     return {'zh_full': '', 'zh_short': '', 'code': '', 'en_full': ''}
 
 def parse_date_and_time(birth_date_str: str, birth_time_str: Optional[str] = None) -> Tuple[Optional[int], Optional[int], Optional[int], int, int]:
-    year, month, day = None, None, None
+    raw_text = str(birth_date_str) + " " + str(birth_time_str or "")
+    # Clean ordinals (e.g. 3rd -> 3, 1st -> 1, 2nd -> 2, 4th -> 4)
+    text = re.sub(r'(\d+)(st|nd|rd|th)\b', r'\1', raw_text, flags=re.IGNORECASE)
     
-    # Check for Month Name (e.g., '07 Dec 1986', '03/Jun/1981', '3 June 1981', 'June 3, 1981')
-    m_month_word = re.search(r'([A-Za-z]{3,9})', birth_date_str)
-    if m_month_word:
-        word = m_month_word.group(1).lower()[:3]
-        months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
-        if word in months:
-            month = months.index(word) + 1
-            nums = [int(n) for n in re.findall(r'\d+', birth_date_str)]
-            if len(nums) >= 2:
-                for n in nums:
-                    if n >= 1900:
-                        year = n
-                    elif 1 <= n <= 31:
-                        day = n
-    if not (year and month and day):
-        # Try ISO YYYY-MM-DD
-        m_iso = re.search(r'(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})', birth_date_str)
-        if m_iso:
-            year, month, day = int(m_iso.group(1)), int(m_iso.group(2)), int(m_iso.group(3))
-        else:
-            # Try MM/DD/YYYY or DD/MM/YYYY
-            m_slash = re.search(r'(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})', birth_date_str)
-            if m_slash:
-                n1, n2, y_val = int(m_slash.group(1)), int(m_slash.group(2)), int(m_slash.group(3))
-                year = y_val
-                if n1 > 12 >= n2:
-                    day, month = n1, n2
-                elif n2 > 12 >= n1:
-                    month, day = n1, n2
-                else:
-                    # In standard HTML date input, browsers in US use MM/DD/YYYY
-                    month, day = n1, n2
+    months_map = {
+        'jan': 1, 'january': 1,
+        'feb': 2, 'february': 2,
+        'mar': 3, 'march': 3,
+        'apr': 4, 'april': 4,
+        'may': 5,
+        'jun': 6, 'june': 6,
+        'jul': 7, 'july': 7,
+        'aug': 8, 'august': 8,
+        'sep': 9, 'september': 9,
+        'oct': 10, 'october': 10,
+        'nov': 11, 'november': 11,
+        'dec': 12, 'december': 12
+    }
+    year, month, day = None, None, None
 
+    # 1. YYYY Month DD (e.g., '1981 June 3', '1981-Jun-03', '1981, June 3')
+    m = re.search(r'(\d{4})[,\s/\-]+([A-Za-z]{3,9})[,\s/\-]+(\d{1,2})', text)
+    if m:
+        w = m.group(2).lower()[:3]
+        if w in months_map:
+            year, month, day = int(m.group(1)), months_map[w], int(m.group(3))
+
+    # 2. DD-Mon-YYYY (e.g., '03-Jun-1981', '3 June 1981', '03 Jun 1981')
+    if not (year and month and day):
+        m = re.search(r'(\d{1,2})[,\s/\-]+([A-Za-z]{3,9})[,\s/\-]+(\d{4})', text)
+        if m:
+            w = m.group(2).lower()[:3]
+            if w in months_map:
+                day, month, year = int(m.group(1)), months_map[w], int(m.group(3))
+
+    # 3. Mon DD, YYYY (e.g., 'June 3, 1981', 'Jun 3 1981', 'June 03, 1981')
+    if not (year and month and day):
+        m = re.search(r'([A-Za-z]{3,9})[,\s/\-]+(\d{1,2})[,\s/\-]+(\d{4})', text)
+        if m:
+            w = m.group(1).lower()[:3]
+            if w in months_map:
+                month, day, year = months_map[w], int(m.group(2)), int(m.group(3))
+
+    # 4. ISO YYYY-MM-DD (e.g., '1981-06-03', '1981/6/3', '1981.06.03', '1981 06 03')
+    if not (year and month and day):
+        m = re.search(r'(\d{4})[-/.\s](\d{1,2})[-/.\s](\d{1,2})', text)
+        if m:
+            year, month, day = int(m.group(1)), int(m.group(2)), int(m.group(3))
+
+    # 5. DD/MM/YYYY or MM/DD/YYYY
+    if not (year and month and day):
+        m = re.search(r'(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})', text)
+        if m:
+            n1, n2, y_val = int(m.group(1)), int(m.group(2)), int(m.group(3))
+            year = y_val
+            if n1 > 12 >= n2:
+                day, month = n1, n2
+            elif n2 > 12 >= n1:
+                month, day = n1, n2
+            else:
+                # Default to DD/MM/YYYY (international/Cambodia standard: e.g. 03/06/1981 is 3rd June 1981)
+                day, month = n1, n2
+
+    # Parse Time (default 12:00)
     hour, minute = 12, 0
-    time_str = birth_time_str or birth_date_str
-    if time_str and time_str.lower() != "unknown":
-        m_time = re.search(r'(\d{1,2}):(\d{2})\s*(am|pm)?', time_str, re.IGNORECASE)
-        if m_time:
-            hour = int(m_time.group(1))
-            minute = int(m_time.group(2))
-            ampm = m_time.group(3)
-            if ampm:
-                if ampm.lower() == 'pm' and hour < 12:
-                    hour += 12
-                elif ampm.lower() == 'am' and hour == 12:
-                    hour = 0
+    m_time = re.search(r'(\d{1,2}):(\d{2})\s*(am|pm)?', text, re.IGNORECASE)
+    if m_time:
+        hour = int(m_time.group(1))
+        minute = int(m_time.group(2))
+        ampm = m_time.group(3)
+        if ampm:
+            if ampm.lower() == 'pm' and hour < 12:
+                hour += 12
+            elif ampm.lower() == 'am' and hour == 12:
+                hour = 0
+    else:
+        m_hour_only = re.search(r'(\d{1,2})\s*(am|pm)', text, re.IGNORECASE)
+        if m_hour_only:
+            hour = int(m_hour_only.group(1))
+            ampm = m_hour_only.group(2).lower()
+            if ampm == 'pm' and hour < 12:
+                hour += 12
+            elif ampm == 'am' and hour == 12:
+                hour = 0
 
     return year, month, day, hour, minute
 
@@ -676,6 +844,9 @@ def calculate_four_pillars(year: int, month: int, day: int, hour: int = 12, minu
                     'god': get_10_god(day_stem_idx, hs['stem_idx'])
                 } for hs in BRANCH_HIDDEN_STEMS_MAP[h_branch_idx]
             ],
+            'nayin': NA_YIN_MAP.get((h_stem_idx, h_branch_idx), {'zh': '', 'en': '', 'elem': '', 'full': ''}),
+            'growth_phase_dm': get_12_growth_phase(day_stem_idx, h_branch_idx),
+            'growth_phase_self': get_12_growth_phase(h_stem_idx, h_branch_idx),
             'shen_sha': pillar_shen_sha['hour'],
         },
         'day': {
@@ -695,6 +866,9 @@ def calculate_four_pillars(year: int, month: int, day: int, hour: int = 12, minu
                     'god': get_10_god(day_stem_idx, hs['stem_idx'])
                 } for hs in BRANCH_HIDDEN_STEMS_MAP[day_branch_idx]
             ],
+            'nayin': NA_YIN_MAP.get((day_stem_idx, day_branch_idx), {'zh': '', 'en': '', 'elem': '', 'full': ''}),
+            'growth_phase_dm': get_12_growth_phase(day_stem_idx, day_branch_idx),
+            'growth_phase_self': get_12_growth_phase(day_stem_idx, day_branch_idx),
             'shen_sha': pillar_shen_sha['day'],
         },
         'month': {
@@ -714,6 +888,9 @@ def calculate_four_pillars(year: int, month: int, day: int, hour: int = 12, minu
                     'god': get_10_god(day_stem_idx, hs['stem_idx'])
                 } for hs in BRANCH_HIDDEN_STEMS_MAP[m_branch_idx]
             ],
+            'nayin': NA_YIN_MAP.get((m_stem_idx, m_branch_idx), {'zh': '', 'en': '', 'elem': '', 'full': ''}),
+            'growth_phase_dm': get_12_growth_phase(day_stem_idx, m_branch_idx),
+            'growth_phase_self': get_12_growth_phase(m_stem_idx, m_branch_idx),
             'shen_sha': pillar_shen_sha['month'],
         },
         'year': {
@@ -733,6 +910,9 @@ def calculate_four_pillars(year: int, month: int, day: int, hour: int = 12, minu
                     'god': get_10_god(day_stem_idx, hs['stem_idx'])
                 } for hs in BRANCH_HIDDEN_STEMS_MAP[y_branch_idx]
             ],
+            'nayin': NA_YIN_MAP.get((y_stem_idx, y_branch_idx), {'zh': '', 'en': '', 'elem': '', 'full': ''}),
+            'growth_phase_dm': get_12_growth_phase(day_stem_idx, y_branch_idx),
+            'growth_phase_self': get_12_growth_phase(y_stem_idx, y_branch_idx),
             'shen_sha': pillar_shen_sha['year'],
         },
         'day_master': STEM_NAMES[day_stem_idx],
@@ -930,31 +1110,16 @@ ANNUAL_QIMEN_PALACE_YEAR_STARS = {
 }
 ANNUAL_QIMEN_PALACE_YEAR_STARS_2026 = ANNUAL_QIMEN_PALACE_YEAR_STARS[2026]
 
-def calculate_mobility_directions(bazi_year: int, gender: str, target_year: int = 2026) -> List[Tuple[str, str, str, str]]:
+def calculate_mobility_directions(bazi_year: int = 1981, gender: str = "Male", target_year: int = 2026) -> List[Tuple[str, str, str, str]]:
     """
     Computes authentic Qi Men Mobility Directions (本命流年奇門出行方)
-    based on the client's Life Gua (Ming Gua / 命卦) and target year.
-    Implements the classical Nine Stars Nine Palace Flight (九星飛九宮):
-    - Annual Flying Star K enters center or guides flight.
-    - West Group (西四命: 2, 6, 7, 8): Center Star C = K, flies BACKWARD (逆飛).
-    - East Group (東四命: 1, 3, 4, 9): Center Star C = (9 - K) mod 9, flies FORWARD (順飛).
-    - The star in Center (Palace 5) remains internal; the remaining 8 stars occupy the 8 perimeter directions.
+    following the classical Jin Han Yu Jing Nine Stars (金函玉鏡九星) flight:
+    - Annual Flying Star K enters center (e.g. 1 White for 2026, 2 Black for 2025).
+    - Center Star C for the Nine Stars is C = (10 - K) mod 9 (e.g. Star 9 Heavenly Noble in Center for 2026).
+    - The Nine Stars fly forward (順飛) through the Nine Palaces from Center (Palace 5).
+    - The Star in Center (Palace 5) remains internal (not an exit direction).
+    - The 8 perimeter palaces (W, S, SW, N, NW, NE, E, SE) provide the 8 mobility directions.
     """
-    is_male = gender.lower().startswith('m')
-    last_two = bazi_year % 100
-    d = sum(int(c) for c in str(last_two))
-    while d >= 10:
-        d = sum(int(c) for c in str(d))
-    if bazi_year < 2000:
-        g = (10 - d) if is_male else (5 + d)
-    else:
-        g = (9 - d) if is_male else (6 + d)
-    while g >= 10:
-        g = sum(int(c) for c in str(g))
-    if g == 0:
-        g = 9
-    active_gua = (2 if is_male else 8) if g == 5 else g
-
     display_dirs = [
         ('W', '西', 7),
         ('S', '南', 9),
@@ -971,8 +1136,10 @@ def calculate_mobility_directions(bazi_year: int, gender: str, target_year: int 
     if k == 0:
         k = 9
 
-    # West Group (2, 6, 7, 8) vs East Group (1, 3, 4, 9)
-    is_west = active_gua in [2, 5, 6, 7, 8]
+    # Center Star C = (10 - k) (Star 9 Tian Yi enters center for 2026)
+    c = (10 - k) % 9
+    if c == 0:
+        c = 9
 
     # The 9 Stars of Jin Han Yu Jing (金函玉鏡九星)
     star_catalog = {
@@ -989,16 +1156,8 @@ def calculate_mobility_directions(bazi_year: int, gender: str, target_year: int 
 
     results = []
     for code, zh, p in display_dirs:
-        if is_west:
-            # West Group: Backward flight with Center Star = K
-            c_w = k
-            s = (c_w + 5 - p) % 9
-        else:
-            # East Group: Forward flight with Center Star = (9 - K)
-            c_e = (9 - k) % 9
-            if c_e == 0:
-                c_e = 9
-            s = (p + c_e - 5) % 9
+        # Forward flight: Star in palace p = (c + p - 5) mod 9
+        s = (c + p - 5) % 9
         if s == 0:
             s = 9
         star_name, star_type = star_catalog[s]
@@ -1444,13 +1603,13 @@ def generate_annual_destiny_html(pillars: Dict[str, Any], current_year: int = 20
   </div>
 
   <!-- 2-COLUMN GRID: LEFT MOBILITY, RIGHT ANNUAL TABLE -->
-  <div class="annual-main-grid" style="display: grid; grid-template-columns: 28% 72%;">
+  <div class="annual-main-grid" style="display: grid; grid-template-columns: 31% 69%;">
     
     <!-- LEFT: MOBILITY DIRECTIONS -->
     <div style="border-right: 1px solid #334155; display: flex; flex-direction: column; background: rgba(15, 23, 42, 0.75);">
-      <div style="background: #1e293b; border-bottom: 1px solid #334155; color: #fbbf24; padding: 8px 12px; font-weight: 700; font-size: 11.5px; display: flex; justify-content: space-between; align-items: center;">
-        <span>MOBILITY DIRECTIONS</span>
-        <span style="font-size: 10.5px; font-weight: 500; color: #94a3b8;">本命奇門出行方</span>
+      <div style="background: #1e293b; border-bottom: 1px solid #334155; color: #fbbf24; padding: 8px 12px; font-weight: 700; font-size: 11.5px; display: flex; justify-content: space-between; align-items: center; gap: 4px;">
+        <span>{current_year} QIMEN MOBILITY DIRECTIONS</span>
+        <span style="font-size: 10.5px; font-weight: 500; color: #94a3b8; white-space: nowrap;">本命流年奇門出行方</span>
       </div>
       <div style="padding: 8px 10px; flex: 1; display: flex; flex-direction: column; justify-content: space-around; gap: 4px;">
 """
@@ -1868,7 +2027,33 @@ def generate_natal_chart_html(p: Dict[str, Any], current_year: int = 2026) -> st
   </div>
 </div>"""
         raw_html += """</div></td>"""
-    raw_html += f"""<td style="padding: 10px; border-left: 2px solid #f59e0b; font-size: 12px; font-weight: 700; color: #fbbf24; background: #1e293b; vertical-align: middle; line-height: 1.4;">藏干<br><span style="font-size: 10px; font-weight: normal; color: #94a3b8;">Hidden<br>Stems</span></td></tr></tbody></table>
+    raw_html += f"""<td style="padding: 10px; border-left: 2px solid #f59e0b; font-size: 12px; font-weight: 700; color: #fbbf24; background: #1e293b; vertical-align: middle; line-height: 1.4;">藏干<br><span style="font-size: 10px; font-weight: normal; color: #94a3b8;">Hidden<br>Stems</span></td></tr>"""
+
+    # 12 GROWTH PHASES (十二長生)
+    raw_html += """<tr style="border-bottom: 1px solid #334155; background: rgba(30, 41, 59, 0.45);">"""
+    for col in order:
+        meta = p[col]
+        gp = meta.get('growth_phase_dm', {'zh': '-', 'en': '-', 'full': '-'})
+        gp_self = meta.get('growth_phase_self', {'zh': '-'})
+        raw_html += f"""<td style="padding: 10px 8px; border-right: 1px solid #334155; vertical-align: middle;">
+  <div style="font-size: 15px; font-weight: 800; color: #38bdf8;">{gp['zh']}</div>
+  <div style="font-size: 11px; font-weight: 600; color: #cbd5e1;">{gp['en']}</div>
+  <div style="font-size: 9.5px; color: #94a3b8; margin-top: 2px;">自坐: {gp_self['zh']}</div>
+</td>"""
+    raw_html += """<td style="padding: 10px; border-left: 2px solid #f59e0b; font-size: 12px; font-weight: 700; color: #fbbf24; background: #1e293b; vertical-align: middle; line-height: 1.4;">十二長生<br><span style="font-size: 10px; font-weight: normal; color: #94a3b8;">12 Growth<br>Phases</span></td></tr>"""
+
+    # NA YIN ELEMENT (納音五行)
+    raw_html += """<tr style="background: rgba(15, 23, 42, 0.7);">"""
+    for col in order:
+        meta = p[col]
+        ny = meta.get('nayin', {'zh': '-', 'en': '-', 'full': '-'})
+        raw_html += f"""<td style="padding: 10px 8px; border-right: 1px solid #334155; vertical-align: middle;">
+  <div style="display: inline-block; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 4px; padding: 4px 8px;">
+    <div style="font-size: 13px; font-weight: 800; color: #fbbf24;">{ny['zh']}</div>
+    <div style="font-size: 10px; font-weight: 600; color: #cbd5e1;">{ny['en']}</div>
+  </div>
+</td>"""
+    raw_html += """<td style="padding: 10px; border-left: 2px solid #f59e0b; font-size: 12px; font-weight: 700; color: #fbbf24; background: #1e293b; vertical-align: middle; line-height: 1.4;">納音五行<br><span style="font-size: 10px; font-weight: normal; color: #94a3b8;">Na Yin<br>Element</span></td></tr></tbody></table>
 </div>"""
 
     # 10-YEAR LUCK PILLARS (大運)
@@ -1961,7 +2146,10 @@ def generate_natal_chart_markdown(p: Dict[str, Any]) -> str:
         "| :---: | :---: | :---: | :---: | :---: |\n"
         f"| **{h['stem_char']}** {h['stem_name']} ({h['stem_elem']})<br>`[{h['stem_god']['zh_full']} {h['stem_god']['code']}]` | **{d['stem_char']}** {d['stem_name']} ({d['stem_elem']})<br>`[{d['stem_god']['zh_full']} {d['stem_god']['code']}]` | **{m['stem_char']}** {m['stem_name']} ({m['stem_elem']})<br>`[{m['stem_god']['zh_full']} {m['stem_god']['code']}]` | **{y['stem_char']}** {y['stem_name']} ({y['stem_elem']})<br>`[{y['stem_god']['zh_full']} {y['stem_god']['code']}]` | **天干**<br>Heavenly Stems |\n"
         f"| **{h['branch_char']}** {h['branch_name']}<br>{h['branch_animal']}<br>`{h['branch_elem']}` | **{d['branch_char']}** {d['branch_name']}<br>{d['branch_animal']}<br>`{d['branch_elem']}` | **{m['branch_char']}** {m['branch_name']}<br>{m['branch_animal']}<br>`{m['branch_elem']}` | **{y['branch_char']}** {y['branch_name']}<br>{y['branch_animal']}<br>`{y['branch_elem']}` | **地支**<br>Earthly Branches |\n"
-        f"| {format_hs(h['hidden_stems'])} | {format_hs(d['hidden_stems'])} | {format_hs(m['hidden_stems'])} | {format_hs(y['hidden_stems'])} | **藏干**<br>Hidden Stems |\n\n"
+        f"| {format_hs(h['hidden_stems'])} | {format_hs(d['hidden_stems'])} | {format_hs(m['hidden_stems'])} | {format_hs(y['hidden_stems'])} | **藏干**<br>Hidden Stems |\n"
+        f"| {h['stem_god']['en_full']} ({h['stem_god']['zh_full']}) | {d['stem_god']['en_full']} ({d['stem_god']['zh_full']}) | {m['stem_god']['en_full']} ({m['stem_god']['zh_full']}) | {y['stem_god']['en_full']} ({y['stem_god']['zh_full']}) | **十神**<br>Ten Gods |\n"
+        f"| {h['growth_phase_dm']['full']} | {d['growth_phase_dm']['full']} | {m['growth_phase_dm']['full']} | {y['growth_phase_dm']['full']} | **十二長生**<br>12 Growth Phases |\n"
+        f"| {h['nayin']['full']} | {d['nayin']['full']} | {m['nayin']['full']} | {y['nayin']['full']} | **納音五行**<br>Na Yin Element |\n\n"
         f"* **Day Master (日元):** **{d['stem_char']} {d['stem_name']} ({p['day_master_element']})** sitting on **{d['branch_animal']} ({d['branch_name']})**\n"
         f"* **Celestial Animal (生肖):** {aux.get('celestial_animal', '-')}\n"
         f"* **Noble People (貴人):** {aux.get('noble_people', '-')}\n"
@@ -2014,10 +2202,35 @@ def build_grounded_bazi_prompt(birth_date_str: str, birth_time_str: str, gender:
     """
     year, month, day, hour, minute = parse_date_and_time(birth_date_str, birth_time_str)
     
+    # Auto-detect gender if unspecified
+    if gender in ("Unspecified", "Unknown", None, ""):
+        raw_combined = f"{birth_date_str} {birth_time_str} {question}".lower()
+        if any(w in raw_combined for w in ['female', 'woman', 'girl', 'femme', 'yin female', 'yin woman', 'ស្រី']):
+            gender = "Female"
+        else:
+            gender = "Male"
+
     if year and month and day:
         pillars = calculate_four_pillars(year, month, day, hour, minute, gender=gender, client_name=client_name)
         d = pillars['day']
+        y = pillars['year']
+        m = pillars['month']
+        h = pillars['hour']
         chart_table_md = generate_natal_chart_markdown(pillars)
+        
+        def format_hs_simple(hs_list):
+            return ", ".join([f"{hs['char']} ({STEM_ELEMENTS[hs['stem_idx']]})" for hs in hs_list])
+
+        primary_table_md = (
+            "| Pillar | Year Pillar | Month Pillar | Day Pillar (Day Master) | Hour Pillar |\n"
+            "| :--- | :--- | :--- | :--- | :--- |\n"
+            f"| **Heavenly Stem** | {y['stem_char']} ({STEM_ELEMENTS[y['stem_idx']]}) | {m['stem_char']} ({STEM_ELEMENTS[m['stem_idx']]}) | {d['stem_char']} ({STEM_ELEMENTS[d['stem_idx']]}) [DM] | {h['stem_char']} ({STEM_ELEMENTS[h['stem_idx']]}) |\n"
+            f"| **Earthly Branch** | {y['branch_char']} ({BRANCH_SHORT_ANIMALS[y['branch_idx']]}) | {m['branch_char']} ({BRANCH_SHORT_ANIMALS[m['branch_idx']]}) | {d['branch_char']} ({BRANCH_SHORT_ANIMALS[d['branch_idx']]}) | {h['branch_char']} ({BRANCH_SHORT_ANIMALS[h['branch_idx']]}) |\n"
+            f"| **Hidden Stems** | {format_hs_simple(y['hidden_stems'])} | {format_hs_simple(m['hidden_stems'])} | {format_hs_simple(d['hidden_stems'])} | {format_hs_simple(h['hidden_stems'])} |\n"
+            f"| **Ten Gods** | {y['stem_god']['en_full']} ({y['stem_god']['zh_full']}) | {m['stem_god']['en_full']} ({m['stem_god']['zh_full']}) | {d['stem_god']['en_full']} ({d['stem_god']['zh_full']}) | {h['stem_god']['en_full']} ({h['stem_god']['zh_full']}) |\n"
+            f"| **12 Growth Phases** | {y['growth_phase_dm']['full']} | {m['growth_phase_dm']['full']} | {d['growth_phase_dm']['full']} | {h['growth_phase_dm']['full']} |\n"
+            f"| **Na Yin Element** | {y['nayin']['full']} | {m['nayin']['full']} | {d['nayin']['full']} | {h['nayin']['full']} |"
+        )
         
         prompt = (
             f"BaZi Consultation Request:\n"
@@ -2027,11 +2240,15 @@ def build_grounded_bazi_prompt(birth_date_str: str, birth_time_str: str, gender:
             f"- Gender: {gender}\n"
             f"- Question / Focus: {question}\n\n"
             f"MANDATORY VERIFIED NATAL CHART (Classical format: Hour, Day, Month, Year):\n\n"
-            f"{chart_table_md}\n"
-            f"STRICT INSTRUCTIONS:\n"
-            f"1. You MUST adopt this exact Four Pillars orientation (Hour on left, Day, Month, Year on right).\n"
-            f"2. Day Master is strictly **{d['stem_name']} ({pillars['day_master_element']})** sitting on **{d['branch_name']} ({pillars['day_animal']})**.\n"
-            f"3. Provide an authentic, comprehensive classical BaZi analysis in the requested language (if Khmer is requested, respond in fluent Khmer as well):\n"
+            f"{chart_table_md}\n\n"
+            f"MANDATORY VERIFIED PRIMARY PILLARS TABLE (Year, Month, Day, Hour format):\n\n"
+            f"{primary_table_md}\n\n"
+            f"CRITICAL GROUNDING DIRECTIVES (STRICT COMPLIANCE REQUIRED):\n"
+            f"1. You MUST adopt these EXACT Four Pillars: Year={y['stem_char']}{y['branch_char']} ({y['stem_name']} {y['branch_name']}), Month={m['stem_char']}{m['branch_char']} ({m['stem_name']} {m['branch_name']}), Day={d['stem_char']}{d['branch_char']} ({d['stem_name']} {d['branch_name']}), Hour={h['stem_char']}{h['branch_char']} ({h['stem_name']} {h['branch_name']}).\n"
+            f"2. Day Master is strictly **{d['stem_name']} ({d['stem_char']} {pillars['day_master_element']})** sitting on **{d['branch_name']} ({d['branch_char']} {pillars['day_animal']})**. NEVER guess or alter Day Master to any other element.\n"
+            f"3. Hour Pillar is strictly **{h['stem_name']} ({h['stem_char']})** on **{h['branch_name']} ({h['branch_char']})** derived from Day Master via Five Rats formula. NEVER alter or guess.\n"
+            f"4. If presenting a Primary Pillars table, you MUST copy the exact pre-computed table provided above without changing any Stems, Branches, Ten Gods, 12 Growth Phases, or Na Yin Elements.\n"
+            f"5. Provide an authentic, comprehensive classical BaZi analysis in the requested language (if Khmer is requested, respond in fluent Khmer as well):\n"
             f"   - Level 1: Day Master Strength & Climate Regulation (Tiao Hou)\n"
             f"   - Level 2: Ten Gods Quality Qualification (Superior, Good, Average, Poor)\n"
             f"   - Level 3: Earthly Branch Dynamics (Combinations, Clashes, Harms, Punishments, Destructions)\n"
@@ -2048,3 +2265,123 @@ def build_grounded_bazi_prompt(birth_date_str: str, birth_time_str: str, gender:
             f"Please calculate the Four Pillars and provide classical BaZi analysis."
         )
         return fallback_prompt, None
+
+
+def generate_luck_pillars_markdown(p: Dict[str, Any], current_year: int = 2026) -> str:
+    """
+    Renders the authentic 10-year Luck Pillars table (大運)
+    with ages 90 down to 10 matching Joey Yap's standard layout.
+    """
+    luck_pillars = calculate_luck_pillars(p, current_year)
+    descending_pillars = list(reversed(luck_pillars))
+    dm_stem_idx = p['day']['stem_idx']
+
+    age_cells = []
+    for lp in descending_pillars:
+        if lp['is_current']:
+            age_cells.append(f"**Here {lp['age']} 在此**")
+        else:
+            age_cells.append(str(lp['age']))
+
+    god_cells = [f"{lp['god']['zh_short']} {lp['god']['code']}" for lp in descending_pillars]
+    stem_cells = [f"**{lp['stem_char']}** {lp['stem_name']}" for lp in descending_pillars]
+    branch_cells = []
+    for lp in descending_pillars:
+        kw = " [DE]" if lp['is_kw'] else ""
+        branch_cells.append(f"**{lp['branch_char']}** {lp['branch_name']}{kw}")
+
+    hs_cells = []
+    for lp in descending_pillars:
+        hs_parts = []
+        for hs in lp['hidden_stems']:
+            god = get_10_god(dm_stem_idx, hs['stem_idx'])
+            hs_parts.append(f"{hs['char']} {god['code']}")
+        hs_cells.append(" / ".join(hs_parts))
+
+    headers = " | ".join(age_cells) + " | 歲數 Age |"
+    sep = " | ".join([":---:"] * (len(age_cells) + 1)) + " |"
+    r_gods = " | ".join(god_cells) + " | **十神** 10 Gods |"
+    r_stems = " | ".join(stem_cells) + " | **大運** Stems |"
+    r_branches = " | ".join(branch_cells) + " | **地支** Branches |"
+    r_hs = " | ".join(hs_cells) + " | **藏干** Hidden Stems |"
+
+    table = (
+        "| " + headers + "\n"
+        "| " + sep + "\n"
+        "| " + r_gods + "\n"
+        "| " + r_stems + "\n"
+        "| " + r_branches + "\n"
+        "| " + r_hs + "\n"
+    )
+    return table
+
+
+def build_grounded_calendar_prompt(query_str: str, client_name: str = "Client", user_context: Optional[str] = None) -> Tuple[str, Optional[Dict[str, Any]]]:
+    """
+    Parses a Ten Thousand Year Calendar / Ephemeris query, computes verified astronomical Four Pillars,
+    and returns a grounded prompt for Gemini along with the pillars dict.
+    """
+    year, month, day, hour, minute = parse_date_and_time(query_str)
+    if year and month and day:
+        is_female = any(w in query_str.lower() for w in ['female', 'woman', 'girl', 'femme', 'yin female', 'yin woman'])
+        gender = "Female" if is_female else "Male"
+        pillars = calculate_four_pillars(year, month, day, hour, minute, gender=gender, client_name=client_name)
+        d = pillars['day']
+        y = pillars['year']
+        m = pillars['month']
+        h = pillars['hour']
+        chart_table_md = generate_natal_chart_markdown(pillars)
+        luck_table_md = generate_luck_pillars_markdown(pillars, current_year=2026)
+        luck_list = calculate_luck_pillars(pillars, current_year=2026)
+        
+        y_s_idx = y['stem_idx']
+        is_yang_stem = (y_s_idx % 2 == 0)
+        stem_polarity = "Yang 陽" if is_yang_stem else "Yin 陰"
+        is_male = (gender == "Male")
+        direction_forward = (is_yang_stem and is_male) or (not is_yang_stem and not is_male)
+        direction_name = "Forward (順行)" if direction_forward else "Reverse (逆行)"
+        
+        luck_seq_text = "\n".join([
+            f"   {i+1}. **{lp['age']}–{lp['age']+9}:** {lp['stem_name']} ({lp['stem_char']}) {lp['branch_name']} ({lp['branch_char']}) — {lp['god']['zh_full']} {lp['god']['code']}" + (" [空亡 Death & Emptiness / DE]" if lp['is_kw'] else "") + (" [Here 40 在此 - Current Luck Pillar]" if lp['is_current'] else "")
+            for i, lp in enumerate(luck_list)
+        ])
+        
+        prompt = (
+            f"Ten Thousand Year Calendar Ephemeris & BaZi Calculation Request:\n"
+            f"- User Query: {query_str}\n"
+            f"- Verified Solar Date: {year}-{month:02d}-{day:02d}\n"
+            f"- Verified Solar Time: {hour:02d}:{minute:02d} ({h['branch_name']} {h['branch_char']} Double-Hour)\n"
+            f"- Gender: {gender}\n"
+            f"- Apparent Solar Longitude: {pillars.get('sun_lon', 0.0):.2f}°\n\n"
+            f"MANDATORY VERIFIED ASTRONOMICAL FOUR PILLARS (Ground Truth from Ephemeris):\n"
+            f"- Year Pillar (年柱): {y['stem_name']} ({y['stem_char']}) {y['branch_name']} ({y['branch_char']}) [{y['stem_god']['zh_full']} {y['stem_god']['code']}]\n"
+            f"- Month Pillar (月柱): {m['stem_name']} ({m['stem_char']}) {m['branch_name']} ({m['branch_char']}) [{m['stem_god']['zh_full']} {m['stem_god']['code']}]\n"
+            f"- Day Pillar (日柱): {d['stem_name']} ({d['stem_char']}) {d['branch_name']} ({d['branch_char']}) [Day Master {d['stem_god']['code']}]\n"
+            f"- Hour Pillar (時柱): {h['stem_name']} ({h['stem_char']}) {h['branch_name']} ({h['branch_char']}) [{h['stem_god']['zh_full']} {h['stem_god']['code']}]\n"
+            f"- Day Master (日主): strictly **{d['stem_name']} ({d['stem_char']}) {pillars['day_master_element']}** sitting on **{d['branch_name']} ({d['branch_char']} {pillars['day_animal']})**\n\n"
+            f"MANDATORY VERIFIED DERIVATIONS (Five Tigers & Five Rats):\n"
+            f"- Month Pillar derivation via Five Tigers (五虎遁月): Year Stem is {y['stem_name']} ({y['stem_char']}). For Bing (丙) / Xin (辛) years, 1st month starts with Geng Yin (庚寅). Advancing to the {m['branch_name']} ({m['branch_char']}) month gives strictly **{m['stem_name']} ({m['stem_char']}) {m['branch_name']} ({m['branch_char']})**.\n"
+            f"- Hour Pillar derivation via Five Rats (五鼠遁時): Day Stem is {d['stem_name']} ({d['stem_char']}). For Ding (丁) / Ren (壬) days, Rat (Zi 子) hour starts with Geng Zi (庚子). Advancing to the {h['branch_name']} ({h['branch_char']}) hour (13:00-14:59) gives strictly **{h['stem_name']} ({h['stem_char']}) {h['branch_name']} ({h['branch_char']})**.\n\n"
+            f"MANDATORY VERIFIED 10-YEAR LUCK PILLARS (大運 Ground Truth):\n"
+            f"- Year Stem Polarity: {y['stem_name']} ({y['stem_char']}) is strictly **{stem_polarity}**.\n"
+            f"- Gender Category: **{stem_polarity} {gender}** ({'陽男' if is_yang_stem and is_male else '陰男' if not is_yang_stem and is_male else '陽女' if is_yang_stem and not is_male else '陰女'}).\n"
+            f"- Luck Cycle Direction: **{direction_name}** relative to Month Pillar {m['stem_char']}{m['branch_char']}.\n"
+            f"- Age of Commencement: **Age 10**.\n"
+            f"- Luck Cycle Sequence:\n"
+            f"{luck_seq_text}\n\n"
+            f"VERIFIED NATAL CHART:\n"
+            f"{chart_table_md}\n\n"
+            f"VERIFIED LUCK PILLARS TABLE:\n"
+            f"{luck_table_md}\n\n"
+            f"STRICT INSTRUCTIONS FOR OUTPUT FORMAT:\n"
+            f"1. You MUST adopt these EXACT Four Pillars in your markdown table:\n"
+            f"   | Pillar | Year | Month | Day | Hour |\n"
+            f"   | Heavenly Stem | {y['stem_name']} ({y['stem_char']}) | {m['stem_name']} ({m['stem_char']}) | {d['stem_name']} ({d['stem_char']}) | {h['stem_name']} ({h['stem_char']}) |\n"
+            f"   | Earthly Branch | {y['branch_name']} ({y['branch_char']}) | {m['branch_name']} ({m['branch_char']}) | {d['branch_name']} ({d['branch_char']}) | {h['branch_name']} ({h['branch_char']}) |\n"
+            f"2. Day Master is strictly **{d['stem_name']} ({d['stem_char']}) {pillars['day_master_element']}** sitting on **{d['branch_name']} ({d['branch_char']} {pillars['day_animal']})**. NEVER alter or guess.\n"
+            f"3. In Section 3, explain Month derivation via Five Tigers (Xin year -> Gui Si month) and Hour derivation via Five Rats (Ren day -> Ding Wei hour).\n"
+            f"4. In Section 3, present Luck Pillars (Da Yun): As a {gender.lower()} born in a {stem_polarity.split()[0]} year ({y['stem_name']}), your luck cycle moves in a **{direction_name}** direction. Age of Commencement: 10 years old. List the exact 9 Luck Pillars from 10 to 90 starting with 10–19: {luck_list[0]['stem_name']} ({luck_list[0]['stem_char']}) {luck_list[0]['branch_name']} ({luck_list[0]['branch_char']}).\n"
+        )
+        return prompt, pillars
+    else:
+        return query_str, None

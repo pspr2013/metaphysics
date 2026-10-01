@@ -66,7 +66,6 @@ def build_main_menu() -> dict:
             {"text": "🏡 Feng Shui Audit", "callback_data": "skill_fengshui"}
         ],
         [
-            {"text": "📜 10K Calendar Ephemeris", "callback_data": "skill_calendar"},
             {"text": "💬 Free Consultation", "callback_data": "skill_free"}
         ]
     ]
@@ -100,7 +99,6 @@ def handle_update(update: dict):
                 "• `/qimen_fs <inquiry>` - Qi Men Feng Shui audit & dynamic forecasting (Zhi Run Fa)\n"
                 "• `/bazi <YYYY-MM-DD> <time> <gender> [question]` - Four Pillars & 10 Gods PSPR\n"
                 "• `/fengshui <period> <facing> <door>` - Classical landform & 9 Palaces audit\n"
-                "• `/calendar <query>` - Ephemeris, solar terms & 60 Jia Zi conversion\n"
                 "• `/menu` - Show interactive service menu"
             )
             send_message(chat_id, help_text)
@@ -124,10 +122,6 @@ def handle_update(update: dict):
         elif text.startswith("/qimen_date"):
             active_skill = "qimen_date"
             text = text.replace("/qimen_date", "").strip() or "Please select an auspicious date."
-        elif text.startswith("/calendar"):
-            active_skill = "calendar"
-            text = text.replace("/calendar", "").strip() or "Please calculate ephemeris."
-
         # Send typing action
         send_telegram_request("sendChatAction", {"chat_id": chat_id, "action": "typing"})
 
@@ -135,6 +129,12 @@ def handle_update(update: dict):
         prompt_to_send = text
         if active_skill == "bazi":
             prompt_to_send, _ = build_grounded_bazi_prompt(text, text, "Unspecified", text)
+        else:
+            from bazi_engine import parse_date_and_time
+            y, m, d, _, _ = parse_date_and_time(text)
+            if y and m and d:
+                prompt_to_send, _ = build_grounded_bazi_prompt(text, text, "Unspecified", text)
+                active_skill = "bazi"
 
         # Call Gemini with specialized skill prompt
         response = call_gemini(prompt=prompt_to_send, skill_key=active_skill)
@@ -173,8 +173,6 @@ def handle_update(update: dict):
                     msg += "`Born 1988-08-08 at 09:30 AM (Solar Time), Male. Analyze career & wealth potential.`"
                 elif skill_id == "fengshui":
                     msg += "`Period 8 apartment, Balcony facing East, main door at SE. Road curve on the north side.`"
-                elif skill_id == "calendar":
-                    msg += "`Convert 2026-10-15 14:00 to 4 Pillars, identify current Jie Qi, and check Dun/Ju.`"
 
                 send_message(chat_id, msg)
 

@@ -13,6 +13,21 @@ This skill translates a client's birth data (Year, Month, Day, Hour) into their 
 
 ## Formatting Standards (MANDATORY)
 
+### CRITICAL GROUNDING DIRECTIVE
+When pre-computed Four Pillars or Natal Chart ephemeris data are provided in the prompt, you MUST adopt those EXACT pillars (Year, Month, Day, Hour) and Day Master without recalculating or guessing.
+Reference Ground Truth Benchmark:
+- For `1981-06-03` (`June 3, 1981`) at `13:30`, Male:
+  - Year: **Xin You (辛酉)**
+  - Month: **Gui Si (癸巳)**
+  - Day: **Ren Zi (壬子)** (Day Master strictly **Ren 壬 Water**; NEVER guess Jia Wu 甲午!)
+  - Hour: **Ding Wei (丁未)** (NEVER guess Xin Wei 辛未!)
+  - Destiny Palace: **East (東 E, Palace 3 Zhen)**
+  - Life Stem: **Ren (壬)**
+  - Door of Destiny: **Open Door (開門)**
+  - Star of Destiny: **Tian Peng / Grass (天蓬星)**
+  - Guardian of Destiny: **Chief (值符 Zhi Fu)**
+  - Life Star: **1 White 一白星命 Water 水** | Feng Shui Gua: **Kan 坎 (North)**
+
 Every Natal Qi Men reading MUST follow this exact structure:
 
 ### 1. Executive Summary & Chart Identifiers

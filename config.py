@@ -63,15 +63,6 @@ SKILLS = {
         "description": "Auspicious timing and spatial activations (Back/Moving Towards direction) using Zhi Run Fa (置閏法).",
         "prompt_file": "qimen_date_selection.md",
         "icon": "📅"
-    },
-    "calendar": {
-        "id": "calendar",
-        "title": "Ten Thousand Year Calendar Ephemeris",
-        "title_km": "ប្រតិទិនម៉ឺនឆ្នាំ និងរូបមន្តគណនា",
-        "command": "calendar",
-        "description": "Solar terms (Jie Qi), 60 Jia Zi, 24 Mountains, Five Tigers/Rats, Ba Zhai, and Flying Stars.",
-        "prompt_file": "ten_thousand_calendar.md",
-        "icon": "📜"
     }
 }
 
@@ -84,7 +75,6 @@ ROUTER_SYSTEM_PROMPT = """You are an elite Master Chinese Metaphysics AI Assista
 2. Classical Feng Shui: Exterior landforms, interior 9 Palaces layout, main door, kitchen/stove, bed.
 3. Qi Men Dun Jia Feng Shui (Zhi Run Fa): Property audits and dynamic remote forecasting across 13 sectors.
 4. Qi Men Date Selection (Zhi Run Fa): Precision date selection, personal BaZi clash filtering, hourly Qi Men activations.
-5. Ten Thousand Year Calendar: Solar terms, 60 Jia Zi, ephemeris conversions.
 
 STRICT INSTRUCTION:
 - All Qi Men Dun Jia charts (Dun and Ju determination) must strictly use Zhi Run Fa (置閏法 - Intercalation Method) as the default engine.

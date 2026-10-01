@@ -10,9 +10,10 @@ logger = logging.getLogger(__name__)
 # Fallback models in priority order for resilience against temporary high-demand (503) spikes
 CANDIDATE_MODELS = list(dict.fromkeys([
     GEMINI_MODEL,
-    "gemini-2.5-flash",
-    "gemini-flash-latest",
-    "gemini-3.1-flash-lite"
+    "gemini-3.7-flash",
+    "gemini-3.5-flash",
+    "gemini-3.1-flash-lite",
+    "gemini-flash-latest"
 ]))
 
 def call_gemini(prompt: str, skill_key: str = None, user_context: str = None) -> str:
