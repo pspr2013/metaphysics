@@ -1273,23 +1273,31 @@ def calculate_mobility_directions(
     bazi_year: int = 1981,
     gender: str = "Male",
     target_year: int = 2026,
-    destiny_palace_num: Optional[int] = None
+    destiny_palace_num: Optional[int] = None,
+    dun_type: Optional[str] = None
 ) -> List[Tuple[str, str, str, str]]:
     """
     Computes authentic Qi Men Mobility Directions (本命流年奇門出行方)
-    matching the exact Joey Yap classical Jin Han Yu Jing (金函玉鏡九星) standard:
+    matching the exact Joey Yap classical Jin Han Yu Jing (金函玉鏡九星) standard.
     
-    2026 Baseline (Exact Match to Joey Yap Ground Truth):
-      W   西   : 太乙 Celestial Advisor [吉]
-      S   南   : 軒轅 Regulus
-      SW  西南 : 天符 Heavenly Seal
-      N   北   : 招搖 Swagger
-      NW  西北 : 天乙 Heavenly Noble [吉]
-      NE  東北 : 攝提 Extractor
-      E   東   : 青龍 Green Dragon [吉]
-      SE  東南 : 咸池 Salty Pool
-    
-    Each year, the Annual Nine Stars rotate systematically across the palaces.
+    The General Formula:
+    1. Annual Retrograde Anchor (流年九星退位):
+       In 2026 (Bing Wu), Anchor Palace is Palace 6 (Northwest 乾).
+       For any target year, the Annual Nine Stars retrograde by 1 palace:
+       anchor = ((6 - (target_year - 2026) - 1) % 9) + 1
+       
+    2. Natal Qi Men Polarity Flight (陽遁順排，陰遁逆排):
+       - If native was born under Yang Dun (陽遁, Winter Solstice to Summer Solstice):
+         The 9 stars fly FORWARD (順飛):
+         start_palace = ((anchor + 1 - 1) % 9) + 1  (Palace 7 in 2026)
+         palace(s) = ((start_palace + (s - 1) - 1) % 9) + 1
+       - If native was born under Yin Dun (陰遁, Summer Solstice to Winter Solstice):
+         The 9 stars fly BACKWARD / REVERSE (逆飛):
+         start_palace = ((anchor - 1 - 1) % 9) + 1  (Palace 5 in 2026)
+         palace(s) = ((start_palace - (s - 1) - 1) % 9) + 1
+         
+       In both cases, Star 9 (天乙 Heavenly Noble) anchors to the Annual Anchor Palace (Palace 6 in 2026).
+       Exactly one star enters Center (Palace 5), and the remaining 8 stars occupy the 8 perimeter compass directions.
     """
     display_dirs = [
         ('W', '西', 7),
@@ -1302,14 +1310,20 @@ def calculate_mobility_directions(
         ('SE', '東南', 4)
     ]
 
-    # Star 1 (太乙) base palace in 2026 is Palace 7 (West 兌)
-    # The annual rotation shifts backwards by 1 palace each year:
-    s1_palace = ((7 - (target_year - 2026) - 1) % 9) + 1
-
+    anchor = ((6 - (target_year - 2026) - 1) % 9) + 1
     palace_to_star = {}
-    for s in range(1, 10):
-        p = ((s1_palace - 1 + (s - 1)) % 9) + 1
-        palace_to_star[p] = s
+    is_yang = not str(dun_type or 'Yang').strip().lower().startswith('yin')
+
+    if is_yang:
+        start_p = ((anchor + 1 - 1) % 9) + 1
+        for s in range(1, 10):
+            p = ((start_p + (s - 1) - 1) % 9) + 1
+            palace_to_star[p] = s
+    else:
+        start_p = ((anchor - 1 - 1) % 9) + 1
+        for s in range(1, 10):
+            p = ((start_p - (s - 1) - 1) % 9) + 1
+            palace_to_star[p] = s
 
     star_catalog = {
         1: ('太乙 Celestial Advisor', 'red'),
@@ -1694,7 +1708,8 @@ def generate_annual_destiny_html(pillars: Dict[str, Any], current_year: int = 20
         palace_name = "東 E (震宮 3)"
 
     # Dynamic Mobility Directions for target year aligned with Personal Qi Men Life Palace
-    mobility_directions = calculate_mobility_directions(birth_year, gender, target_year=current_year, destiny_palace_num=dest_p_num)
+    dun_type = qm_natal.get('dun_type') or ('Yin' if 'Yin' in str(qm_natal.get('structure', '')) else 'Yang')
+    mobility_directions = calculate_mobility_directions(birth_year, gender, target_year=current_year, destiny_palace_num=dest_p_num, dun_type=dun_type)
 
     # Door auspicious determination
     is_door_auspicious = any(qm_door.startswith(d) for d in ['開', 'Open', '休', 'Rest', '生', 'Life'])
@@ -2341,7 +2356,8 @@ def generate_natal_chart_markdown(p: Dict[str, Any]) -> str:
     gender = p.get('gender', 'Male')
     qm_dest = p.get('qimen_destiny', {})
     dest_p_num = qm_dest.get('palace_num', 3)
-    mob_dirs = calculate_mobility_directions(birth_year, gender, target_year=target_year, destiny_palace_num=dest_p_num)
+    dun_type = qm_dest.get('dun_type') or ('Yin' if 'Yin' in str(qm_dest.get('structure', '')) else 'Yang')
+    mob_dirs = calculate_mobility_directions(birth_year, gender, target_year=target_year, destiny_palace_num=dest_p_num, dun_type=dun_type)
     mob_line1 = " | ".join([f"**{c} {z}:** {s}" for c, z, s, _ in mob_dirs[:3]])
     mob_line2 = " | ".join([f"**{c} {z}:** {s}" for c, z, s, _ in mob_dirs[3:6]])
     mob_line3 = " | ".join([f"**{c} {z}:** {s}" for c, z, s, _ in mob_dirs[6:]])

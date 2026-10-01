@@ -425,7 +425,8 @@ def calculate_natal_qimen_destiny(pillars: Dict[str, Any]) -> Dict[str, Any]:
         'star': star_display,
         'guardian': f"{deity_char} {deity_en}",
         'structure': f"{dun_type} Dun {ju_num} ({term_name})",
-        'palace_num': destiny_p
+        'palace_num': destiny_p,
+        'dun_type': dun_type
     }
 
 # ==========================================
